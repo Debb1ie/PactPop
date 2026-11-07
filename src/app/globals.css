@@ -1,0 +1,139 @@
+@import "tailwindcss";
+
+/* Dark mode is class-driven (.dark on <html>), initialised before paint from the saved
+   preference or the OS setting — see ThemeScript in layout.tsx. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ───────── PactPop brand tokens ───────── */
+:root {
+  /* brand */
+  --pp-aubergine: #1b1230;
+  --pp-violet: #7656e8;
+  --pp-violet-strong: #5f3fd6;
+  --pp-lavender: #b9a5ff;
+  --pp-lilac: #f1ecff;
+  --pp-ink: #191426;
+  /* semantic */
+  --pp-success: #22a06b;
+  --pp-warning: #e9a23b;
+  --pp-error: #dc5267;
+
+  /* surfaces (light) */
+  --background: #faf8ff;
+  --surface: #ffffff;
+  --surface-2: #f6f2ff;
+  --border: #e7e1f5;
+  --border-strong: #d6cdef;
+  --foreground: var(--pp-ink);
+  --muted: #6b6480;
+  --accent: var(--pp-violet);
+  --accent-fg: #ffffff;
+  --accent-soft: #efe9ff;
+  --ring: #9b84f2;
+  --success-soft: #e3f5ec;
+  --warning-soft: #fdf2e0;
+  --error-soft: #fce8eb;
+  --shadow-color: 260 40% 20%;
+}
+
+.dark {
+  --background: #120c22;
+  --surface: #1b1230;
+  --surface-2: #231940;
+  --border: #31264f;
+  --border-strong: #43366a;
+  --foreground: #f1ecff;
+  --muted: #a69cc4;
+  --accent: #8b70f0;
+  --accent-fg: #ffffff;
+  --accent-soft: #2a1f4d;
+  --ring: #b9a5ff;
+  --success-soft: #12322a;
+  --warning-soft: #3a2a12;
+  --error-soft: #3d1621;
+  --shadow-color: 260 60% 3%;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-soft: var(--accent-soft);
+  --color-ring: var(--ring);
+  --color-aubergine: var(--pp-aubergine);
+  --color-violet: var(--pp-violet);
+  --color-violet-strong: var(--pp-violet-strong);
+  --color-lavender: var(--pp-lavender);
+  --color-lilac: var(--pp-lilac);
+  --color-ink: var(--pp-ink);
+  --color-success: var(--pp-success);
+  --color-warning: var(--pp-warning);
+  --color-error: var(--pp-error);
+  --color-success-soft: var(--success-soft);
+  --color-warning-soft: var(--warning-soft);
+  --color-error-soft: var(--error-soft);
+
+  --font-display: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+
+  --radius-card: 1.125rem;
+  --shadow-card: 0 1px 2px hsl(var(--shadow-color) / 0.06), 0 4px 16px -4px hsl(var(--shadow-color) / 0.08);
+  --shadow-lift: 0 2px 4px hsl(var(--shadow-color) / 0.08), 0 12px 32px -8px hsl(var(--shadow-color) / 0.18);
+}
+
+html {
+  color-scheme: light;
+}
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+/* Financial figures: tabular monospace so columns line up. */
+.money {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+@keyframes pp-shimmer {
+  100% { transform: translateX(100%); }
+}
+@keyframes pp-pop {
+  0% { transform: scale(0.6); opacity: 0; }
+  60% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); }
+}
+@keyframes pp-rise {
+  from { transform: translateY(6px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+.animate-pop { animation: pp-pop 360ms cubic-bezier(.2,.9,.3,1.2) both; }
+.animate-rise { animation: pp-rise 280ms ease-out both; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+}
