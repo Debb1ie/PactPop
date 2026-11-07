@@ -28,19 +28,22 @@ PactPop is under active development. This table is kept honest: anything not mar
 | Light & dark themes, responsive layout with a mobile tab bar, scroll-reactive WebGL grid terrain | ✅ Working |
 | VowGraph 3D view (commitments as glass orbs: milestones as rings, change orders as satellites) and 3D architecture diagram | ✅ Working (live data) |
 | One-click demo workspace with sample commitments, scope change and approval | ✅ Working |
-| Customer request portal, proposals, commitments & timeline, Approval Center | 🚧 Next |
-| Agent orchestrator + Command Center (Anthropic Claude via provider abstraction) | 🚧 Planned |
+| **Agent console** on the dashboard and **Command Center**: live, streamed agent runs with every tool call and TrustGate decision visible | ✅ Working |
+| Intake, Pricing, Proposal, Scope (ScopeWatch), Operations and Finance agents acting on real records through 12 tools | ✅ Working (Claude Opus 5.5 with `AI_API_KEY`; labelled rule-based mode without) |
+| **Approval Center** + inline approvals: approving a change order creates agreement v2 and a change-order milestone | ✅ Working |
+| Agent briefing: next actions found in your records, one click to run | ✅ Working |
+| Customer request portal, proposal acceptance page, commitments pages | 🚧 Next |
 | PayPal Sandbox: Invoicing v2, Orders v2, webhook verification, reconciliation | 🚧 Planned |
 | ScopeWatch, ProofFlow, Evidence Vault, VowGraph, reports, settings | 🚧 Planned |
 
-The full plan is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), and progress is tracked in [docs/DEVLOG.md](docs/DEVLOG.md).
+The full plan is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), the agent system is documented in [docs/AGENTS.md](docs/AGENTS.md), and progress is tracked in [docs/DEVLOG.md](docs/DEVLOG.md).
 
 ### Hackathon requirements: where each one stands
 
 | Requirement | How PactPop meets it | Status |
 |---|---|---|
 | Meaningfully integrate a PayPal technology | Invoicing v2 for deposits, milestones and change orders; Orders v2 checkout; verified webhooks drive the commitment timeline | 🚧 In progress (architecture, schema and money handling done) |
-| Meaningfully incorporate AI | Intake, Scope, Pricing, Proposal, Operations, ProofFlow, PayFlow and Finance agents with permission-checked tool calls | 🚧 In progress (TrustGate policies and pricing engine done) |
+| Meaningfully incorporate AI | Claude-driven orchestrator coordinating specialist agents through permission-checked tools that change real records ([docs/AGENTS.md](docs/AGENTS.md)) | ✅ Agents working; PayFlow / ProofFlow next |
 | Working prototype | One-click demo workspace; setup steps below run on any machine with Node.js | ✅ Runs locally |
 | Documentation | This README plus [docs/](docs/) | ✅ |
 | Public, open-source repo with a license | MIT, see [LICENSE](LICENSE) | ✅ |
@@ -201,7 +204,8 @@ The tests check, among other things, that the demo project prices to **$1,500** 
 
 ## Known limitations
 
-- The agent workflow, the PayPal integration and the customer portal are not implemented yet (see Project status).
+- The PayPal integration (PayFlow Agent), ProofFlow and the customer portal are not implemented yet (see Project status).
+- In rule-based mode (no `AI_API_KEY`) the planner understands a fixed set of intents. Claude handles free-form requests.
 - PGlite is for local development only. Use PostgreSQL in production.
 
 ## Disclaimer

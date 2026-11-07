@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { AlertTriangle, CheckCircle2, Clock, Inbox } from "lucide-react";
+import { AlertTriangle, Inbox } from "lucide-react";
 import { QuickActions } from "@/components/app/quick-actions";
 import { Statement } from "@/components/app/statement";
 import { RevenueChart } from "@/components/app/revenue-chart";
@@ -12,6 +12,12 @@ import { getDb } from "@/server/db/client";
 import { paypalConfigured } from "@/server/env";
 import { commitmentStatusCounts, financeSummary, recentActivity, revenueTrend } from "@/server/services/finance";
 import { vowgraphSummary } from "@/server/services/vowgraph";
+import { buildBriefing } from "@/server/services/briefing";
+import { listApprovals } from "@/server/services/workflow";
+import { aiConfigured, env } from "@/server/env";
+import { AgentConsole } from "@/components/agents/agent-console";
+import { ApprovalCard } from "@/components/agents/approval-card";
+import { BriefingList } from "@/components/agents/briefing-list";
 import { OrbField, type Orb, type OrbTone } from "@/components/fx/orb-field";
 import { statusLabel } from "@/components/ui/status-badge";
 
@@ -25,13 +31,6 @@ function timeAgo(d: Date) {
   return `${Math.floor(s / 86400)}d ago`;
 }
 
-type Insight = { tone: "warning" | "info" | "success"; text: string };
-const INSIGHT_ICON = {
-  warning: { icon: AlertTriangle, bg: "bg-warning-soft !text-warning" },
-  info: { icon: Clock, bg: "bg-accent-soft !text-accent" },
-  success: { icon: CheckCircle2, bg: "bg-success-soft !text-success" },
-};
-
 export default async function DashboardPage() {
   const ctx = await requireAuth();
   const db = await getDb();
@@ -42,6 +41,8 @@ export default async function DashboardPage() {
     recentActivity(db, ctx.business.id),
     vowgraphSummary(db, ctx.business.id),
   ]);
+  const [briefing, pendingApprovals] = await Promise.all([buildBriefing(db, ctx.business.id), listApprovals(db, ctx.business.id)]);
+  const ai = aiConfigured();
   // VowGraph orbs: one per commitment, sized by agreed amount; rings = milestones (lit when paid);
   // satellites = pending change orders.
   const toneFor = (status: string): OrbTone =>
@@ -68,13 +69,6 @@ export default async function DashboardPage() {
   const cur = ctx.business.currency;
   const firstName = ctx.user.name.split(" ")[0];
 
-  // Deterministic insights from real records (AI-written summaries arrive with the Finance Agent).
-  const insights: Insight[] = [];
-  if (summary.pendingApprovals > 0) insights.push({ tone: "warning", text: `${summary.pendingApprovals} action(s) are waiting for your approval.` });
-  if (summary.overdueCount > 0) insights.push({ tone: "warning", text: `${summary.overdueCount} invoice(s) are overdue, totalling ${formatMoney(summary.overdueMinor, cur)}.` });
-  if (summary.outstandingCount > 0) insights.push({ tone: "info", text: `${formatMoney(summary.outstandingMinor, cur)} is invoiced and not yet paid.` });
-  if (summary.receivedCount > 0) insights.push({ tone: "success", text: `${summary.receivedCount} payment(s) confirmed by PayPal so far.` });
-
   return (
     <>
       <PageHeader title={`Welcome back, ${firstName}`} description="Here's where your commitments and payments stand today." />
@@ -88,6 +82,41 @@ export default async function DashboardPage() {
           </p>
         </Notice>
       )}
+
+      <div className="mb-6 grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+        <div className="min-w-0">
+          <AgentConsole
+            mode={ai ? "ai" : "heuristic"}
+            model={ai ? env().AI_MODEL : null}
+            suggestions={[
+              "Give me a briefing on my business",
+              "Analyse the new request from Kitefly Tours",
+              "Draft a proposal for Kitefly Tours",
+              "Northwind asked for a booking system too. Check the scope.",
+              "What's waiting for my approval?",
+            ]}
+          />
+        </div>
+        <div className="min-w-0 space-y-6">
+          <Card>
+            <CardHeader title="Agent briefing" description="Next actions the Operations Agent found in your records" />
+            <div className="pt-2">
+              <BriefingList items={briefing} />
+            </div>
+          </Card>
+          {pendingApprovals.length > 0 && (
+            <section aria-label="Needs your decision" className="space-y-3">
+              <h2 className="text-[0.9375rem] font-semibold">Needs your decision</h2>
+              {pendingApprovals.slice(0, 2).map(({ a, clientName, commitmentTitle }) => (
+                <ApprovalCard
+                  key={a.id}
+                  approval={{ id: a.id, title: a.title, amount: a.amountMinor != null ? formatMoney(a.amountMinor, a.currency ?? cur) : null, reason: a.reasoningSummary, client: clientName, commitment: commitmentTitle }}
+                />
+              ))}
+            </section>
+          )}
+        </div>
+      </div>
 
       <Statement
         title="Statement"
@@ -170,16 +199,6 @@ export default async function DashboardPage() {
             </CardBody>
           </Card>
 
-          <ListGroup header="Insights">
-            {insights.length === 0 ? (
-              <ListRow icon={<CheckCircle2 className="h-4 w-4" />} iconBg="bg-success-soft !text-success" title="All clear" subtitle="Alerts appear as commitments and payments move." />
-            ) : (
-              insights.map((i) => {
-                const { icon: Icon, bg } = INSIGHT_ICON[i.tone];
-                return <ListRow key={i.text} icon={<Icon className="h-4 w-4" />} iconBg={bg} title={<span className="whitespace-normal">{i.text}</span>} />;
-              })
-            )}
-          </ListGroup>
 
 
           {statusCounts.length > 0 && (

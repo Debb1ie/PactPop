@@ -22,13 +22,13 @@ export type NavItem = { href: string; label: string; icon: LucideIcon; group: "w
  */
 export const NAV_ITEMS: NavItem[] = [
   { href: "/app/dashboard", label: "Dashboard", icon: LayoutGrid, group: "work", ready: true },
-  { href: "/app/command", label: "Command Center", icon: Sparkles, group: "work", ready: false },
+  { href: "/app/command", label: "Command Center", icon: Sparkles, group: "work", ready: true },
   { href: "/app/commitments", label: "Commitments", icon: Handshake, group: "work", ready: false },
   { href: "/app/clients", label: "Clients", icon: Users, group: "work", ready: true },
   { href: "/app/proposals", label: "Proposals", icon: FileText, group: "work", ready: false },
   { href: "/app/deliverables", label: "Deliverables", icon: PackageCheck, group: "work", ready: false },
   { href: "/app/payments", label: "Payments", icon: Wallet, group: "money", ready: false },
-  { href: "/app/approvals", label: "Approvals", icon: CheckCheck, group: "money", ready: false },
+  { href: "/app/approvals", label: "Approvals", icon: CheckCheck, group: "money", ready: true },
   { href: "/app/evidence", label: "Evidence Vault", icon: Archive, group: "money", ready: false },
   { href: "/app/reports", label: "Reports", icon: BarChart3, group: "money", ready: false },
   { href: "/app/agents", label: "AI Agents", icon: Bot, group: "system", ready: false },

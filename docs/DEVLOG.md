@@ -74,3 +74,18 @@
 - Marketing copy reworked as documents: ScopeWatch as a redline, ProofFlow as a checklist, TrustGate as a permissions table, and a signature-line call to action.
 - Agent roster aligned with the mission brief: the **PayFlow** Agent and a separate **ProofFlow** Agent (8 roles).
 - Fixed: a Three.js transmission pass ignores transparent meshes, so milestone rings must be opaque.
+
+## 2026-11-07: Agentic dashboard
+
+- **Orchestrator** (`src/server/agents/orchestrator.ts`): runs Claude Opus 5.5 tool use (adaptive thinking, effort medium, cached system prompt, server-side refusal fallback), or a labelled rule-based planner when no key is set. Every tool call is zod-validated, TrustGate-checked against the business's policies with locked floors, recorded in `agent_tool_calls`, and streamed to the browser as NDJSON.
+- **12 tools** (`src/server/agents/tools.ts`) backed by real services (`src/server/services/workflow.ts`): intake analysis, engine-priced quotes and proposals, ScopeWatch change orders, approvals. Tools take units, never prices.
+- **Approvals execute real changes.** Approving a change order writes agreement v2, raises the agreed total, adds a change-order milestone, and records timeline and audit entries. Reject marks the change order rejected. Both are idempotent.
+- **UI**:
+  - Dashboard: "Ask PactPop" console with live agent steps, TrustGate decision chips and inline approval cards.
+  - Agent briefing with one-click Run.
+  - "Needs your decision" panel.
+  - Command Center page with run history and the tool list.
+  - Approval Center with decision history.
+- ScopeWatch reads lists ("a Team page, a Gallery and an FAQ") and doesn't duplicate a pending change order.
+- Default `AI_MODEL` is now `claude-opus-5-5`.
+- Tests: 25 passing, including an end-to-end agent workflow on in-memory Postgres. Verified live in Chrome: $1,500 agreement → ScopeWatch $300 change order → approve → $1,800, with the dashboard updating.

@@ -17,7 +17,7 @@ const schema = z.object({
 
   AI_PROVIDER: z.enum(["anthropic", "heuristic"]).default("anthropic"),
   AI_API_KEY: z.string().optional(),
-  AI_MODEL: z.string().default("claude-sonnet-5-5"),
+  AI_MODEL: z.string().default("claude-opus-5-5"),
 });
 
 export type Env = z.infer<typeof schema>;
