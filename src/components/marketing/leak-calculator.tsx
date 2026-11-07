@@ -13,7 +13,7 @@ function Slider({ label, value, min, max, step, format, onChange }: SliderProps)
   return (
     <div>
       <div className="flex items-baseline justify-between gap-3">
-        <label htmlFor={id} className="text-sm text-lilac/80">
+        <label htmlFor={id} className="text-sm text-white/70">
           {label}
         </label>
         <span className="money text-sm font-semibold text-white">{format(value)}</span>
@@ -26,7 +26,7 @@ function Slider({ label, value, min, max, step, format, onChange }: SliderProps)
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="mt-2 w-full accent-[#b9a5ff]"
+        className="mt-2 w-full accent-[#8b7bff]"
       />
     </div>
   );
@@ -52,15 +52,15 @@ export function LeakCalculator() {
   const multiple = proYear > 0 ? total / proYear : 0;
 
   return (
-    <section id="calculator" className="bg-aubergine py-20 text-lilac">
+    <section id="calculator" className="border-y border-white/5 bg-[#08080d] py-20 text-white/80 sm:py-28">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-[1fr_1.05fr] lg:items-center">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.14em] text-lavender">Revenue leak calculator</p>
-          <h2 className="mt-3 text-3xl font-semibold text-white sm:text-4xl">How much work are you doing for free?</h2>
-          <p className="mt-4 text-lg text-lilac/75">
+          <p className="text-[0.9375rem] font-semibold text-lavender">Revenue leak calculator</p>
+          <h2 className="mt-2 text-[2.25rem] font-semibold leading-tight text-white sm:text-[3rem]">How much work are you doing for free?</h2>
+          <p className="mt-4 text-lg text-white/60">
             Small unbilled extras and hours spent chasing invoices add up. Move the sliders to match your business.
           </p>
-          <div className="mt-8 space-y-6 rounded-3xl border border-white/10 bg-white/[0.04] p-6">
+          <div className="mt-8 space-y-6 rounded-[1.75rem] border border-white/[0.08] bg-white/[0.035] p-6">
             <Slider label="Client projects per month" value={projects} min={1} max={20} step={1} format={String} onChange={setProjects} />
             <Slider label="Average project value" value={value} min={250} max={20000} step={250} format={usd} onChange={setValue} />
             <Slider label="Extra work you don't bill for" value={creep} min={0} max={40} step={1} format={(v) => `${v}%`} onChange={setCreep} />
@@ -69,7 +69,7 @@ export function LeakCalculator() {
           </div>
         </div>
 
-        <div className="rounded-[2rem] bg-gradient-to-br from-violet to-[#4b2fb8] p-8 text-white shadow-[0_30px_80px_-30px_rgb(118_86_232/0.8)] sm:p-10">
+        <div className="rounded-[2rem] bg-gradient-to-br from-[#7b6dff] via-[#5b45e8] to-[#3a1fb8] p-8 text-white shadow-[0_30px_80px_-30px_rgb(108_92_255/0.9)] ring-1 ring-white/15 sm:p-10">
           <p className="text-sm text-white/75">Estimated revenue leaking each year</p>
           <p className="money mt-2 text-5xl font-semibold sm:text-6xl" aria-live="polite">
             {usd(total)}
@@ -94,7 +94,7 @@ export function LeakCalculator() {
               itself.
             </p>
           )}
-          <ButtonLink href="/register?plan=pro" size="lg" className="mt-8 w-full bg-white text-violet-strong shadow-none hover:bg-lilac">
+          <ButtonLink href="/register?plan=pro" size="lg" variant="white" className="mt-8 w-full">
             Stop the leak. Start free <ArrowRight className="h-4 w-4" />
           </ButtonLink>
           <p className="mt-3 text-center text-xs text-white/60">Estimate based only on your inputs. Not a guarantee of results.</p>

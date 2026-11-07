@@ -1,29 +1,22 @@
 import Link from "next/link";
-import { Logo, LogoMark } from "@/components/brand/logo";
+import { redirect } from "next/navigation";
+import { ChevronLeft } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme";
+import { getAuthContext } from "@/server/auth/session";
 
-export default function AuthLayout({ children }: LayoutProps<"/">) {
+export default async function AuthLayout({ children }: LayoutProps<"/">) {
+  // Already signed in → straight to the app (fixes login/register showing for active sessions).
+  if (await getAuthContext()) redirect("/app/dashboard");
   return (
-    <div className="grid min-h-screen lg:grid-cols-[1fr_1.1fr]">
-      <aside className="relative hidden overflow-hidden bg-aubergine p-12 text-lilac lg:flex lg:flex-col">
-        <Link href="/" aria-label="PactPop home">
-          <Logo tone="light" />
+    <div className="flex min-h-screen flex-col bg-background">
+      <header className="flex h-14 items-center justify-between px-4 sm:px-6">
+        <Link href="/" className="-ml-1 inline-flex items-center text-[1.0625rem] text-accent hover:opacity-70">
+          <ChevronLeft className="h-5 w-5" /> Home
         </Link>
-        <div className="my-auto max-w-md">
-          <LogoMark variant="mark" className="h-16 w-16 text-white" />
-          <p className="mt-8 font-display text-3xl font-semibold leading-tight text-white">Make promises. Make progress. Get paid.</p>
-          <p className="mt-4 text-lilac/70">Every request, agreement, deliverable and PayPal payment, connected on one record.</p>
-        </div>
-        <div className="pointer-events-none absolute -bottom-40 -right-40 h-[28rem] w-[28rem] rounded-full bg-violet/30 blur-3xl" />
-      </aside>
-      <main className="flex flex-col px-4 py-8 sm:px-10">
-        <div className="flex items-center justify-between">
-          <Link href="/" className="lg:invisible" aria-label="PactPop home">
-            <Logo />
-          </Link>
-          <ThemeToggle />
-        </div>
-        <div className="mx-auto my-auto w-full max-w-md py-10">{children}</div>
+        <ThemeToggle />
+      </header>
+      <main className="flex flex-1 items-start justify-center px-4 pb-16 pt-4 sm:items-center sm:pt-0">
+        <div className="w-full max-w-[26rem]">{children}</div>
       </main>
     </div>
   );

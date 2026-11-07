@@ -5,6 +5,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   serverExternalPackages: ["@electric-sql/pglite", "pg", "bcryptjs"],
   poweredByHeader: false,
+  // Dev-only Next.js badge overlaps the top-bar user menu; hide it.
+  devIndicators: false,
   turbopack: {
     rules: {
       "*.css": {

@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ChevronLeft, Handshake, Wallet } from "lucide-react";
 import { z } from "zod";
-import { Card, CardBody, CardHeader, DemoBadge, EmptyState, PageHeader, Stat } from "@/components/ui/primitives";
+import { Card, CardBody, CardHeader, DemoBadge, EmptyState, ListGroup, ListRow, PageHeader, Stat } from "@/components/ui/primitives";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { formatMoney } from "@/lib/money";
 import { requireAuth } from "@/server/auth/session";
@@ -26,6 +28,9 @@ export default async function ClientPage({ params }: PageProps<"/app/clients/[id
 
   return (
     <>
+      <Link href="/app/clients" className="-ml-1 mb-2 inline-flex items-center text-[1.0625rem] text-accent hover:opacity-70">
+        <ChevronLeft className="h-5 w-5" /> Clients
+      </Link>
       <PageHeader
         title={client.name}
         description={
@@ -34,62 +39,68 @@ export default async function ClientPage({ params }: PageProps<"/app/clients/[id
           </span>
         }
       />
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Stat label="Paid to date" value={formatMoney(data.paidMinor, cur)} sub="Confirmed by PayPal" />
-        <Stat label="Outstanding" value={formatMoney(data.outstandingMinor, cur)} sub={`${data.invoices.length} invoice(s) in total`} />
-        <Stat label="Commitments" value={data.commitments.length} sub={`${data.requests.length} request(s) received`} />
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+        <Stat label="Paid" value={formatMoney(data.paidMinor, cur)} sub="Confirmed by PayPal" icon={<Wallet className="h-4 w-4" />} iconBg="bg-success" />
+        <Stat label="Outstanding" value={formatMoney(data.outstandingMinor, cur)} sub={`${data.invoices.length} invoice(s)`} icon={<Wallet className="h-4 w-4" />} iconBg="bg-warning" />
+        <div className="col-span-2 sm:col-span-1">
+          <Stat label="Commitments" value={data.commitments.length} sub={`${data.requests.length} request(s) received`} icon={<Handshake className="h-4 w-4" />} />
+        </div>
       </div>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[1.4fr_1fr]">
-        <div className="space-y-6">
-          <Card>
-            <CardHeader title="Commitments" description="Agreements with this client" />
-            {data.commitments.length === 0 ? (
-              <EmptyState title="No commitments yet" description="A commitment is created when this client accepts a proposal." />
-            ) : (
-              <ul className="divide-y divide-border">
-                {data.commitments.map((c) => (
-                  <li key={c.id} className="flex items-center justify-between gap-3 px-5 py-3.5">
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium">{c.title}</p>
-                      <p className="text-xs text-muted">Started {fmtDate(c.startDate ?? c.createdAt)}</p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="money text-sm">{formatMoney(c.agreedTotalMinor, c.currency)}</span>
+      <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
+        <div className="min-w-0 space-y-6">
+          {data.commitments.length === 0 ? (
+            <ListGroup header="Commitments">
+              <li>
+                <EmptyState title="No commitments yet" description="A commitment is created when this client accepts a proposal." />
+              </li>
+            </ListGroup>
+          ) : (
+            <ListGroup header="Commitments">
+              {data.commitments.map((c) => (
+                <ListRow
+                  key={c.id}
+                  title={c.title}
+                  subtitle={`Started ${fmtDate(c.startDate ?? c.createdAt)}`}
+                  detail={
+                    <span className="flex flex-col items-end gap-1">
+                      <span className="money font-semibold text-foreground">{formatMoney(c.agreedTotalMinor, c.currency)}</span>
                       <StatusBadge status={c.status} />
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Card>
-          <Card>
-            <CardHeader title="Payment history" description="Only payments reported by PayPal" />
+                    </span>
+                  }
+                />
+              ))}
+            </ListGroup>
+          )}
+
+          <ListGroup header="Payment history" footer="Only payments reported by PayPal are listed.">
             {data.payments.length === 0 ? (
-              <EmptyState title="No payments yet" />
+              <ListRow title={<span className="text-muted">No payments yet</span>} />
             ) : (
-              <ul className="divide-y divide-border">
-                {data.payments.map(({ payment: p, commitmentTitle }) => (
-                  <li key={p.id} className="flex items-center justify-between gap-3 px-5 py-3.5">
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium">{commitmentTitle}</p>
-                      <p className="money truncate text-xs text-muted">
-                        {p.paypalCaptureId ?? p.paypalOrderId ?? p.paypalInvoicePaymentId ?? "—"}
-                        {p.isSandbox ? " · sandbox" : ""}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="money text-sm">{formatMoney(p.amountMinor, p.currency)}</span>
+              data.payments.map(({ payment: p, commitmentTitle }) => (
+                <ListRow
+                  key={p.id}
+                  title={commitmentTitle}
+                  subtitle={
+                    <span className="font-mono text-xs">
+                      {p.paypalCaptureId ?? p.paypalOrderId ?? p.paypalInvoicePaymentId ?? "—"}
+                      {p.isSandbox ? " · sandbox" : ""}
+                    </span>
+                  }
+                  detail={
+                    <span className="flex flex-col items-end gap-1">
+                      <span className="money font-semibold text-foreground">{formatMoney(p.amountMinor, p.currency)}</span>
                       <StatusBadge status={p.status === "completed" ? "paid" : p.status} />
-                    </div>
-                  </li>
-                ))}
-              </ul>
+                    </span>
+                  }
+                />
+              ))
             )}
-          </Card>
+          </ListGroup>
         </div>
-        <Card>
-          <CardHeader title="Profile & notes" />
+
+        <Card className="self-start">
+          <CardHeader title="Profile & notes" description="Notes are only visible to your team." />
           <CardBody>
             <ClientForm action={updateClientAction.bind(null, client.id)} defaults={client} submitLabel="Save changes" />
           </CardBody>

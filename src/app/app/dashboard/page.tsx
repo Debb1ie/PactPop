@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { AlertTriangle, CheckCheck, Handshake, Inbox, Wallet } from "lucide-react";
+import { AlertTriangle, CheckCheck, CheckCircle2, CircleDollarSign, Clock, Handshake, Inbox, Link2, Wallet } from "lucide-react";
+import { QuickActions } from "@/components/app/quick-actions";
 import { RevenueChart } from "@/components/app/revenue-chart";
 import { ButtonLink } from "@/components/ui/button";
-import { Card, CardBody, CardHeader, EmptyState, Notice, PageHeader, Stat } from "@/components/ui/primitives";
+import { Card, CardBody, CardHeader, EmptyState, ListGroup, ListRow, Notice, PageHeader, Stat } from "@/components/ui/primitives";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { formatMoney } from "@/lib/money";
+import { PLANS } from "@/lib/plans";
 import { requireAuth } from "@/server/auth/session";
 import { getDb } from "@/server/db/client";
 import { paypalConfigured } from "@/server/env";
@@ -21,6 +22,13 @@ function timeAgo(d: Date) {
   return `${Math.floor(s / 86400)}d ago`;
 }
 
+type Insight = { tone: "warning" | "info" | "success"; text: string };
+const INSIGHT_ICON = {
+  warning: { icon: AlertTriangle, bg: "bg-warning" },
+  info: { icon: Clock, bg: "bg-accent" },
+  success: { icon: CheckCircle2, bg: "bg-success" },
+};
+
 export default async function DashboardPage() {
   const ctx = await requireAuth();
   const db = await getDb();
@@ -32,9 +40,10 @@ export default async function DashboardPage() {
   ]);
   const cur = ctx.business.currency;
   const firstName = ctx.user.name.split(" ")[0];
+  const onFreePlan = (PLANS.find((p) => p.id === ctx.business.plan) ?? PLANS[0]).monthlyMinor === 0;
 
   // Deterministic insights from real records (AI-written summaries arrive with the Finance Agent).
-  const insights: { tone: "warning" | "info" | "success"; text: string; href?: string }[] = [];
+  const insights: Insight[] = [];
   if (summary.pendingApprovals > 0) insights.push({ tone: "warning", text: `${summary.pendingApprovals} action(s) are waiting for your approval.` });
   if (summary.overdueCount > 0) insights.push({ tone: "warning", text: `${summary.overdueCount} invoice(s) are overdue, totalling ${formatMoney(summary.overdueMinor, cur)}.` });
   if (summary.outstandingCount > 0) insights.push({ tone: "info", text: `${formatMoney(summary.outstandingMinor, cur)} is invoiced and not yet paid.` });
@@ -42,104 +51,92 @@ export default async function DashboardPage() {
 
   return (
     <>
-      <PageHeader
-        title={`Hi ${firstName} 👋`}
-        description="Here's where your commitments and payments stand."
-        actions={
-          <ButtonLink href="/app/clients/new" variant="outline">
-            Add client
-          </ButtonLink>
-        }
-      />
+      <PageHeader title={`Welcome back, ${firstName}`} description="Here's where your commitments and payments stand today." />
 
       {!paypalConfigured() && (
-        <Notice tone="warning" className="mb-6">
-          <p className="font-medium">PayPal Sandbox isn&apos;t connected yet</p>
-          <p className="mt-0.5 text-muted">
-            Add <code className="money text-xs">PAYPAL_CLIENT_ID</code> and <code className="money text-xs">PAYPAL_CLIENT_SECRET</code> to{" "}
-            <code className="money text-xs">.env</code> to issue sandbox invoices. Payment figures below only include payments PayPal has confirmed.
+        <Notice tone="warning" className="mb-6" icon={<AlertTriangle className="h-5 w-5 text-warning" />}>
+          <p className="font-semibold">PayPal Sandbox isn&apos;t connected yet</p>
+          <p className="mt-0.5 text-[0.8125rem] text-muted">
+            Add <code className="font-mono text-xs">PAYPAL_CLIENT_ID</code> and <code className="font-mono text-xs">PAYPAL_CLIENT_SECRET</code> to{" "}
+            <code className="font-mono text-xs">.env</code> to send sandbox invoices. Figures below only count payments PayPal has confirmed.
           </p>
         </Notice>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Stat label="Payments received" value={formatMoney(summary.receivedMinor, cur)} sub={`${summary.receivedCount} confirmed by PayPal`} icon={<Wallet className="h-5 w-5" />} />
-        <Stat label="Outstanding" value={formatMoney(summary.outstandingMinor, cur)} sub={`${summary.outstandingCount} open invoice(s)`} icon={<Inbox className="h-5 w-5" />} />
-        <Stat label="Active commitments" value={summary.activeCommitments} sub={`${formatMoney(summary.agreedMinor, cur)} under agreement`} icon={<Handshake className="h-5 w-5" />} />
-        <Stat label="Pending approvals" value={summary.pendingApprovals} sub="Actions waiting for you" icon={<CheckCheck className="h-5 w-5" />} />
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
+        <Stat tone="violet" label="Payments received" value={formatMoney(summary.receivedMinor, cur)} sub={`${summary.receivedCount} confirmed by PayPal`} icon={<Wallet className="h-4 w-4" />} />
+        <Stat tone="peach" label="Outstanding" value={formatMoney(summary.outstandingMinor, cur)} sub={`${summary.outstandingCount} open invoice(s)`} icon={<CircleDollarSign className="h-4 w-4" />} />
+        <Stat tone="pink" label="Under agreement" value={formatMoney(summary.agreedMinor, cur)} sub={`${summary.activeCommitments} active commitment(s)`} icon={<Handshake className="h-4 w-4" />} />
+        <Stat tone="ice" label="Pending approvals" value={summary.pendingApprovals} sub="Waiting for your decision" icon={<CheckCheck className="h-4 w-4" />} />
       </div>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[1.6fr_1fr]">
-        <Card>
-          <CardHeader title="Payments received" description="PayPal-confirmed payments per month" />
-          <CardBody>
-            <RevenueChart data={trend} currency={cur} />
-          </CardBody>
-        </Card>
-        <Card>
-          <CardHeader title="Insights" description="Calculated from your records" />
-          <CardBody className="space-y-3">
+      <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)]">
+        <div className="min-w-0 space-y-6">
+          {activity.length === 0 ? (
+            <Card>
+              <CardHeader title="Recent activity" />
+              <EmptyState
+                icon={<Inbox className="h-6 w-6" />}
+                title="No activity yet"
+                description="Every proposal, approval and PayPal payment will show up here."
+                action={<ButtonLink href="/app/clients/new">Add your first client</ButtonLink>}
+              />
+            </Card>
+          ) : (
+            <ListGroup header="Recent activity">
+              {activity.map(({ event, commitmentTitle, clientName }) => (
+                <ListRow
+                  key={event.id}
+                  title={event.title}
+                  subtitle={`${clientName} · ${commitmentTitle} · ${timeAgo(event.createdAt)}`}
+                  detail={event.amountMinor != null ? <span className="money font-semibold text-foreground">{formatMoney(event.amountMinor, cur)}</span> : undefined}
+                />
+              ))}
+            </ListGroup>
+          )}
+
+          <Card>
+            <CardHeader title="Payments received" description="PayPal-confirmed, last 6 months" />
+            <CardBody>
+              <RevenueChart data={trend} currency={cur} />
+            </CardBody>
+          </Card>
+        </div>
+
+        <div className="min-w-0 space-y-6">
+          <Card>
+            <CardHeader title="Quick actions" />
+            <CardBody>
+              <QuickActions showUpgrade={onFreePlan} />
+            </CardBody>
+          </Card>
+
+          <ListGroup header="Insights">
             {insights.length === 0 ? (
-              <p className="text-sm text-muted">No alerts. New insights appear here as commitments and payments move.</p>
+              <ListRow icon={<CheckCircle2 className="h-4 w-4" />} iconBg="bg-success" title="All clear" subtitle="Alerts appear as commitments and payments move." />
             ) : (
-              insights.map((i) => (
-                <div key={i.text} className="flex gap-3 text-sm">
-                  <AlertTriangle className={i.tone === "warning" ? "h-4 w-4 shrink-0 text-warning" : i.tone === "success" ? "h-4 w-4 shrink-0 text-success" : "h-4 w-4 shrink-0 text-accent"} />
-                  <span>{i.text}</span>
-                </div>
-              ))
+              insights.map((i) => {
+                const { icon: Icon, bg } = INSIGHT_ICON[i.tone];
+                return <ListRow key={i.text} icon={<Icon className="h-4 w-4" />} iconBg={bg} title={<span className="whitespace-normal">{i.text}</span>} />;
+              })
             )}
-            {statusCounts.length > 0 && (
-              <div className="border-t border-border pt-4">
-                <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted">Commitments by status</p>
-                <div className="flex flex-wrap gap-2">
-                  {statusCounts.map((s) => (
-                    <span key={s.status} className="inline-flex items-center gap-1.5">
-                      <StatusBadge status={s.status} />
-                      <span className="money text-xs text-muted">{s.n}</span>
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-          </CardBody>
-        </Card>
-      </div>
+          </ListGroup>
 
-      <Card className="mt-6">
-        <CardHeader title="Recent activity" description="Across all commitments" />
-        {activity.length === 0 ? (
-          <EmptyState
-            icon={<Inbox className="h-6 w-6" />}
-            title="No activity yet"
-            description={`Share your request link (/request/${ctx.business.slug}) with a client, or add a client to get started.`}
-            action={<ButtonLink href="/app/clients/new">Add your first client</ButtonLink>}
-          />
-        ) : (
-          <ul className="divide-y divide-border">
-            {activity.map(({ event, commitmentTitle, clientName }) => (
-              <li key={event.id} className="flex items-start gap-3 px-5 py-3.5">
-                <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-accent" aria-hidden />
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium">{event.title}</p>
-                  <p className="truncate text-xs text-muted">
-                    {clientName} · {commitmentTitle} · {event.actorLabel ?? event.actorType}
-                  </p>
-                </div>
-                <div className="text-right">
-                  {event.amountMinor != null && <p className="money text-sm">{formatMoney(event.amountMinor, cur)}</p>}
-                  <p className="text-xs text-muted">{timeAgo(event.createdAt)}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Card>
-      <p className="mt-4 text-xs text-muted">
-        Records tagged <span className="font-semibold text-warning">DEMO</span> are seeded sample data. Nothing on this page is presented as PayPal data unless PayPal confirmed it.{" "}
-        <Link href="/app/clients" className="text-accent hover:underline">
-          View clients
-        </Link>
+          <ListGroup header="Your request link" footer="Clients will use this link to send project requests for the Intake Agent to analyse.">
+            <ListRow icon={<Link2 className="h-4 w-4" />} iconBg="bg-[#3b82f6]" title={`/request/${ctx.business.slug}`} subtitle="Client request portal" />
+          </ListGroup>
+
+          {statusCounts.length > 0 && (
+            <ListGroup header="Commitments by status">
+              {statusCounts.map((s) => (
+                <ListRow key={s.status} title={<StatusBadge status={s.status} />} detail={<span className="money">{s.n}</span>} />
+              ))}
+            </ListGroup>
+          )}
+        </div>
+      </div>
+      <p className="mt-6 text-[0.8125rem] text-muted">
+        Records tagged <span className="font-semibold text-warning">DEMO</span> are seeded sample data. Payment figures only come from PayPal.
       </p>
     </>
   );

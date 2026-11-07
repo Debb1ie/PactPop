@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Check, Minus, Sparkles } from "lucide-react";
 import { ButtonLink } from "@/components/ui/button";
+import { Segmented } from "@/components/ui/segmented";
 import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/money";
 import { AI_ACTION_PACK, annualSavingsMinor, PLAN_MATRIX, PLANS } from "@/lib/plans";
@@ -16,23 +17,16 @@ export function PricingPlans({ showMatrix = false }: { showMatrix?: boolean }) {
   return (
     <div>
       <div className="flex justify-center">
-        <div role="radiogroup" aria-label="Billing period" className="inline-flex rounded-full border border-border bg-surface p-1 text-sm">
-          {[
-            { v: false, l: "Monthly" },
-            { v: true, l: "Annual" },
-          ].map((o) => (
-            <button
-              key={o.l}
-              role="radio"
-              aria-checked={annual === o.v}
-              onClick={() => setAnnual(o.v)}
-              className={cn("rounded-full px-4 py-1.5 font-medium transition-colors", annual === o.v ? "bg-accent text-white" : "text-muted hover:text-foreground")}
-            >
-              {o.l}
-              {o.v && <span className={cn("ml-1.5 text-xs", annual ? "text-white/85" : "text-success")}>2 months free</span>}
-            </button>
-          ))}
-        </div>
+        <Segmented
+          label="Billing period"
+          size="lg"
+          value={annual}
+          onChange={setAnnual}
+          options={[
+            { value: false, label: "Monthly" },
+            { value: true, label: <span>Annual <span className="text-xs font-semibold text-success">2 months free</span></span> },
+          ]}
+        />
       </div>
 
       <div className="mt-10 grid gap-5 lg:grid-cols-3">
@@ -42,12 +36,12 @@ export function PricingPlans({ showMatrix = false }: { showMatrix?: boolean }) {
             <div
               key={p.id}
               className={cn(
-                "relative flex flex-col rounded-3xl border bg-surface p-7",
-                p.featured ? "border-accent shadow-[0_24px_60px_-24px_rgb(118_86_232/0.55)] ring-1 ring-accent lg:-translate-y-2" : "border-border",
+                "glass relative flex flex-col rounded-[1.75rem] border p-7",
+                p.featured ? "border-accent/60 shadow-[0_30px_80px_-30px_rgb(108_92_255/0.8)] ring-1 ring-accent/50 lg:-translate-y-2" : "border-border",
               )}
             >
               {p.featured && (
-                <span className="absolute -top-3 left-7 inline-flex items-center gap-1 rounded-full bg-accent px-3 py-1 text-xs font-semibold text-white">
+                <span className="absolute -top-3 left-7 inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-[#7d70ff] to-[#5a4af2] px-3 py-1 text-xs font-semibold text-white shadow-[0_6px_16px_-6px_rgb(108_92_255/0.8)]">
                   <Sparkles className="h-3.5 w-3.5" /> Most popular
                 </span>
               )}
@@ -79,7 +73,7 @@ export function PricingPlans({ showMatrix = false }: { showMatrix?: boolean }) {
         })}
       </div>
 
-      <div className="mt-6 flex flex-col items-center justify-between gap-3 rounded-2xl border border-dashed border-border-strong bg-surface/60 px-6 py-4 text-sm sm:flex-row">
+      <div className="glass mt-6 flex flex-col items-center justify-between gap-3 rounded-2xl border border-border px-6 py-4 text-sm sm:flex-row">
         <p>
           <span className="font-semibold">Need more AI?</span> <span className="text-muted">Add {AI_ACTION_PACK.actions.toLocaleString()} agent actions to any plan.</span>
         </p>
@@ -104,7 +98,7 @@ function PlanMatrix() {
   return (
     <div className="mt-16">
       <h3 className="text-center text-2xl font-semibold">Compare plans</h3>
-      <div className="mt-8 overflow-x-auto rounded-2xl border border-border bg-surface">
+      <div className="glass mt-8 overflow-x-auto rounded-[1.5rem] border border-border">
         <table className="w-full min-w-[620px] text-left text-sm">
           <thead>
             <tr className="border-b border-border">
@@ -119,7 +113,7 @@ function PlanMatrix() {
           {PLAN_MATRIX.map((g) => (
             <tbody key={g.group}>
               <tr>
-                <td colSpan={4} className="bg-surface-2/70 px-5 py-2 text-xs font-semibold uppercase tracking-wide text-muted">
+                <td colSpan={4} className="bg-fill px-5 py-2 text-xs font-semibold uppercase tracking-wide text-muted">
                   {g.group}
                 </td>
               </tr>

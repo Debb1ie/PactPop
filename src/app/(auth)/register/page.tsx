@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Check } from "lucide-react";
+import { LogoMark } from "@/components/brand/logo";
 import { formatMoney } from "@/lib/money";
 import { PLANS } from "@/lib/plans";
 import { RegisterForm } from "../auth-forms";
@@ -13,37 +14,39 @@ export default async function RegisterPage({ searchParams }: PageProps<"/registe
   const paid = plan.monthlyMinor > 0;
   return (
     <>
-      <h1 className="text-3xl font-semibold">Create your workspace</h1>
-      <p className="mt-2 text-sm text-muted">Set up your business. You&apos;ll get a client request link straight away.</p>
+      <div className="text-center">
+        <LogoMark className="mx-auto h-[4.5rem] w-[4.5rem] drop-shadow-[0_12px_24px_rgb(118_86_232/0.35)]" />
+        <h1 className="mt-5 text-[1.75rem] font-bold">Create your workspace</h1>
+        <p className="mt-1 text-[0.9375rem] text-muted">You&apos;ll get a client request link straight away.</p>
+      </div>
 
-      <div className="mt-6 rounded-2xl border border-accent/30 bg-accent-soft/60 p-4">
+      <div className="mt-6 rounded-2xl bg-surface p-4 shadow-[var(--shadow-card)] dark:shadow-none">
         <div className="flex items-center justify-between gap-3">
-          <p className="font-display font-semibold">
-            {plan.name} {paid ? "· 14-day free trial" : "· free forever"}
+          <p className="font-semibold">
+            {plan.name} <span className="font-normal text-muted">{paid ? "· 14-day free trial" : "· free forever"}</span>
           </p>
-          {paid && <span className="money text-sm text-muted">then {formatMoney(plan.annualMonthlyMinor).replace(/\.00$/, "")}/mo yearly</span>}
+          <Link href="/pricing" className="text-[0.8125rem] font-semibold text-accent hover:opacity-70">
+            Change
+          </Link>
         </div>
-        <ul className="mt-2 grid gap-1 text-sm text-muted sm:grid-cols-2">
+        <ul className="mt-2 grid gap-1 text-[0.8125rem] text-muted sm:grid-cols-2">
           {plan.highlights.slice(0, 4).map((h) => (
             <li key={h} className="flex gap-1.5">
               <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" /> {h}
             </li>
           ))}
         </ul>
-        <p className="mt-3 text-xs text-muted">
-          No card required.{" "}
-          <Link href="/pricing" className="text-accent hover:underline">
-            Change plan
-          </Link>
+        <p className="mt-2 text-xs text-muted">
+          No card required.{paid && ` Then ${formatMoney(plan.annualMonthlyMinor).replace(/\.00$/, "")}/mo billed yearly.`}
         </p>
       </div>
 
       <div className="mt-6">
         <RegisterForm plan={plan.id} />
       </div>
-      <p className="mt-6 text-center text-sm text-muted">
+      <p className="mt-6 text-center text-[0.9375rem] text-muted">
         Already have an account?{" "}
-        <Link href="/login" className="font-medium text-accent hover:underline">
+        <Link href="/login" className="font-semibold text-accent hover:opacity-70">
           Log in
         </Link>
       </p>

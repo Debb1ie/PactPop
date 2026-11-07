@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useRef, type ReactNode } from "react";
-import { Button } from "./button";
+import { Spinner } from "./button";
+import { cn } from "@/lib/cn";
 
-/** Accessible confirmation dialog built on the native <dialog> element (focus trap + Esc for free). */
+/** iOS UIAlertController-style confirmation, on the native <dialog> (focus trap + Esc). */
 export function ConfirmDialog({
   open,
   title,
@@ -37,19 +38,28 @@ export function ConfirmDialog({
         e.preventDefault();
         onCancel();
       }}
-      className="m-auto w-[min(92vw,28rem)] rounded-2xl border border-border bg-surface p-0 text-foreground shadow-[var(--shadow-lift)] backdrop:bg-aubergine/50 backdrop:backdrop-blur-sm"
+      className="material m-auto w-[min(86vw,17.5rem)] overflow-hidden rounded-[0.9rem] p-0 text-center text-foreground shadow-[var(--shadow-lift)]"
     >
-      <div className="p-6">
-        <h2 className="text-lg font-semibold">{title}</h2>
-        {children && <div className="mt-2 text-sm text-muted">{children}</div>}
-        <div className="mt-6 flex justify-end gap-2">
-          <Button variant="ghost" onClick={onCancel} disabled={loading}>
-            Cancel
-          </Button>
-          <Button variant={tone} onClick={onConfirm} loading={loading} autoFocus>
-            {confirmLabel}
-          </Button>
-        </div>
+      <div className="px-4 pb-4 pt-5">
+        <h2 className="text-[1.0625rem] font-semibold">{title}</h2>
+        {children && <div className="mt-1 text-[0.8125rem] leading-snug text-foreground/80">{children}</div>}
+      </div>
+      <div className="hairline-t grid grid-cols-2">
+        <button onClick={onCancel} disabled={loading} className="h-11 text-[1.0625rem] text-accent hover:bg-fill disabled:opacity-40">
+          Cancel
+        </button>
+        <button
+          onClick={onConfirm}
+          disabled={loading}
+          autoFocus
+          className={cn(
+            "flex h-11 items-center justify-center gap-2 border-l-[0.5px] border-border-strong text-[1.0625rem] font-semibold hover:bg-fill disabled:opacity-60",
+            tone === "danger" ? "text-error" : tone === "success" ? "text-success" : "text-accent",
+          )}
+        >
+          {loading && <Spinner />}
+          {confirmLabel}
+        </button>
       </div>
     </dialog>
   );

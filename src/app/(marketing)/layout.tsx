@@ -12,14 +12,14 @@ const NAV = [
 export default function MarketingLayout({ children }: LayoutProps<"/">) {
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-40 border-b border-border/70 bg-background/80 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-4 sm:px-6">
+      <header className="sticky top-0 z-40 px-3 pt-3 sm:px-6">
+        <div className="glass mx-auto flex h-14 max-w-6xl items-center gap-6 rounded-2xl border border-border px-3 shadow-[var(--shadow-card)] sm:px-4">
           <Link href="/" aria-label="PactPop home">
             <Logo />
           </Link>
           <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
             {NAV.map((n) => (
-              <Link key={n.href} href={n.href} className="rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground">
+              <Link key={n.href} href={n.href} className="rounded-xl px-3 py-2 text-sm text-muted transition-colors hover:bg-fill hover:text-foreground">
                 {n.label}
               </Link>
             ))}
@@ -34,19 +34,19 @@ export default function MarketingLayout({ children }: LayoutProps<"/">) {
             </ButtonLink>
           </div>
         </div>
-        <nav className="flex gap-1 overflow-x-auto px-4 pb-2 md:hidden" aria-label="Main mobile">
+        <nav className="mx-auto mt-2 flex max-w-6xl gap-1 overflow-x-auto md:hidden" aria-label="Main mobile">
           {NAV.map((n) => (
-            <Link key={n.href} href={n.href} className="shrink-0 rounded-lg px-3 py-1.5 text-sm text-muted hover:bg-surface-2">
+            <Link key={n.href} href={n.href} className="glass shrink-0 rounded-xl border border-border px-3 py-1.5 text-sm text-muted hover:bg-fill">
               {n.label}
             </Link>
           ))}
-          <Link href="/login" className="shrink-0 rounded-lg px-3 py-1.5 text-sm text-muted hover:bg-surface-2 sm:hidden">
+          <Link href="/login" className="glass shrink-0 rounded-xl border border-border px-3 py-1.5 text-sm text-muted hover:bg-fill sm:hidden">
             Log in
           </Link>
         </nav>
       </header>
       <main className="flex-1">{children}</main>
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/90 p-3 backdrop-blur-xl md:hidden">
+      <div className="glass fixed inset-x-0 bottom-0 z-40 border-t border-border p-3 md:hidden">
         <ButtonLink href="/register" className="w-full" size="lg">
           Get Started free
         </ButtonLink>

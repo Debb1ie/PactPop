@@ -28,3 +28,19 @@
 - `docs/BUSINESS_MODEL.md`: revenue streams, conversion design, unit-economics assumptions, metrics.
 
 **Tests:** 15 unit tests pass (new plan invariants). Lint and typecheck clean. Production build passes. A Chrome end-to-end check covered pricing → Pro trial signup → dashboard with trial badge. Browser console clean on `/`, `/pricing` and `/register`.
+
+## 2026-11-07 — Bug-fix pass + dark glass redesign
+
+**Bugs fixed (found by a Playwright audit in Chrome plus screenshot review)**
+- The logo icon disappeared on mobile and the auth pages because every copy shared one SVG gradient ID and the first copy was inside a hidden sidebar. IDs are now unique per instance (`useId`).
+- The clients table hid its Paid and Outstanding columns on phones. It's now a responsive list.
+- The empty revenue chart showed "$0" on every axis tick. It now shows an empty state.
+- Logged-in users could still open `/login` and `/register`. They're now redirected to the dashboard.
+- The mobile dashboard overflowed sideways by 34px (grid tracks without `minmax(0, …)`).
+- Every insight showed a warning icon. Icons now match the tone.
+- The dev-only Next.js badge overlapped the sidebar avatar and user menu, so it's disabled.
+- The Add client page referred to a request portal that doesn't exist yet. The text is fixed.
+
+**Redesign** (matching the reference the owner supplied): near-black canvas with a blue-violet ambient glow, translucent glass panels, pastel gradient KPI cards with a wave motif, pill sidebar with a white active item, a top bar with working client search, a quick-add button and a user menu, Quick Actions tiles, a purple "Upgrade to Pro" card, a mobile tab bar and account sheet, and segmented controls. Dark is the default; light mode keeps the same structure. The landing hero now shows a dashboard preview with floating cards.
+
+**Checks:** 15 unit tests pass. Lint and typecheck clean. Production build passes. The Playwright audit (desktop and mobile, light and dark, logged out and logged in) finds no console errors, no horizontal overflow and no broken links.

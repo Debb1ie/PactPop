@@ -1,14 +1,23 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { Search, Users } from "lucide-react";
+import { Plus, Search, Users } from "lucide-react";
 import { ButtonLink } from "@/components/ui/button";
-import { Card, DemoBadge, EmptyState, Input, PageHeader } from "@/components/ui/primitives";
+import { Card, DemoBadge, EmptyState, ListGroup, ListRow, PageHeader } from "@/components/ui/primitives";
 import { formatMoney } from "@/lib/money";
 import { requireAuth } from "@/server/auth/session";
 import { getDb } from "@/server/db/client";
 import { listClients } from "@/server/services/clients";
 
 export const metadata: Metadata = { title: "Clients" };
+
+function initials(name: string) {
+  return name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase() ?? "")
+    .join("");
+}
+
+const AVATAR_COLORS = ["bg-[#7656e8]", "bg-[#30b0c7]", "bg-[#ff9f0a]", "bg-[#34c759]", "bg-[#ff6b6b]", "bg-[#5856d6]"];
 
 export default async function ClientsPage({ searchParams }: PageProps<"/app/clients">) {
   const ctx = await requireAuth();
@@ -17,57 +26,65 @@ export default async function ClientsPage({ searchParams }: PageProps<"/app/clie
   const db = await getDb();
   const rows = await listClients(db, ctx.business.id, q);
   const cur = ctx.business.currency;
+  const totalOutstanding = rows.reduce((s, c) => s + c.outstandingMinor, 0);
 
   return (
     <>
       <PageHeader
         title="Clients"
-        description="Everyone you've made promises to, with what they've paid and what's still outstanding."
-        actions={<ButtonLink href="/app/clients/new">Add client</ButtonLink>}
+        description={`${rows.length} ${rows.length === 1 ? "client" : "clients"}${totalOutstanding > 0 ? ` · ${formatMoney(totalOutstanding, cur)} outstanding` : ""}`}
+        actions={
+          <ButtonLink href="/app/clients/new" size="sm">
+            <Plus className="h-4 w-4" /> Add client
+          </ButtonLink>
+        }
       />
-      <form className="relative mb-4 max-w-sm" role="search">
+      <form className="relative mb-6" role="search">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
-        <Input name="q" defaultValue={q} placeholder="Search name, company or email" className="pl-9" aria-label="Search clients" />
+        <input
+          name="q"
+          defaultValue={q}
+          placeholder="Search"
+          aria-label="Search clients by name, company or email"
+          className="h-10 w-full rounded-xl bg-fill pl-9 pr-3 text-[1.0625rem] placeholder:text-muted focus:outline-none focus:ring-[3px] focus:ring-ring sm:max-w-md"
+        />
       </form>
-      <Card className="overflow-hidden">
-        {rows.length === 0 ? (
+
+      {rows.length === 0 ? (
+        <Card>
           <EmptyState
             icon={<Users className="h-6 w-6" />}
-            title={q ? "No clients match your search" : "No clients yet"}
-            description={q ? "Try a different name or email." : "Add a client, or share your request link so clients can come to you."}
+            title={q ? "No results" : "No clients yet"}
+            description={q ? `Nothing matches "${q}". Check the spelling or try an email address.` : "Add a client, or share your request link so clients can come to you."}
             action={!q && <ButtonLink href="/app/clients/new">Add client</ButtonLink>}
           />
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[640px] text-sm">
-              <thead className="bg-surface-2/60 text-left text-xs uppercase tracking-wide text-muted">
-                <tr>
-                  <th className="px-5 py-3 font-medium">Client</th>
-                  <th className="px-5 py-3 font-medium">Active</th>
-                  <th className="px-5 py-3 text-right font-medium">Paid</th>
-                  <th className="px-5 py-3 text-right font-medium">Outstanding</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {rows.map((c) => (
-                  <tr key={c.id} className="transition-colors hover:bg-surface-2/50">
-                    <td className="px-5 py-3.5">
-                      <Link href={`/app/clients/${c.id}`} className="font-medium hover:text-accent">
-                        {c.name}
-                      </Link>{" "}
-                      {c.isDemo && <DemoBadge />}
-                      <p className="text-xs text-muted">{[c.company, c.email].filter(Boolean).join(" · ") || "No contact details"}</p>
-                    </td>
-                    <td className="money px-5 py-3.5">{c.activeCommitments}</td>
-                    <td className="money px-5 py-3.5 text-right">{formatMoney(c.paidMinor, cur)}</td>
-                    <td className={`money px-5 py-3.5 text-right ${c.outstandingMinor > 0 ? "text-warning" : ""}`}>{formatMoney(c.outstandingMinor, cur)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </Card>
+        </Card>
+      ) : (
+        <ListGroup header={q ? `Results for "${q}"` : "All clients"}>
+          {rows.map((c, i) => (
+            <ListRow
+              key={c.id}
+              href={`/app/clients/${c.id}`}
+              icon={<span className="text-[0.8125rem] font-semibold">{initials(c.name)}</span>}
+              iconBg={`${AVATAR_COLORS[i % AVATAR_COLORS.length]} !rounded-full !h-10 !w-10`}
+              title={
+                <span className="flex items-center gap-2">
+                  <span className="truncate">{c.name}</span> {c.isDemo && <DemoBadge />}
+                </span>
+              }
+              subtitle={[c.company, c.email].filter(Boolean).join(" · ") || "No contact details"}
+              detail={
+                <span className="flex flex-col items-end leading-tight">
+                  <span className={`money font-semibold ${c.outstandingMinor > 0 ? "text-warning" : "text-foreground"}`}>
+                    {formatMoney(c.outstandingMinor > 0 ? c.outstandingMinor : c.paidMinor, cur)}
+                  </span>
+                  <span className="text-xs">{c.outstandingMinor > 0 ? "outstanding" : c.activeCommitments > 0 ? `${c.activeCommitments} active` : "paid"}</span>
+                </span>
+              }
+            />
+          ))}
+        </ListGroup>
+      )}
     </>
   );
 }

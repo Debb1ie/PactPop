@@ -3,12 +3,12 @@ import { cn } from "@/lib/cn";
 type Tone = "neutral" | "violet" | "success" | "warning" | "error" | "info";
 
 const tones: Record<Tone, string> = {
-  neutral: "bg-surface-2 text-muted border-border",
-  violet: "bg-accent-soft text-accent border-accent/20",
-  info: "bg-accent-soft text-accent border-accent/20",
-  success: "bg-success-soft text-success border-success/25",
-  warning: "bg-warning-soft text-[#a86a10] dark:text-warning border-warning/30",
-  error: "bg-error-soft text-error border-error/25",
+  neutral: "bg-fill text-muted",
+  violet: "bg-accent-soft text-accent",
+  info: "bg-accent-soft text-accent",
+  success: "bg-success-soft text-success",
+  warning: "bg-warning-soft text-warning",
+  error: "bg-error-soft text-error",
 };
 
 /** Maps every status in the system to a human label + tone, so wording stays consistent. */
@@ -53,7 +53,6 @@ const STATUS: Record<string, [string, Tone]> = {
   payment_pending: ["Payment pending", "warning"],
   unknown: ["Unknown", "neutral"],
   created: ["Created", "neutral"],
-  completed_payment: ["Completed", "success"],
   failed: ["Failed", "error"],
   // approvals
   rejected: ["Rejected", "error"],
@@ -67,7 +66,6 @@ const STATUS: Record<string, [string, Tone]> = {
   client_accepted: ["Client accepted", "success"],
   // agent
   running: ["Running", "violet"],
-  awaiting_approval_exec: ["Awaiting approval", "warning"],
   allowed: ["Allowed", "success"],
   approval_required: ["Approval required", "warning"],
   denied: ["Denied", "error"],
@@ -80,10 +78,5 @@ export function statusLabel(status: string) {
 
 export function StatusBadge({ status, className }: { status: string; className?: string }) {
   const [label, tone] = STATUS[status] ?? [statusLabel(status), "neutral" as Tone];
-  return (
-    <span className={cn("inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-medium", tones[tone], className)}>
-      <span className="h-1.5 w-1.5 rounded-full bg-current opacity-80" aria-hidden />
-      {label}
-    </span>
-  );
+  return <span className={cn("inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-[3px] text-xs font-semibold", tones[tone], className)}>{label}</span>;
 }

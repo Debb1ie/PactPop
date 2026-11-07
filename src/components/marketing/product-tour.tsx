@@ -86,10 +86,10 @@ export function ProductTour() {
   const step = STEPS[active];
   const Icon = step.icon;
   return (
-    <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+    <section className="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-28">
       <div className="max-w-2xl">
-        <p className="text-sm font-semibold uppercase tracking-[0.14em] text-accent">See it work</p>
-        <h2 className="mt-3 text-3xl font-semibold sm:text-4xl">One project, from &ldquo;hi&rdquo; to paid.</h2>
+        <p className="text-[0.9375rem] font-semibold text-accent">See it work</p>
+        <h2 className="mt-2 text-[2.25rem] font-semibold leading-tight sm:text-[3rem]">One project, from &ldquo;hi&rdquo; to paid.</h2>
         <p className="mt-4 text-lg text-muted">Follow a real-sized engagement through PactPop: a $1,500 website redesign that grows by $300.</p>
       </div>
       <div className="mt-10 flex gap-2 overflow-x-auto pb-2" role="tablist" aria-label="Product tour">
@@ -103,7 +103,9 @@ export function ProductTour() {
               onClick={() => setActive(i)}
               className={cn(
                 "flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all",
-                i === active ? "border-accent bg-accent text-white shadow-[0_8px_20px_-8px_rgb(118_86_232/0.8)]" : "border-border bg-surface text-muted hover:text-foreground",
+                i === active
+                  ? "border-transparent bg-gradient-to-r from-white to-[#d9d4ff] text-[#111118] shadow-[0_8px_24px_-10px_rgb(108_92_255/0.8)]"
+                  : "border-border bg-fill text-muted hover:text-foreground",
               )}
             >
               <span className="money text-xs opacity-70">0{i + 1}</span>
@@ -112,9 +114,9 @@ export function ProductTour() {
           );
         })}
       </div>
-      <div key={step.key} role="tabpanel" className="animate-rise mt-6 grid gap-6 rounded-[2rem] border border-border bg-surface p-6 shadow-[var(--shadow-card)] sm:p-8 lg:grid-cols-2 lg:items-center">
+      <div key={step.key} role="tabpanel" className="glass animate-rise mt-6 grid gap-6 rounded-[2rem] border border-border p-6 shadow-[var(--shadow-card)] sm:p-8 lg:grid-cols-2 lg:items-center">
         <div>
-          <span className="inline-flex items-center gap-2 rounded-full bg-accent-soft px-3 py-1 text-xs font-medium text-accent">
+          <span className="inline-flex items-center gap-2 rounded-full border border-accent/25 bg-accent-soft px-3 py-1 text-xs font-medium text-accent">
             <Icon className="h-3.5 w-3.5" /> {step.agent}
           </span>
           <h3 className="mt-4 text-2xl font-semibold">{step.title}</h3>
@@ -123,25 +125,25 @@ export function ProductTour() {
             <button
               onClick={() => setActive((a) => Math.max(0, a - 1))}
               disabled={active === 0}
-              className="rounded-xl border border-border px-3 py-2 text-sm hover:bg-surface-2 disabled:opacity-40"
+              className="rounded-xl border border-border px-3 py-2 text-sm hover:bg-fill disabled:opacity-40"
             >
               Back
             </button>
             <button
               onClick={() => setActive((a) => Math.min(STEPS.length - 1, a + 1))}
               disabled={active === STEPS.length - 1}
-              className="rounded-xl bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-violet-strong disabled:opacity-40"
+              className="rounded-xl bg-gradient-to-b from-[#7d70ff] to-[#5a4af2] px-3 py-2 text-sm font-medium text-white hover:brightness-110 disabled:opacity-40"
             >
               Next step
             </button>
           </div>
         </div>
-        <div className="rounded-2xl border border-border bg-surface-2/60 p-5">
-          <p className="text-xs uppercase tracking-wide text-muted">Northwind Bakery · Website redesign</p>
-          <dl className="mt-4 divide-y divide-border">
+        <div className="glow-card glow-ice rounded-2xl p-5">
+          <p className="muted-ink text-xs font-semibold uppercase tracking-wide">Northwind Bakery · Website redesign</p>
+          <dl className="mt-4 divide-y divide-black/10">
             {step.panel.map(([k, v]) => (
               <div key={k} className="flex justify-between gap-4 py-2.5 text-sm">
-                <dt className="text-muted">{k}</dt>
+                <dt className="muted-ink">{k}</dt>
                 <dd className="money text-right font-medium">{v}</dd>
               </div>
             ))}
