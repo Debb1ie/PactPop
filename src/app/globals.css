@@ -4,70 +4,68 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ───────── PactPop design tokens ─────────
-   Dark, glassy fintech UI: near-black canvas, blue-violet ambient glow, translucent panels with
-   hairline borders, pastel gradient KPI cards. Light mode mirrors the same structure. */
+   Matte, document-like UI. No glows, no neon: solid surfaces, crisp 1px rules, flat violet accent.
+   Signature containers are "stubs" (agreement / receipt stubs with a dashed tear line and punched
+   notches) and "clauses" (numbered contract-style rows). */
 :root {
   /* brand */
   --pp-aubergine: #1b1230;
-  --pp-violet: #6c5cff;
-  --pp-violet-strong: #5646f0;
+  --pp-violet: #6a5ae0;
+  --pp-violet-strong: #5646c9;
   --pp-lavender: #b9a5ff;
   --pp-lilac: #f1ecff;
-  --pp-ink: #111118;
+  --pp-ink: #16151c;
 
   /* state */
-  --pp-success: #16a36a;
-  --pp-warning: #d4870f;
-  --pp-error: #e5484d;
+  --pp-success: #1e8a5a;
+  --pp-warning: #b8740c;
+  --pp-error: #cc3d4a;
 
-  /* light surfaces */
-  --background: #f3f3f9;
+  /* light: cool neutral, biased toward the violet accent */
+  --background: #f4f4f8;
   --surface: #ffffff;
-  --surface-2: #f6f6fb;
-  --glass: rgb(255 255 255 / 0.78);
-  --border: rgb(17 17 26 / 0.08);
-  --border-strong: rgb(17 17 26 / 0.14);
-  --foreground: #111118;
-  --muted: #6b6b80;
-  --faint: #a3a3b5;
-  --fill: rgb(17 17 26 / 0.05);
-  --fill-strong: rgb(17 17 26 / 0.09);
-  --accent: #5b4cf5;
+  --surface-2: #efeff5;
+  --glass: rgb(244 244 248 / 0.86);
+  --border: #e3e2ec;
+  --border-strong: #cdcbdb;
+  --foreground: #16151c;
+  --muted: #646273;
+  --faint: #a09eb0;
+  --fill: rgb(22 21 28 / 0.045);
+  --fill-strong: rgb(22 21 28 / 0.08);
+  --accent: #5b4bd6;
   --accent-fg: #ffffff;
-  --accent-soft: rgb(91 76 245 / 0.1);
-  --ring: rgb(108 92 255 / 0.45);
-  --success-soft: rgb(22 163 106 / 0.12);
-  --warning-soft: rgb(212 135 15 / 0.14);
-  --error-soft: rgb(229 72 77 / 0.12);
-  --glow-a: rgb(108 92 255 / 0.16);
-  --glow-b: rgb(91 141 255 / 0.12);
-  --shadow-color: 245 30% 25%;
+  --accent-soft: rgb(91 75 214 / 0.09);
+  --ring: rgb(91 75 214 / 0.35);
+  --success-soft: rgb(30 138 90 / 0.1);
+  --warning-soft: rgb(184 116 12 / 0.11);
+  --error-soft: rgb(204 61 74 / 0.1);
+  --shadow-color: 245 15% 30%;
 }
 
 .dark {
-  --background: #07070b;
-  --surface: #111117;
-  --surface-2: #17171f;
-  --glass: rgb(20 20 28 / 0.72);
-  --border: rgb(255 255 255 / 0.07);
-  --border-strong: rgb(255 255 255 / 0.13);
-  --foreground: #f4f4f8;
-  --muted: #9b9bb0;
-  --faint: #5e5e72;
-  --fill: rgb(255 255 255 / 0.05);
-  --fill-strong: rgb(255 255 255 / 0.1);
-  --accent: #7b6dff;
+  /* dark: matte ink */
+  --background: #0e0d12;
+  --surface: #17161d;
+  --surface-2: #1e1d25;
+  --glass: rgb(14 13 18 / 0.86);
+  --border: #2a2832;
+  --border-strong: #3a3743;
+  --foreground: #ecebf0;
+  --muted: #9a98a6;
+  --faint: #615f6c;
+  --fill: rgb(255 255 255 / 0.045);
+  --fill-strong: rgb(255 255 255 / 0.08);
+  --accent: #8f82f0;
   --accent-fg: #ffffff;
-  --accent-soft: rgb(123 109 255 / 0.16);
-  --ring: rgb(150 138 255 / 0.55);
-  --pp-success: #4ade80;
-  --pp-warning: #fbbf24;
-  --pp-error: #fb7185;
-  --success-soft: rgb(74 222 128 / 0.12);
-  --warning-soft: rgb(251 191 36 / 0.13);
-  --error-soft: rgb(251 113 133 / 0.13);
-  --glow-a: rgb(108 92 255 / 0.22);
-  --glow-b: rgb(72 110 255 / 0.14);
+  --accent-soft: rgb(143 130 240 / 0.13);
+  --ring: rgb(143 130 240 / 0.45);
+  --pp-success: #4fbf87;
+  --pp-warning: #e0a33e;
+  --pp-error: #ec6b74;
+  --success-soft: rgb(79 191 135 / 0.12);
+  --warning-soft: rgb(224 163 62 / 0.12);
+  --error-soft: rgb(236 107 116 / 0.12);
   --shadow-color: 0 0% 0%;
 }
 
@@ -105,9 +103,9 @@
   --font-brand: var(--font-sora), var(--font-inter), sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 
-  --radius-card: 1.375rem;
-  --shadow-card: 0 1px 2px hsl(var(--shadow-color) / 0.05), 0 10px 30px -14px hsl(var(--shadow-color) / 0.16);
-  --shadow-lift: 0 2px 6px hsl(var(--shadow-color) / 0.1), 0 30px 60px -20px hsl(var(--shadow-color) / 0.45);
+  --radius-card: 1.125rem;
+  --shadow-card: 0 1px 0 hsl(var(--shadow-color) / 0.04), 0 1px 3px hsl(var(--shadow-color) / 0.05);
+  --shadow-lift: 0 2px 4px hsl(var(--shadow-color) / 0.08), 0 16px 40px -16px hsl(var(--shadow-color) / 0.28);
   --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
@@ -116,10 +114,6 @@ html.dark { color-scheme: dark; }
 
 body {
   background-color: var(--background);
-  background-image:
-    radial-gradient(60rem 36rem at 85% -10%, var(--glow-a), transparent 70%),
-    radial-gradient(48rem 30rem at -10% 10%, var(--glow-b), transparent 70%);
-  background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -128,50 +122,90 @@ body {
 
 h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.025em; }
 
-/* Financial figures */
 .money { font-variant-numeric: tabular-nums; letter-spacing: -0.015em; }
 
-/* Glass panel material */
-.glass {
-  background: var(--glass);
-  -webkit-backdrop-filter: saturate(160%) blur(18px);
-  backdrop-filter: saturate(160%) blur(18px);
+/* Small mono eyebrow / clause label */
+.label-mono {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
-.material { background: var(--glass); -webkit-backdrop-filter: saturate(160%) blur(20px); backdrop-filter: saturate(160%) blur(20px); }
 
-/* Pastel gradient KPI cards (always light, ink text) */
-.glow-card { color: #111118; position: relative; overflow: hidden; isolation: isolate; }
-.glow-card::after {
-  content: ""; position: absolute; inset: auto -10% -35% -10%; height: 75%; z-index: -1; opacity: 0.55;
-  background: radial-gradient(60% 80% at 30% 100%, rgb(255 255 255 / 0.9), transparent 70%);
+/* Frosted bars (navigation only) */
+.glass, .material {
+  background: var(--glass);
+  -webkit-backdrop-filter: saturate(140%) blur(14px);
+  backdrop-filter: saturate(140%) blur(14px);
 }
-.glow-violet { background: linear-gradient(135deg, #ffffff 0%, #eeebff 45%, #a59cff 100%); }
-.glow-peach  { background: linear-gradient(135deg, #ffffff 0%, #fff0e3 45%, #ffb27a 100%); }
-.glow-pink   { background: linear-gradient(135deg, #ffffff 0%, #ffe9f0 45%, #ff9dbd 100%); }
-.glow-ice    { background: linear-gradient(135deg, #ffffff 0%, #f1f0fb 55%, #d9d6f5 100%); }
-.glow-card .muted-ink { color: rgb(17 17 24 / 0.6); }
+
+/* ───────── Stub: PactPop's signature container ─────────
+   A card with a dashed tear line and two punched notches at --tear (distance from the top).
+   Tone colour via --t ("r g b"). */
+.stub {
+  --tear: 3.25rem;
+  --notch: 9px;
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  -webkit-mask:
+    radial-gradient(circle var(--notch) at 0 var(--tear), transparent 98%, #000) left / 51% 100% no-repeat,
+    radial-gradient(circle var(--notch) at 100% var(--tear), transparent 98%, #000) right / 51% 100% no-repeat;
+  mask:
+    radial-gradient(circle var(--notch) at 0 var(--tear), transparent 98%, #000) left / 51% 100% no-repeat,
+    radial-gradient(circle var(--notch) at 100% var(--tear), transparent 98%, #000) right / 51% 100% no-repeat;
+}
+.stub::after {
+  content: ""; position: absolute; left: calc(var(--notch) + 6px); right: calc(var(--notch) + 6px); top: var(--tear);
+  border-top: 1.5px dashed var(--border-strong); pointer-events: none;
+}
+.tone-violet { --t: 106 90 224; }
+.tone-mint   { --t: 30 150 100; }
+.tone-amber  { --t: 196 128 20; }
+.tone-rose   { --t: 210 74 100; }
+.tone-sky    { --t: 40 120 210; }
+.dark .tone-violet { --t: 143 130 240; }
+.dark .tone-mint   { --t: 79 191 135; }
+.dark .tone-amber  { --t: 224 163 62; }
+.dark .tone-rose   { --t: 236 107 140; }
+.dark .tone-sky    { --t: 96 160 240; }
+.tone-text { color: rgb(var(--t)); }
+.tone-bg { background: rgb(var(--t) / 0.12); }
+.tone-bar { background: rgb(var(--t)); }
+
+/* Redline (contract diff) */
+.redline-ins { background: var(--success-soft); color: var(--pp-success); text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+.redline-keep { color: var(--muted); }
 
 .hairline-b { box-shadow: inset 0 -1px 0 var(--border); }
 .hairline-t { box-shadow: inset 0 1px 0 var(--border); }
 
-:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; border-radius: 12px; }
+:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; border-radius: 10px; }
 
 .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 0.5rem); }
 
 @keyframes pp-shimmer { 100% { transform: translateX(100%); } }
 @keyframes pp-rise { from { transform: translateY(10px); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes pp-drop { from { transform: translateY(-16px) scale(0.98); opacity: 0; } to { transform: none; opacity: 1; } }
-@keyframes pp-alert { from { transform: scale(1.08); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-@keyframes pp-float { 0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); } 50% { transform: translateY(-8px) rotate(var(--r, 0deg)); } }
+@keyframes pp-alert { from { transform: scale(1.06); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes pp-float { 0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); } 50% { transform: translateY(-6px) rotate(var(--r, 0deg)); } }
 .animate-rise { animation: pp-rise 480ms var(--ease-ios) both; }
 .animate-drop { animation: pp-drop 420ms var(--ease-ios) both; }
-.animate-float { animation: pp-float 6s ease-in-out infinite; }
+.animate-float { animation: pp-float 7s ease-in-out infinite; }
 
-dialog[open] { animation: pp-alert 240ms var(--ease-ios) both; }
-dialog::backdrop { background: rgb(0 0 0 / 0.55); backdrop-filter: blur(4px); }
+dialog[open] { animation: pp-alert 220ms var(--ease-ios) both; }
+dialog::backdrop { background: rgb(0 0 0 / 0.5); }
 
 input[type="range"] { accent-color: var(--accent); }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
 }
+
+/* VowGraph stage: a dark set for the glass orbs (deliberately dark in both themes) */
+.pp-orb-stage { background: radial-gradient(110% 85% at 50% 0%, #1b1930 0%, #0d0c14 55%, #09080d 100%); }
+.pp-orb-label { text-align: center; white-space: nowrap; }
+.pp-orb-title { font-size: 0.75rem; font-weight: 600; color: #ecebf0; }
+.pp-orb-caption { margin-top: 1px; font-family: var(--font-mono); font-size: 0.65rem; color: #9a98a6; }

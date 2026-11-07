@@ -16,7 +16,7 @@ export type Role = "owner" | "admin" | "member";
 /** Everything a request handler needs to act on behalf of a user inside one tenant. */
 export type AuthContext = {
   user: { id: string; email: string; name: string };
-  business: { id: string; name: string; slug: string; currency: string; isDemo: boolean; plan: string; trialEndsAt: Date | null };
+  business: { id: string; name: string; slug: string; currency: string; isDemo: boolean };
   role: Role;
   sessionId: string;
 };
@@ -84,8 +84,6 @@ export const getAuthContext = cache(async (): Promise<AuthContext | null> => {
         slug: businesses.slug,
         currency: businesses.currency,
         isDemo: businesses.isDemo,
-        plan: businesses.plan,
-        trialEndsAt: businesses.trialEndsAt,
       },
     })
     .from(businessMembers)

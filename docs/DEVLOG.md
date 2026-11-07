@@ -51,3 +51,26 @@
 - Demo workspace moved into `src/server/services/demo.ts`, shared by `db:seed` and a new **Try the demo workspace** button (`demoLoginAction`). The button creates the demo on first use and can only sign into the `is_demo` workspace.
 - The demo now contains realistic records: an in-progress $1,500 commitment with versions, milestones and deliverables; a ScopeWatch scope change with a $300 change order and a pending TrustGate approval; a sent proposal; a new request; a draft; and a timeline. It still has no invoices or payments.
 - Verified in Chrome: canvas frames change on scroll, the demo button lands on a populated dashboard, and there are no console errors.
+
+## 2026-11-07 — Free & open source, own visual identity, WebGL grid
+
+- **Removed all monetisation:** plans, trials, the pricing page, the upgrade card and tile, plan badges, the `businesses.plan` and `trial_ends_at` columns (migration `0002`), plan tests and the business-model doc. Added the MIT `LICENSE`, as the hackathon rules require.
+- **Design reworked** so it is inspired by, not copied from, the owner's reference shot:
+  - "Aurora" KPI cards: dark surface, corner glow, gradient hairline edge and the logo's tide mark.
+  - Accent-bar sidebar navigation.
+  - A request-link card replaces the upgrade card.
+  - Quick actions as a list.
+  - Pill search and a primary "New client" button.
+- **Background grid rebuilt in WebGL (three.js):** a shader-drawn major/minor grid on a displaced terrain mesh, with fog and crest highlights. Scroll velocity drives forward flight and wave amplitude, scroll progress lowers and pitches the camera, and the pointer adds parallax. The 2D canvas line version was removed.
+- README: hackathon-requirements map and a "Tools used" section.
+
+## 2026-11-07: Non-generic design pass, 3D VowGraph, mission alignment
+
+- Applied the design review principles: no glows or neon, matte surfaces, cool neutrals tinted toward the accent, no accent rails, no decorative numbering (numbers remain only where order matters: workflow steps), a left-aligned hero, and card styling used by role.
+- Dashboard KPI tiles became an account-style **Statement** strip, with attention flags such as "Action needed" and overdue counts.
+- Quick actions became plain rows. The owner-approved request-link card was kept exactly as it was.
+- **VowGraph 3D** (`src/components/fx/orb-field.tsx`, `src/server/services/vowgraph.ts`): one glass orb per commitment, sized by agreed amount. Inner rings are milestones and light up when paid; satellites are pending change orders. Hover shows details, click opens the client. Built from real foreign keys.
+- **3D architecture** on the landing and how-it-works pages: client portal → AI agents → TrustGate → PayPal → ledger, joined by flowing links. Ring counts encode real structure (8 agent roles, 3 TrustGate decisions, 3 PayPal APIs).
+- Marketing copy reworked as documents: ScopeWatch as a redline, ProofFlow as a checklist, TrustGate as a permissions table, and a signature-line call to action.
+- Agent roster aligned with the mission brief: the **PayFlow** Agent and a separate **ProofFlow** Agent (8 roles).
+- Fixed: a Three.js transmission pass ignores transparent meshes, so milestone rings must be opaque.

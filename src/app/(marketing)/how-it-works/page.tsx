@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ProductTour } from "@/components/marketing/product-tour";
-import { CtaBand, FaqSection, HowItWorks, PayPalSection, Problem } from "@/components/marketing/sections";
+import { ArchitectureSection, CtaBand, FaqSection, HowItWorks, PayPalSection, Problem } from "@/components/marketing/sections";
 
 export const metadata: Metadata = { title: "How it works" };
 
@@ -12,6 +12,7 @@ export default function HowItWorksPage() {
         <p className="mt-4 max-w-2xl text-lg text-muted">Follow a $1,500 website redesign from the client&apos;s first message to a PayPal-confirmed payment.</p>
       </div>
       <ProductTour />
+      <ArchitectureSection />
       <HowItWorks />
       <Problem />
       <PayPalSection />

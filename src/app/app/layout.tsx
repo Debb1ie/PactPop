@@ -4,14 +4,9 @@ import { requireAuth } from "@/server/auth/session";
 import { getDb } from "@/server/db/client";
 import { approvals } from "@/server/db/schema";
 import { aiConfigured, paypalConfigured } from "@/server/env";
-import { PLANS } from "@/lib/plans";
 import { logoutAction } from "../(auth)/actions";
 
-function planBadge(planId: string, trialEndsAt: Date | null) {
-  const plan = PLANS.find((p) => p.id === planId) ?? PLANS[0];
-  const trialDaysLeft = trialEndsAt ? Math.max(0, Math.ceil((trialEndsAt.getTime() - Date.now()) / 86_400_000)) : null;
-  return { name: plan.name, paid: plan.monthlyMinor > 0, trialDaysLeft };
-}
+
 
 export default async function AppLayout({ children }: LayoutProps<"/app">) {
   const ctx = await requireAuth();
@@ -24,7 +19,7 @@ export default async function AppLayout({ children }: LayoutProps<"/app">) {
     <AppShell
       user={ctx.user}
       business={ctx.business}
-      plan={planBadge(ctx.business.plan, ctx.business.trialEndsAt)}
+      requestPath={`/request/${ctx.business.slug}`}
       pendingApprovals={n}
       logout={logoutAction}
       integrations={{ paypal: paypalConfigured(), ai: aiConfigured() }}

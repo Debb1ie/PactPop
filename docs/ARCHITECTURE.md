@@ -46,7 +46,7 @@ Key rule: **agents never call PayPal directly.** An agent invokes a registered t
 ```
 src/
   app/
-    (marketing)/          landing, features, how-it-works, pricing
+    (marketing)/          landing, features, how-it-works
     (auth)/               login, register
     request/[slug]/       public customer project-request portal
     accept/[token]/       customer proposal acceptance + payment page

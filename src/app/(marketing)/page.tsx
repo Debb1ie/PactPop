@@ -2,6 +2,7 @@ import { LeakCalculator } from "@/components/marketing/leak-calculator";
 import { ProductTour } from "@/components/marketing/product-tour";
 import {
   AgentsSection,
+  ArchitectureSection,
   AudienceSection,
   ComparisonSection,
   CtaBand,
@@ -9,7 +10,6 @@ import {
   Hero,
   IntelligenceSection,
   PayPalSection,
-  PricingSection,
   Problem,
   SecuritySection,
 } from "@/components/marketing/sections";
@@ -21,13 +21,13 @@ export default function LandingPage() {
       <Problem />
       <LeakCalculator />
       <ProductTour />
+      <ArchitectureSection />
       <IntelligenceSection />
       <AgentsSection />
       <ComparisonSection />
       <AudienceSection />
       <PayPalSection />
       <SecuritySection />
-      <PricingSection />
       <FaqSection />
       <CtaBand />
     </>

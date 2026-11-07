@@ -10,7 +10,7 @@ PactPop is an AI-powered commercial operations platform for freelancers, consult
 
 Specialised AI agents read client requests, structure scope and pricing, catch scope creep, check delivered work against acceptance criteria, and prepare PayPal invoices. A permission layer called **TrustGate** ensures that sensitive financial actions always wait for a human.
 
-> Built for the **PayPal AI Hackathon**. Runs against the **PayPal Sandbox** only, so no real money moves.
+> Built for the **PayPal AI Hackathon** (*Build What's Next with PayPal and AI*). Free and open source under the [MIT License](LICENSE). Runs against the **PayPal Sandbox** only, so no real money moves.
 
 ---
 
@@ -20,20 +20,30 @@ PactPop is under active development. This table is kept honest: anything not mar
 
 | Area | Status |
 |---|---|
-| Landing, features, how-it-works and pricing pages, revenue-leak calculator, product tour | ✅ Working |
-| Registration / login (session auth), plan selection with 14-day trial | ✅ Working |
+| Landing, features and how-it-works pages, revenue-leak calculator, product tour | ✅ Working |
+| Registration / login (session auth), one-click demo login | ✅ Working |
 | Dashboard (PayPal-confirmed metrics only), clients (list, search, create, edit, balances) | ✅ Working |
 | Database schema for the whole workflow (24 tables), migrations, demo seed | ✅ Working |
 | Deterministic pricing engine, exact money handling, TrustGate policy table | ✅ Working (unit-tested) |
-| Light & dark themes, responsive layout with a mobile tab bar, scroll-reactive 3D grid background | ✅ Working |
+| Light & dark themes, responsive layout with a mobile tab bar, scroll-reactive WebGL grid terrain | ✅ Working |
+| VowGraph 3D view (commitments as glass orbs: milestones as rings, change orders as satellites) and 3D architecture diagram | ✅ Working (live data) |
 | One-click demo workspace with sample commitments, scope change and approval | ✅ Working |
 | Customer request portal, proposals, commitments & timeline, Approval Center | 🚧 Next |
 | Agent orchestrator + Command Center (Anthropic Claude via provider abstraction) | 🚧 Planned |
 | PayPal Sandbox: Invoicing v2, Orders v2, webhook verification, reconciliation | 🚧 Planned |
 | ScopeWatch, ProofFlow, Evidence Vault, VowGraph, reports, settings | 🚧 Planned |
-| Subscription billing (PayPal Subscriptions) and plan-limit enforcement | 🚧 Planned |
 
 The full plan is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), and progress is tracked in [docs/DEVLOG.md](docs/DEVLOG.md).
+
+### Hackathon requirements: where each one stands
+
+| Requirement | How PactPop meets it | Status |
+|---|---|---|
+| Meaningfully integrate a PayPal technology | Invoicing v2 for deposits, milestones and change orders; Orders v2 checkout; verified webhooks drive the commitment timeline | 🚧 In progress (architecture, schema and money handling done) |
+| Meaningfully incorporate AI | Intake, Scope, Pricing, Proposal, Operations, ProofFlow, PayFlow and Finance agents with permission-checked tool calls | 🚧 In progress (TrustGate policies and pricing engine done) |
+| Working prototype | One-click demo workspace; setup steps below run on any machine with Node.js | ✅ Runs locally |
+| Documentation | This README plus [docs/](docs/) | ✅ |
+| Public, open-source repo with a license | MIT, see [LICENSE](LICENSE) | ✅ |
 
 ---
 
@@ -58,7 +68,7 @@ The inputs are unstructured: client emails, change requests, screenshots and del
 
 ## How the agents work (design)
 
-One capable model with seven specialised roles: **Intake, Scope, Pricing, Proposal, Payment, Finance and Operations**. A central orchestrator routes each request. Every tool call passes through **TrustGate**, which returns one of three outcomes:
+One capable model with eight specialised roles: **Intake, Scope, Pricing, Proposal, Operations, ProofFlow, PayFlow and Finance**. A central orchestrator routes each request. Every tool call passes through **TrustGate**, which returns one of three outcomes:
 
 | Decision | Result |
 |---|---|
@@ -74,7 +84,7 @@ Capturing payments, issuing refunds, changing agreed amounts and applying change
 
 - **Next.js 16** (App Router) · **React 19** · **TypeScript** · **Tailwind CSS v4**
 - **Drizzle ORM** on **PostgreSQL**, with embedded **PGlite** for zero-setup local development
-- **Zod** validation, **bcrypt** password hashing, **Recharts** charts
+- **Zod** validation, **bcrypt** password hashing, **Recharts** charts, **three.js** (WebGL background)
 - **Vitest** unit tests, **Playwright** browser checks
 - Planned: **Anthropic Claude** (agents), **PayPal REST APIs**
 
@@ -84,7 +94,7 @@ Key decisions and their reasons are recorded in [docs/DECISIONS.md](docs/DECISIO
 
 ```
 src/
-  app/(marketing)/     landing, features, how-it-works, pricing
+  app/(marketing)/     landing, features, how-it-works
   app/(auth)/          login, register (+ server actions)
   app/app/             authenticated app: dashboard, clients
   components/          brand, ui primitives, app shell, marketing sections
@@ -92,12 +102,12 @@ src/
   server/
     db/                schema, migrations, database factory
     auth/              sessions and guards
-    services/          domain logic (pricing, clients, finance, accounts, audit)
+    services/          domain logic (pricing, clients, finance, accounts, audit, demo)
     agents/            TrustGate tool policies (orchestrator coming next)
     security/          rate limiting
 scripts/               migrate, seed
-tests/unit/            money, pricing and plan tests
-docs/                  architecture, decisions, business model, dev log
+tests/unit/            money and pricing tests
+docs/                  architecture, decisions, dev log
 ```
 
 ---
@@ -173,7 +183,7 @@ The PayPal workflow itself is still in development. See the project status above
 ## Testing
 
 ```bash
-npm test            # money formatting, pricing engine, plan invariants
+npm test            # money formatting and the pricing engine
 npm run typecheck
 npm run lint
 npm run build
@@ -192,13 +202,21 @@ The tests check, among other things, that the demo project prices to **$1,500** 
 ## Known limitations
 
 - The agent workflow, the PayPal integration and the customer portal are not implemented yet (see Project status).
-- Subscription plans are shown and recorded at signup, but **nothing is billed** yet.
 - PGlite is for local development only. Use PostgreSQL in production.
 
 ## Disclaimer
 
 PayPal is a trademark of PayPal, Inc. PactPop is an independent hackathon project and is not affiliated with or endorsed by PayPal. PactPop helps organise agreements and evidence. It does not provide legal advice or guarantee payment outcomes.
 
+## Tools used
+
+| Tool | How it is used |
+|---|---|
+| **PayPal Developer Platform (Sandbox)** | Invoicing v2, Orders v2 and Webhooks are the payment backbone: deposits, milestone payments and approved change orders are invoiced through PayPal, and only PayPal-verified events mark money as received. |
+| **Anthropic Claude** (runtime, `claude-sonnet-5-5` by default) | Powers PactPop's agents: extracting requirements from client messages, comparing new requests with the accepted scope, drafting proposals and change orders, and checking deliverable evidence. Accessed through a provider interface, so the model can be swapped. Every tool call goes through TrustGate. |
+| **Claude Code** (development) | AI coding assistant used to plan the architecture, write and review code, and run tests and browser checks during the hackathon. It is not part of the running app. |
+| **three.js** | WebGL grid-terrain background that reacts to scrolling, the VowGraph orb view on the dashboard, and the 3D architecture diagram. |
+
 ## License
 
-No license has been chosen yet. Until one is added, all rights are reserved by the author.
+PactPop is free and open source under the [MIT License](LICENSE). There are no paid plans.

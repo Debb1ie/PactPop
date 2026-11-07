@@ -202,9 +202,6 @@ export const businesses = pgTable("businesses", {
   pricingRules: jsonb("pricing_rules").$type<PricingRules>().notNull(),
   brandColor: text("brand_color"),
   aiAutonomy: text("ai_autonomy").notNull().default("balanced"),
-  /** Subscription plan id from src/lib/plans.ts. Paid plans start as a trial until billing is connected. */
-  plan: text("plan").notNull().default("solo"),
-  trialEndsAt: timestamp("trial_ends_at", { withTimezone: true }),
   isDemo: boolean("is_demo").notNull().default(false),
   createdAt: createdAt(),
   updatedAt: updatedAt(),

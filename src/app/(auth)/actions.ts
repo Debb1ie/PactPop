@@ -19,7 +19,6 @@ const registerSchema = z.object({
   businessName: z.string().trim().min(2, "Enter your business name").max(80),
   email: z.string().trim().email("Enter a valid email").max(200),
   password: z.string().min(10, "Use at least 10 characters").max(200),
-  plan: z.enum(["solo", "pro", "studio"]).catch("solo"),
 });
 
 function fieldErrors(error: z.ZodError) {

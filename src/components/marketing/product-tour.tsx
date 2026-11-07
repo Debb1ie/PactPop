@@ -104,7 +104,7 @@ export function ProductTour() {
               className={cn(
                 "flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all",
                 i === active
-                  ? "border-transparent bg-gradient-to-r from-white to-[#d9d4ff] text-[#111118] shadow-[0_8px_24px_-10px_rgb(108_92_255/0.8)]"
+                  ? "border-foreground bg-foreground text-background"
                   : "border-border bg-fill text-muted hover:text-foreground",
               )}
             >
@@ -114,7 +114,7 @@ export function ProductTour() {
           );
         })}
       </div>
-      <div key={step.key} role="tabpanel" className="glass animate-rise mt-6 grid gap-6 rounded-[2rem] border border-border p-6 shadow-[var(--shadow-card)] sm:p-8 lg:grid-cols-2 lg:items-center">
+      <div key={step.key} role="tabpanel" className="animate-rise mt-6 grid gap-6 rounded-[var(--radius-card)] border border-border bg-surface p-6 sm:p-8 lg:grid-cols-2 lg:items-center">
         <div>
           <span className="inline-flex items-center gap-2 rounded-full border border-accent/25 bg-accent-soft px-3 py-1 text-xs font-medium text-accent">
             <Icon className="h-3.5 w-3.5" /> {step.agent}
@@ -132,18 +132,18 @@ export function ProductTour() {
             <button
               onClick={() => setActive((a) => Math.min(STEPS.length - 1, a + 1))}
               disabled={active === STEPS.length - 1}
-              className="rounded-xl bg-gradient-to-b from-[#7d70ff] to-[#5a4af2] px-3 py-2 text-sm font-medium text-white hover:brightness-110 disabled:opacity-40"
+              className="rounded-xl bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-violet-strong disabled:opacity-40"
             >
               Next step
             </button>
           </div>
         </div>
-        <div className="glow-card glow-ice rounded-2xl p-5">
-          <p className="muted-ink text-xs font-semibold uppercase tracking-wide">Northwind Bakery · Website redesign</p>
-          <dl className="mt-4 divide-y divide-black/10">
+        <div className="rounded-xl border border-border bg-background p-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted">Northwind Bakery · Website redesign</p>
+          <dl className="mt-4 divide-y divide-border">
             {step.panel.map(([k, v]) => (
               <div key={k} className="flex justify-between gap-4 py-2.5 text-sm">
-                <dt className="muted-ink">{k}</dt>
+                <dt className="text-muted">{k}</dt>
                 <dd className="money text-right font-medium">{v}</dd>
               </div>
             ))}

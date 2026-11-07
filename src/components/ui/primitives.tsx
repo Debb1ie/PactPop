@@ -8,7 +8,7 @@ import { cn } from "@/lib/cn";
 export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("glass overflow-hidden rounded-[var(--radius-card)] border border-border shadow-[var(--shadow-card)] dark:shadow-none", className)}
+      className={cn("overflow-hidden rounded-[var(--radius-card)] border border-border bg-surface shadow-[var(--shadow-card)] dark:shadow-none", className)}
       {...props}
     />
   );
@@ -48,7 +48,7 @@ export function ListGroup({ header, footer, children, className, action }: { hea
       <Card>
         {(header || action) && (
           <div className="flex items-center justify-between gap-3 px-5 pb-2 pt-4">
-            {header && <h2 className="text-[1.0625rem] font-semibold tracking-tight">{header}</h2>}
+            {header && <h2 className="text-[1rem] font-semibold tracking-tight">{header}</h2>}
             {action}
           </div>
         )}
@@ -197,31 +197,25 @@ export function DemoBadge({ className }: { className?: string }) {
   );
 }
 
-/** Decorative wave used behind KPI figures. */
-function Wave() {
-  return (
-    <svg viewBox="0 0 200 60" preserveAspectRatio="none" className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-2/3 w-full opacity-40" aria-hidden>
-      {/* solid fill (no gradient id) so repeated instances never clash */}
-      <path d="M0 45 C25 20 40 50 65 32 S105 8 125 30 S165 52 200 18 V60 H0Z" fill="#ffffff" fillOpacity="0.55" />
-      <path d="M0 45 C25 20 40 50 65 32 S105 8 125 30 S165 52 200 18" fill="none" stroke="#ffffff" strokeWidth="1.5" />
-    </svg>
-  );
-}
+export type StatTone = "violet" | "mint" | "amber" | "rose" | "sky";
 
-export type StatTone = "violet" | "peach" | "pink" | "ice";
-
-/** KPI tile. With `tone` it renders as a pastel gradient card (as in the reference design). */
+/**
+ * KPI tile. With `tone` it renders as a stub (receipt-style ticket): label above the dashed tear
+ * line, figure below.
+ */
 export function Stat({ label, value, sub, icon, tone, iconBg = "bg-accent" }: { label: string; value: ReactNode; sub?: ReactNode; icon?: ReactNode; tone?: StatTone; iconBg?: string }) {
   if (tone) {
     return (
-      <div className={cn("glow-card rounded-[var(--radius-card)] p-4 shadow-[var(--shadow-card)] sm:p-5", `glow-${tone}`)}>
-        <Wave />
-        <div className="flex items-start justify-between gap-2">
-          <p className="text-[0.9375rem] font-semibold tracking-tight">{label}</p>
-          {icon && <span className="grid h-8 w-8 place-items-center rounded-full border border-black/10 bg-white/60 text-[#111118]">{icon}</span>}
+      <div className={cn("stub", `tone-${tone}`)}>
+        <div className="flex h-[3.25rem] items-center gap-2.5 px-4 sm:px-5">
+          {icon && <span className="tone-bg tone-text grid h-7 w-7 shrink-0 place-items-center rounded-lg">{icon}</span>}
+          <p className="truncate text-[0.8125rem] font-medium text-muted">{label}</p>
+          <span className="tone-bar ml-auto h-2 w-2 shrink-0 rounded-[2px]" aria-hidden />
         </div>
-        {sub && <p className="muted-ink mt-0.5 text-[0.8125rem]">{sub}</p>}
-        <p className="money mt-5 text-[1.75rem] font-semibold leading-none tracking-[-0.03em] sm:text-[2rem]">{value}</p>
+        <div className="px-4 pb-4 pt-4 sm:px-5 sm:pb-5">
+          <p className="money text-[1.6rem] font-semibold leading-none tracking-[-0.03em] sm:text-[1.875rem]">{value}</p>
+          {sub && <p className="mt-2 font-mono text-[0.6875rem] uppercase tracking-[0.06em] text-muted">{sub}</p>}
+        </div>
       </div>
     );
   }

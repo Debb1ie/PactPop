@@ -4,7 +4,6 @@ import { useId, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { ButtonLink } from "@/components/ui/button";
 import { formatMoney } from "@/lib/money";
-import { PLANS } from "@/lib/plans";
 
 type SliderProps = { label: string; value: number; min: number; max: number; step: number; format: (v: number) => string; onChange: (v: number) => void };
 
@@ -48,8 +47,6 @@ export function LeakCalculator() {
   const unbilledScope = projects * 12 * value * (creep / 100);
   const chasingCost = chaseHours * 12 * rate;
   const total = unbilledScope + chasingCost;
-  const proYear = (PLANS.find((p) => p.id === "pro")!.annualMonthlyMinor * 12) / 100;
-  const multiple = proYear > 0 ? total / proYear : 0;
 
   return (
     <section id="calculator" className="border-y border-white/5 bg-[#08080d] py-20 text-white/80 sm:py-28">
@@ -69,7 +66,7 @@ export function LeakCalculator() {
           </div>
         </div>
 
-        <div className="rounded-[2rem] bg-gradient-to-br from-[#7b6dff] via-[#5b45e8] to-[#3a1fb8] p-8 text-white shadow-[0_30px_80px_-30px_rgb(108_92_255/0.9)] ring-1 ring-white/15 sm:p-10">
+        <div className="rounded-[1.25rem] border border-[#2a2832] bg-[#17161d] p-8 text-white sm:p-10">
           <p className="text-sm text-white/75">Estimated revenue leaking each year</p>
           <p className="money mt-2 text-5xl font-semibold sm:text-6xl" aria-live="polite">
             {usd(total)}
@@ -79,23 +76,16 @@ export function LeakCalculator() {
               <dt className="text-white/75">Unbilled scope changes</dt>
               <dd className="money font-semibold">{usd(unbilledScope)}</dd>
             </div>
-            <div className="flex justify-between gap-4 border-b border-white/15 pb-3">
+            <div className="flex justify-between gap-4">
               <dt className="text-white/75">Time spent chasing payments</dt>
               <dd className="money font-semibold">{usd(chasingCost)}</dd>
             </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-white/75">PactPop Pro, billed yearly</dt>
-              <dd className="money font-semibold">{usd(proYear)}</dd>
-            </div>
           </dl>
-          {multiple >= 1 && (
-            <p className="mt-6 rounded-2xl bg-white/10 px-4 py-3 text-sm">
-              If PactPop helped you bill even <span className="font-semibold">{Math.max(1, Math.ceil((proYear / Math.max(total, 1)) * 100))}%</span> of that, Pro would pay for
-              itself.
-            </p>
-          )}
-          <ButtonLink href="/register?plan=pro" size="lg" variant="white" className="mt-8 w-full">
-            Stop the leak. Start free <ArrowRight className="h-4 w-4" />
+          <p className="mt-6 rounded-xl border border-white/10 px-4 py-3 text-sm text-white/70">
+            ScopeWatch prices extra asks before you do them, and PayPal invoices go out the moment work is approved. PactPop is free.
+          </p>
+          <ButtonLink href="/register" size="lg" variant="white" className="mt-8 w-full">
+            Stop the leak <ArrowRight className="h-4 w-4" />
           </ButtonLink>
           <p className="mt-3 text-center text-xs text-white/60">Estimate based only on your inputs. Not a guarantee of results.</p>
         </div>

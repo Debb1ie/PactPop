@@ -11,4 +11,8 @@
 | 7 | 2026-11-07 | One model, specialised roles, provider abstraction (Anthropic first) | More reliable/cheaper than independent agents; provider swappable. |
 | 8 | 2026-11-07 | Brand palette: user-supplied refinement (Aubergine #1B1230, Violet #7656E8, Lavender #B9A5FF, Lilac #F1ECFF) + semantic colours from the brief | The pasted palette refines the brief's purples; success/warning/error/ink kept from brief. |
 | 9 | 2026-11-07 | Logo concept: two vow nodes joined by a tide wave meeting at a central agreement point, with a small "pop" burst | Encodes "Vow" (commitment) + "Tide" (coordinated movement) + completion. |
-| 10 | 2026-11-07 | License: MIT (pending owner confirmation) | Common for hackathon submissions; easy to change before publishing. |
+| 10 | 2026-11-07 | License: MIT | Hackathon rules require a public, open-source repo with a visible license file. |
+| 11 | 2026-11-07 | `cacheComponents` off; dynamic rendering for all app pages | Per-tenant live financial data must never be served stale. |
+| 12 | 2026-11-07 | PactPop is entirely free; subscription plans, trials and pricing page removed (migration `0002`) | Owner decision. Keeps the hackathon submission focused on PayPal + AI rather than SaaS monetisation. |
+| 13 | 2026-11-07 | Visual identity: dark glass UI with PactPop's own "aurora" KPI cards, tide-mark motif and accent-bar navigation | Inspired by a reference shot the owner liked, deliberately reworked so it isn't a copy. |
+| 14 | 2026-11-07 | WebGL (three.js, lazily loaded) for the background grid terrain | A shader-drawn grid on a displaced mesh gives real perspective and anti-aliasing that 2D canvas lines couldn't. |

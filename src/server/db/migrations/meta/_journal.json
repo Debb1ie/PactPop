@@ -15,6 +15,13 @@
       "when": 1794044971844,
       "tag": "0001_subscription_plan",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794063881224,
+      "tag": "0002_remove_subscription_plan",
+      "breakpoints": true
     }
   ]
 }

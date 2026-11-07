@@ -10,12 +10,12 @@ export default function LoginPage() {
   return (
     <>
       <div className="text-center">
-        <LogoMark className="mx-auto h-[4.5rem] w-[4.5rem] drop-shadow-[0_12px_30px_rgb(108_92_255/0.55)]" />
+        <LogoMark className="mx-auto h-[4.5rem] w-[4.5rem]" />
         <h1 className="mt-5 text-[1.75rem] font-semibold">Welcome back</h1>
         <p className="mt-1 text-[0.9375rem] text-muted">Log in to your PactPop workspace.</p>
       </div>
 
-      <div className="glass mt-8 rounded-[1.5rem] border border-border p-5 shadow-[var(--shadow-card)]">
+      <div className="mt-8 rounded-[var(--radius-card)] border border-border bg-surface p-5">
         <p className="text-sm font-semibold">Just looking around?</p>
         <p className="mt-0.5 text-[0.8125rem] text-muted">Open a sample workspace with clients, a live proposal and a change order waiting for approval.</p>
         <div className="mt-4">
@@ -30,7 +30,7 @@ export default function LoginPage() {
         <span className="h-px flex-1 bg-border" /> Your account <span className="h-px flex-1 bg-border" />
       </div>
 
-      <div className="glass rounded-[1.5rem] border border-border p-5 shadow-[var(--shadow-card)]">
+      <div className="rounded-[var(--radius-card)] border border-border bg-surface p-5">
         <LoginForm />
       </div>
       <p className="mt-6 text-center text-[0.9375rem] text-muted">

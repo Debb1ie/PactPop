@@ -1,16 +1,19 @@
 import type { Metadata } from "next";
-import { AlertTriangle, CheckCheck, CheckCircle2, CircleDollarSign, Clock, Handshake, Inbox, Link2, Wallet } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Clock, Inbox } from "lucide-react";
 import { QuickActions } from "@/components/app/quick-actions";
+import { Statement } from "@/components/app/statement";
 import { RevenueChart } from "@/components/app/revenue-chart";
 import { ButtonLink } from "@/components/ui/button";
-import { Card, CardBody, CardHeader, EmptyState, ListGroup, ListRow, Notice, PageHeader, Stat } from "@/components/ui/primitives";
+import { Card, CardBody, CardHeader, EmptyState, ListGroup, ListRow, Notice, PageHeader } from "@/components/ui/primitives";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { formatMoney } from "@/lib/money";
-import { PLANS } from "@/lib/plans";
 import { requireAuth } from "@/server/auth/session";
 import { getDb } from "@/server/db/client";
 import { paypalConfigured } from "@/server/env";
 import { commitmentStatusCounts, financeSummary, recentActivity, revenueTrend } from "@/server/services/finance";
+import { vowgraphSummary } from "@/server/services/vowgraph";
+import { OrbField, type Orb, type OrbTone } from "@/components/fx/orb-field";
+import { statusLabel } from "@/components/ui/status-badge";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
@@ -24,23 +27,46 @@ function timeAgo(d: Date) {
 
 type Insight = { tone: "warning" | "info" | "success"; text: string };
 const INSIGHT_ICON = {
-  warning: { icon: AlertTriangle, bg: "bg-warning" },
-  info: { icon: Clock, bg: "bg-accent" },
-  success: { icon: CheckCircle2, bg: "bg-success" },
+  warning: { icon: AlertTriangle, bg: "bg-warning-soft !text-warning" },
+  info: { icon: Clock, bg: "bg-accent-soft !text-accent" },
+  success: { icon: CheckCircle2, bg: "bg-success-soft !text-success" },
 };
 
 export default async function DashboardPage() {
   const ctx = await requireAuth();
   const db = await getDb();
-  const [summary, trend, statusCounts, activity] = await Promise.all([
+  const [summary, trend, statusCounts, activity, vow] = await Promise.all([
     financeSummary(db, ctx.business.id),
     revenueTrend(db, ctx.business.id),
     commitmentStatusCounts(db, ctx.business.id),
     recentActivity(db, ctx.business.id),
+    vowgraphSummary(db, ctx.business.id),
   ]);
+  // VowGraph orbs: one per commitment, sized by agreed amount; rings = milestones (lit when paid);
+  // satellites = pending change orders.
+  const toneFor = (status: string): OrbTone =>
+    status === "completed" ? "mint" : ["in_progress", "accepted", "awaiting_evidence", "awaiting_approval", "payment_ready"].includes(status) ? "violet" : status === "awaiting_acceptance" || status === "proposed" ? "amber" : status === "disputed" ? "rose" : "slate";
+  const maxAmount = Math.max(1, ...vow.map((c) => c.agreedTotalMinor));
+  const orbs: Orb[] = vow.map((c) => {
+    const paid = c.milestones.filter((m) => m.paid).length;
+    return {
+      key: c.id,
+      label: c.clientName,
+      caption: `${formatMoney(c.agreedTotalMinor, c.currency)} · ${statusLabel(c.status)}`,
+      size: c.agreedTotalMinor / maxAmount,
+      tone: toneFor(c.status),
+      rings: c.milestones.length ? c.milestones.map((m) => ({ lit: m.paid })) : [{ lit: false }],
+      satellites: c.pendingChangeOrders.map((o) => ({ label: o.title })),
+      details: [
+        c.title,
+        `${c.milestones.length ? `${paid} of ${c.milestones.length} milestones paid` : "No milestones yet"}`,
+        ...c.pendingChangeOrders.map((o) => `Change order pending: ${o.title} · ${formatMoney(o.amountMinor, c.currency)}`),
+      ],
+      href: `/app/clients/${c.clientId}`,
+    };
+  });
   const cur = ctx.business.currency;
   const firstName = ctx.user.name.split(" ")[0];
-  const onFreePlan = (PLANS.find((p) => p.id === ctx.business.plan) ?? PLANS[0]).monthlyMinor === 0;
 
   // Deterministic insights from real records (AI-written summaries arrive with the Finance Agent).
   const insights: Insight[] = [];
@@ -63,12 +89,45 @@ export default async function DashboardPage() {
         </Notice>
       )}
 
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
-        <Stat tone="violet" label="Payments received" value={formatMoney(summary.receivedMinor, cur)} sub={`${summary.receivedCount} confirmed by PayPal`} icon={<Wallet className="h-4 w-4" />} />
-        <Stat tone="peach" label="Outstanding" value={formatMoney(summary.outstandingMinor, cur)} sub={`${summary.outstandingCount} open invoice(s)`} icon={<CircleDollarSign className="h-4 w-4" />} />
-        <Stat tone="pink" label="Under agreement" value={formatMoney(summary.agreedMinor, cur)} sub={`${summary.activeCommitments} active commitment(s)`} icon={<Handshake className="h-4 w-4" />} />
-        <Stat tone="ice" label="Pending approvals" value={summary.pendingApprovals} sub="Waiting for your decision" icon={<CheckCheck className="h-4 w-4" />} />
-      </div>
+      <Statement
+        title="Statement"
+        period={`As of ${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} · ${cur}`}
+        badge={<span className="rounded-md bg-fill px-2 py-0.5 font-mono text-[0.65rem] uppercase tracking-[0.08em] text-muted">PayPal Sandbox</span>}
+        lines={[
+          {
+            label: "Received",
+            value: formatMoney(summary.receivedMinor, cur),
+            note: summary.receivedCount > 0 ? `${summary.receivedCount} payment(s) confirmed by PayPal` : "No PayPal payments yet",
+          },
+          {
+            label: "Outstanding",
+            value: formatMoney(summary.outstandingMinor, cur),
+            note: `${summary.outstandingCount} open invoice(s)`,
+            flag: summary.overdueCount > 0 ? { text: `${summary.overdueCount} overdue`, tone: "warning" } : undefined,
+          },
+          {
+            label: "Under agreement",
+            value: formatMoney(summary.agreedMinor, cur),
+            note: `${summary.activeCommitments} open commitment(s)`,
+          },
+          {
+            label: "Approvals",
+            value: summary.pendingApprovals,
+            note: summary.pendingApprovals > 0 ? "Waiting for your decision" : "Nothing waiting",
+            flag: summary.pendingApprovals > 0 ? { text: "Action needed", tone: "warning" } : undefined,
+          },
+        ]}
+      />
+
+      <Card className="mt-6">
+        <CardHeader
+          title="VowGraph"
+          description="One orb per commitment, sized by agreed amount. Rings are milestones and light up when paid; orbiting moons are change orders waiting for approval."
+        />
+        <div className="mx-5 mb-5 mt-3 overflow-hidden rounded-xl">
+          <OrbField orbs={orbs} height={330} ariaLabel="3D view of your commitments, their milestones and pending change orders" />
+        </div>
+      </Card>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)]">
         <div className="min-w-0 space-y-6">
@@ -107,13 +166,13 @@ export default async function DashboardPage() {
           <Card>
             <CardHeader title="Quick actions" />
             <CardBody>
-              <QuickActions showUpgrade={onFreePlan} />
+              <QuickActions requestPath={`/request/${ctx.business.slug}`} />
             </CardBody>
           </Card>
 
           <ListGroup header="Insights">
             {insights.length === 0 ? (
-              <ListRow icon={<CheckCircle2 className="h-4 w-4" />} iconBg="bg-success" title="All clear" subtitle="Alerts appear as commitments and payments move." />
+              <ListRow icon={<CheckCircle2 className="h-4 w-4" />} iconBg="bg-success-soft !text-success" title="All clear" subtitle="Alerts appear as commitments and payments move." />
             ) : (
               insights.map((i) => {
                 const { icon: Icon, bg } = INSIGHT_ICON[i.tone];
@@ -122,9 +181,6 @@ export default async function DashboardPage() {
             )}
           </ListGroup>
 
-          <ListGroup header="Your request link" footer="Clients will use this link to send project requests for the Intake Agent to analyse.">
-            <ListRow icon={<Link2 className="h-4 w-4" />} iconBg="bg-[#3b82f6]" title={`/request/${ctx.business.slug}`} subtitle="Client request portal" />
-          </ListGroup>
 
           {statusCounts.length > 0 && (
             <ListGroup header="Commitments by status">

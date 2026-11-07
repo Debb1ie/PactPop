@@ -1,9 +1,10 @@
-import { CheckCheck, CircleDollarSign, Crown, Handshake, Inbox, LayoutGrid, Radar, Users, Wallet } from "lucide-react";
+import type React from "react";
+import { CheckCheck, Handshake, Inbox, LayoutGrid, Radar, Users, Wallet } from "lucide-react";
 import { LogoMark } from "@/components/brand/logo";
 
 /**
- * Static preview of the PactPop dashboard for the landing page (marketing illustration — the
- * figures follow the demo scenario and are not live data).
+ * Static preview of the PactPop dashboard for the landing page. Marketing illustration only:
+ * the figures follow the demo scenario and are not live data.
  */
 export function ProductMockup() {
   const nav = [
@@ -13,76 +14,71 @@ export function ProductMockup() {
     { icon: Wallet, label: "Payments" },
     { icon: CheckCheck, label: "Approvals" },
   ];
+  const statement = [
+    ["Received", "$750.00", "1 PayPal payment"],
+    ["Outstanding", "$1,050.00", "2 open invoices"],
+    ["Under agreement", "$1,800.00", "1 commitment"],
+    ["Approvals", "1", "Action needed"],
+  ];
   const activity = [
-    { icon: Wallet, bg: "bg-[#22c55e]", t: "Deposit paid via PayPal", s: "Northwind Bakery · verified webhook", v: "+$750.00", tone: "text-[#4ade80]", st: "Paid" },
-    { icon: Radar, bg: "bg-[#f59e0b]", t: "ScopeWatch: 3 extra pages", s: "Change order drafted", v: "$300.00", tone: "text-white", st: "Review" },
-    { icon: Handshake, bg: "bg-[#7b6dff]", t: "Proposal accepted", s: "Website redesign · 5 pages", v: "$1,500.00", tone: "text-white", st: "Signed" },
-    { icon: Inbox, bg: "bg-[#3b82f6]", t: "New request analysed", s: "Kitefly Tours · Intake Agent", v: "—", tone: "text-white/60", st: "New" },
+    { icon: Wallet, t: "Deposit paid via PayPal", s: "Northwind Bakery · webhook verified", v: "$750.00", st: "Paid", tone: "text-[#4fbf87]" },
+    { icon: Radar, t: "ScopeWatch: 3 extra pages", s: "Change order drafted", v: "$300.00", st: "Review", tone: "text-[#e0a33e]" },
+    { icon: Handshake, t: "Agreement accepted", s: "Website redesign · 5 pages", v: "$1,500.00", st: "Signed", tone: "text-[#9a98a6]" },
+    { icon: Inbox, t: "New request analysed", s: "Kitefly Tours · Intake Agent", v: "", st: "New", tone: "text-[#9a98a6]" },
   ];
   return (
     <div className="relative mx-auto max-w-5xl" role="img" aria-label="Preview of the PactPop dashboard">
-      <div className="absolute -inset-10 -z-10 rounded-[3rem] bg-[radial-gradient(closest-side,rgb(108_92_255/0.45),transparent)] blur-2xl" />
-      <div className="overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#0a0a0f] p-2.5 text-left text-white shadow-[0_40px_120px_-30px_rgb(70_50_200/0.7)] sm:p-3">
-        <div className="grid gap-3 md:grid-cols-[11rem_1fr]">
-          {/* sidebar */}
-          <div className="hidden flex-col gap-2 rounded-2xl p-2 md:flex">
-            <div className="mb-2 flex items-center gap-2 px-1">
-              <LogoMark className="h-7 w-7" />
+      <div className="overflow-hidden rounded-[1.25rem] border border-[#2a2832] bg-[#0e0d12] text-left text-[#ecebf0] shadow-[var(--shadow-lift)]">
+        {/* window bar */}
+        <div className="flex items-center gap-1.5 border-b border-[#2a2832] px-4 py-2.5">
+          <span className="h-2.5 w-2.5 rounded-full bg-[#3a3743]" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[#3a3743]" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[#3a3743]" />
+          <span className="ml-3 font-mono text-[0.65rem] text-[#615f6c]">pactpop · Lumen Studio</span>
+        </div>
+        <div className="grid md:grid-cols-[11rem_1fr]">
+          <div className="hidden flex-col gap-1 border-r border-[#2a2832] bg-[#17161d] p-3 md:flex">
+            <div className="mb-3 flex items-center gap-2 px-1">
+              <LogoMark className="h-6 w-6" />
               <span className="font-[family-name:var(--font-brand)] text-sm font-semibold">PactPop</span>
             </div>
             {nav.map(({ icon: Icon, label, active }) => (
-              <div
-                key={label}
-                className={
-                  active
-                    ? "flex items-center gap-2 rounded-xl bg-gradient-to-r from-white to-[#d9d4ff] px-3 py-2 text-xs font-semibold text-[#111118]"
-                    : "flex items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.04] px-3 py-2 text-xs text-white/60"
-                }
-              >
+              <div key={label} className={active ? "flex items-center gap-2 rounded-lg bg-white/[0.08] px-2.5 py-1.5 text-xs font-semibold" : "flex items-center gap-2 px-2.5 py-1.5 text-xs text-[#9a98a6]"}>
                 <Icon className="h-3.5 w-3.5" /> {label}
               </div>
             ))}
           </div>
 
-          {/* main */}
-          <div className="space-y-3 p-1">
-            <div className="flex items-center gap-2">
-              <div className="h-9 flex-1 rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-xs text-white/35">Search clients, commitments…</div>
-              <div className="flex h-9 items-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.04] px-2 text-xs">
-                <span className="grid h-6 w-6 place-items-center rounded-full bg-gradient-to-br from-[#9d8fff] to-[#4f3fe6] text-[0.65rem] font-semibold">M</span>
-                <span className="hidden sm:inline">Maya Santos</span>
+          <div className="space-y-3 p-3 sm:p-4">
+            <div className="overflow-hidden rounded-xl border border-[#2a2832] bg-[#17161d]">
+              <div className="flex items-center gap-2 border-b border-[#2a2832] px-3 py-2">
+                <span className="text-xs font-semibold">Statement</span>
+                <span className="font-mono text-[0.6rem] text-[#615f6c]">Nov 7, 2026 · USD</span>
+                <span className="ml-auto rounded bg-white/[0.06] px-1.5 py-0.5 font-mono text-[0.55rem] uppercase tracking-wider text-[#9a98a6]">Sandbox</span>
+              </div>
+              <div className="grid grid-cols-2 lg:grid-cols-4">
+                {statement.map(([l, v, n], i) => (
+                  <div key={l} className={`px-3 py-3 ${i % 2 === 1 ? "border-l border-[#2a2832]" : ""} ${i >= 2 ? "border-t border-[#2a2832] lg:border-t-0" : ""} ${i === 2 ? "lg:border-l" : ""}`}>
+                    <p className="text-[0.65rem] text-[#9a98a6]">{l}</p>
+                    <p className="money mt-1.5 text-lg font-semibold tracking-tight">{v}</p>
+                    <p className={`mt-1 text-[0.6rem] ${l === "Approvals" ? "text-[#e0a33e]" : "text-[#615f6c]"}`}>{n}</p>
+                  </div>
+                ))}
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-4">
-              {[
-                ["Received", "$750", "glow-violet"],
-                ["Outstanding", "$1,050", "glow-peach"],
-                ["Under agreement", "$1,800", "glow-pink"],
-                ["Approvals", "1", "glow-ice"],
-              ].map(([l, v, g]) => (
-                <div key={l} className={`glow-card rounded-2xl p-3 ${g}`}>
-                  <p className="text-[0.7rem] font-semibold">{l}</p>
-                  <p className="money mt-4 text-xl font-semibold tracking-tight">{v}</p>
-                </div>
-              ))}
-            </div>
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3">
-              <div className="mb-2 flex items-center justify-between">
-                <p className="text-xs font-semibold">Recent activity</p>
-                <span className="rounded-full border border-white/15 px-2 py-0.5 text-[0.65rem]">See all</span>
-              </div>
-              <ul className="space-y-1">
-                {activity.map(({ icon: Icon, bg, t, s, v, tone, st }) => (
-                  <li key={t} className="flex items-center gap-2.5 rounded-xl px-2 py-1.5 even:bg-white/[0.02]">
-                    <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg ${bg}`}>
-                      <Icon className="h-3.5 w-3.5" />
-                    </span>
+
+            <div className="overflow-hidden rounded-xl border border-[#2a2832] bg-[#17161d]">
+              <p className="border-b border-[#2a2832] px-3 py-2 text-xs font-semibold">Recent activity</p>
+              <ul className="divide-y divide-[#2a2832]">
+                {activity.map(({ icon: Icon, t, s, v, st, tone }) => (
+                  <li key={t} className="flex items-center gap-3 px-3 py-2">
+                    <Icon className="h-3.5 w-3.5 shrink-0 text-[#615f6c]" />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-[0.72rem] font-medium">{t}</span>
-                      <span className="block truncate text-[0.65rem] text-white/45">{s}</span>
+                      <span className="block truncate text-[0.62rem] text-[#9a98a6]">{s}</span>
                     </span>
-                    <span className={`money hidden text-[0.72rem] font-semibold sm:block ${tone}`}>{v}</span>
-                    <span className="w-12 text-right text-[0.65rem] text-white/60">{st}</span>
+                    {v && <span className="money hidden text-[0.72rem] font-semibold sm:block">{v}</span>}
+                    <span className={`w-12 text-right text-[0.62rem] font-medium ${tone}`}>{st}</span>
                   </li>
                 ))}
               </ul>
@@ -91,22 +87,23 @@ export function ProductMockup() {
         </div>
       </div>
 
-      {/* floating cards */}
-      <div className="animate-float absolute -bottom-8 -left-2 hidden w-56 rounded-3xl bg-gradient-to-br from-[#7b6dff] via-[#5b45e8] to-[#3a1fb8] p-4 text-white shadow-[0_30px_60px_-20px_rgb(60_40_200/0.8)] ring-1 ring-white/20 [--r:-6deg] sm:block lg:-left-14">
-        <span className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-br from-[#ffe08a] to-[#f5a524] text-[#5a3a00]">
-          <Crown className="h-5 w-5" />
-        </span>
-        <p className="mt-3 text-sm font-semibold">Change order approved</p>
-        <p className="text-xs text-white/70">+$300.00 added to the agreement</p>
-      </div>
-      <div className="animate-float absolute -right-2 -top-6 hidden w-60 rounded-3xl border border-white/15 bg-white/10 p-4 text-white shadow-[0_30px_60px_-20px_rgb(0_0_0/0.6)] backdrop-blur-xl [--r:4deg] [animation-delay:-3s] sm:block lg:-right-12">
-        <div className="flex items-center gap-2.5">
-          <span className="grid h-9 w-9 place-items-center rounded-full bg-[#22c55e]">
-            <CircleDollarSign className="h-5 w-5" />
-          </span>
-          <div>
-            <p className="text-sm font-semibold">Deposit received</p>
-            <p className="text-xs text-white/70">$750.00 · confirmed by PayPal</p>
+      {/* PayPal receipt stub */}
+      <div
+        className="stub tone-mint animate-float absolute -bottom-10 -right-2 hidden w-64 shadow-[var(--shadow-lift)] [--r:3deg] sm:block lg:-right-10"
+        style={{ "--tear": "3rem", "--notch": "8px" } as React.CSSProperties}
+      >
+        <div className="flex h-12 items-center justify-between px-4">
+          <span className="text-xs font-semibold">Payment received</span>
+          <span className="font-mono text-[0.6rem] uppercase tracking-wider text-muted">PayPal</span>
+        </div>
+        <div className="space-y-1 px-4 pb-4 pt-3 text-[0.72rem]">
+          <div className="flex justify-between">
+            <span className="text-muted">Northwind Bakery</span>
+            <span className="money font-semibold">$750.00</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-muted">Deposit · 50%</span>
+            <span className="text-success">Verified</span>
           </div>
         </div>
       </div>

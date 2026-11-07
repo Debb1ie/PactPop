@@ -7,7 +7,6 @@ import { ScrollGrid } from "@/components/fx/scroll-grid";
 const NAV = [
   { href: "/features", label: "Features" },
   { href: "/how-it-works", label: "How it works" },
-  { href: "/pricing", label: "Pricing" },
 ];
 
 export default function MarketingLayout({ children }: LayoutProps<"/">) {
@@ -50,7 +49,7 @@ export default function MarketingLayout({ children }: LayoutProps<"/">) {
       <main className="flex-1">{children}</main>
       <div className="glass fixed inset-x-0 bottom-0 z-40 border-t border-border p-3 md:hidden">
         <ButtonLink href="/register" className="w-full" size="lg">
-          Get Started free
+          Get Started
         </ButtonLink>
       </div>
       <footer className="border-t border-border pb-20 md:pb-0">
