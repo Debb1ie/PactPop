@@ -15,6 +15,7 @@ type ShellProps = {
   user: { name: string; email: string };
   business: { name: string; isDemo: boolean };
   pendingApprovals: number;
+  plan: { name: string; paid: boolean; trialDaysLeft: number | null };
   logout: () => Promise<void>;
   integrations: { paypal: boolean; ai: boolean };
 };
@@ -78,7 +79,24 @@ function IntegrationStatus({ integrations }: { integrations: ShellProps["integra
   );
 }
 
-export function AppShell({ children, user, business, pendingApprovals, logout, integrations }: ShellProps) {
+function PlanBadge({ plan }: { plan: ShellProps["plan"] }) {
+  if (!plan.paid) {
+    return (
+      <Link href="/pricing" className="mt-2 flex items-center justify-between rounded-lg bg-accent-soft px-2 py-1 text-xs text-accent hover:brightness-95">
+        <span>Starter plan</span>
+        <span className="font-semibold">Upgrade →</span>
+      </Link>
+    );
+  }
+  return (
+    <p className="mt-2 flex items-center justify-between rounded-lg bg-accent-soft px-2 py-1 text-xs text-accent">
+      <span className="font-semibold">{plan.name}</span>
+      <span>{plan.trialDaysLeft != null ? `Trial · ${plan.trialDaysLeft} day${plan.trialDaysLeft === 1 ? "" : "s"} left` : "Active"}</span>
+    </p>
+  );
+}
+
+export function AppShell({ children, user, business, pendingApprovals, plan, logout, integrations }: ShellProps) {
   const [open, setOpen] = useState(false);
 
   const sidebar = (
@@ -93,6 +111,7 @@ export function AppShell({ children, user, business, pendingApprovals, logout, i
         <p className="mt-0.5 flex items-center gap-2 truncate text-sm font-semibold">
           {business.name} {business.isDemo && <DemoBadge />}
         </p>
+        <PlanBadge plan={plan} />
       </div>
       <div className="flex-1 overflow-y-auto">
         <NavLinks pendingApprovals={pendingApprovals} onNavigate={() => setOpen(false)} />

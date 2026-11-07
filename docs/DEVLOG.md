@@ -17,3 +17,14 @@
 - Demo seed (workspace, 3 clients, and the website-redesign request). No payment data is seeded.
 
 **Tests:** 11 unit tests (money + pricing) pass. `tsc` clean. `next build` OK. HTTP smoke test of all public and authenticated routes OK.
+
+## 2026-11-07 — Website conversion & monetization pass
+
+**Implemented**
+- `src/lib/plans.ts` is now the single source of truth for plans: Starter (free, 3 commitments), Pro ($29, or $24/mo yearly), Studio ($79, or $66/mo yearly, 3 seats + $15/seat), and AI action packs ($10 per 1,000).
+- Landing page: trust bullets under the hero; an interactive revenue-leak calculator; a 5-step product tour of the demo scenario; a who-it's-for section; a comparison table (email/spreadsheets vs invoicing apps vs PactPop); billing FAQs; a stronger closing call to action; a sticky mobile Get Started bar.
+- Pricing page: monthly/annual toggle (annual is the default), featured Pro plan, AI add-on, and a full plan comparison table.
+- Signup carries `?plan=`. Paid plans start a 14-day trial (`businesses.plan`, `trial_ends_at`, migration `0001`). The app sidebar shows the plan, trial days left, or an Upgrade link.
+- `docs/BUSINESS_MODEL.md`: revenue streams, conversion design, unit-economics assumptions, metrics.
+
+**Tests:** 15 unit tests pass (new plan invariants). Lint and typecheck clean. Production build passes. A Chrome end-to-end check covered pricing → Pro trial signup → dashboard with trial badge. Browser console clean on `/`, `/pricing` and `/register`.

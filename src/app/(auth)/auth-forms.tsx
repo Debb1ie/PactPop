@@ -23,11 +23,12 @@ export function LoginForm({ demoEmail }: { demoEmail?: string }) {
   );
 }
 
-export function RegisterForm() {
+export function RegisterForm({ plan }: { plan: string }) {
   const [state, action, pending] = useActionState<AuthState, FormData>(registerAction, undefined);
   const fe = state?.fieldErrors ?? {};
   return (
     <form action={action} className="space-y-4">
+      <input type="hidden" name="plan" value={plan} />
       {state?.error && <ErrorNotice message={state.error} />}
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Your name" htmlFor="name" error={fe.name}>

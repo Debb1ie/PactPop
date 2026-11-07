@@ -1,13 +1,30 @@
-import { AgentsSection, CtaBand, FaqSection, Hero, HowItWorks, IntelligenceSection, PayPalSection, PricingSection, Problem, SecuritySection } from "@/components/marketing/sections";
+import { LeakCalculator } from "@/components/marketing/leak-calculator";
+import { ProductTour } from "@/components/marketing/product-tour";
+import {
+  AgentsSection,
+  AudienceSection,
+  ComparisonSection,
+  CtaBand,
+  FaqSection,
+  Hero,
+  IntelligenceSection,
+  PayPalSection,
+  PricingSection,
+  Problem,
+  SecuritySection,
+} from "@/components/marketing/sections";
 
 export default function LandingPage() {
   return (
     <>
       <Hero />
       <Problem />
-      <HowItWorks />
-      <AgentsSection />
+      <LeakCalculator />
+      <ProductTour />
       <IntelligenceSection />
+      <AgentsSection />
+      <ComparisonSection />
+      <AudienceSection />
       <PayPalSection />
       <SecuritySection />
       <PricingSection />

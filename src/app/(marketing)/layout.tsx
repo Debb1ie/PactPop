@@ -46,7 +46,12 @@ export default function MarketingLayout({ children }: LayoutProps<"/">) {
         </nav>
       </header>
       <main className="flex-1">{children}</main>
-      <footer className="border-t border-border">
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/90 p-3 backdrop-blur-xl md:hidden">
+        <ButtonLink href="/register" className="w-full" size="lg">
+          Get Started free
+        </ButtonLink>
+      </div>
+      <footer className="border-t border-border pb-20 md:pb-0">
         <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div>
             <Logo />

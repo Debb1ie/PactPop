@@ -2,6 +2,9 @@ import {
   ArrowRight,
   BadgeCheck,
   Bot,
+  Briefcase,
+  Building2,
+  UserRound,
   CircleDollarSign,
   FileSearch,
   FileSignature,
@@ -19,6 +22,7 @@ import {
 } from "lucide-react";
 import { ButtonLink } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
+import { PricingPlans } from "./pricing";
 
 export const FLOW = [
   { key: "Request", icon: Inbox, text: "A client describes what they need." },
@@ -63,7 +67,13 @@ export function Hero() {
               See How It Works
             </ButtonLink>
           </div>
-          <p className="mt-4 text-xs text-muted">Runs on PayPal Sandbox. No real money moves while you explore.</p>
+          <ul className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted">
+            {["Free plan, no card required", "Payments through PayPal", "You approve every financial step"].map((t) => (
+              <li key={t} className="flex items-center gap-1.5">
+                <BadgeCheck className="h-4 w-4 text-success" /> {t}
+              </li>
+            ))}
+          </ul>
         </div>
         <HeroPreview />
       </div>
@@ -335,51 +345,120 @@ export function SecuritySection() {
   );
 }
 
-export const PLANS = [
-  { name: "Solo", price: "$0", note: "during beta", features: ["1 business", "Up to 5 active commitments", "All seven agents", "PayPal Sandbox payments"], cta: "Start free" },
-  {
-    name: "Pro",
-    price: "$19",
-    note: "per month, indicative",
-    features: ["Unlimited commitments", "ScopeWatch & ProofFlow", "Evidence Vault reports", "Custom TrustGate policies"],
-    cta: "Start with Pro",
-    featured: true,
-  },
-  { name: "Studio", price: "$49", note: "per month, indicative", features: ["Up to 5 team members", "Role-based approvals", "Finance reports & exports", "Priority support"], cta: "Start with Studio" },
-];
-
-export function PricingSection() {
+export function PricingSection({ showMatrix = false }: { showMatrix?: boolean }) {
   return (
     <section id="pricing" className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
-      <SectionHeading center eyebrow="Pricing" title="Simple plans for independent businesses." intro="PactPop is in beta. Paid plan prices are indicative and are not charged yet." />
-      <div className="mt-12 grid gap-5 lg:grid-cols-3">
-        {PLANS.map((p) => (
-          <div
-            key={p.name}
-            className={cn(
-              "flex flex-col rounded-3xl border bg-surface p-7",
-              p.featured ? "border-accent shadow-[0_20px_50px_-20px_rgb(118_86_232/0.5)] ring-1 ring-accent" : "border-border",
-            )}
-          >
-            <div className="flex items-center justify-between">
-              <p className="font-display text-lg font-semibold">{p.name}</p>
-              {p.featured && <span className="rounded-full bg-accent px-2.5 py-0.5 text-xs font-medium text-white">Popular</span>}
-            </div>
-            <p className="mt-4">
-              <span className="money text-4xl font-semibold">{p.price}</span> <span className="text-sm text-muted">{p.note}</span>
+      <SectionHeading
+        center
+        eyebrow="Pricing"
+        title="Costs less than one unbilled hour a month."
+        intro="Start free on your next project. Upgrade when PactPop is catching more than it costs."
+      />
+      <div className="mt-10">
+        <PricingPlans showMatrix={showMatrix} />
+      </div>
+    </section>
+  );
+}
+
+const AUDIENCES = [
+  {
+    icon: UserRound,
+    who: "Freelancers",
+    pain: "You say yes to a small extra, then another, and the project quietly doubles.",
+    gain: "ScopeWatch catches every extra ask and turns it into a priced change order in one click.",
+  },
+  {
+    icon: Briefcase,
+    who: "Consultants",
+    pain: "Retainers and milestones drift, and invoicing is the last thing you get to.",
+    gain: "Milestones carry their payment terms, and the Payment Agent prepares invoices as work is approved.",
+  },
+  {
+    icon: Building2,
+    who: "Small agencies",
+    pain: "Nobody on the team knows exactly what the client agreed to or what's been paid.",
+    gain: "One shared record per client, with role-based approvals and a full evidence trail.",
+  },
+];
+
+export function AudienceSection() {
+  return (
+    <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+      <SectionHeading eyebrow="Who it's for" title="Built for people who sell their time and expertise." />
+      <div className="mt-10 grid gap-5 md:grid-cols-3">
+        {AUDIENCES.map(({ icon: Icon, who, pain, gain }) => (
+          <div key={who} className="flex flex-col rounded-3xl border border-border bg-surface p-6">
+            <span className="grid h-11 w-11 place-items-center rounded-2xl bg-accent-soft text-accent">
+              <Icon className="h-5 w-5" />
+            </span>
+            <p className="mt-4 font-display text-lg font-semibold">{who}</p>
+            <p className="mt-3 text-sm leading-relaxed text-muted">
+              <span className="font-medium text-error">Today: </span>
+              {pain}
             </p>
-            <ul className="mt-6 flex-1 space-y-2.5 text-sm">
-              {p.features.map((f) => (
-                <li key={f} className="flex gap-2">
-                  <BadgeCheck className="h-4 w-4 shrink-0 text-accent" /> {f}
-                </li>
-              ))}
-            </ul>
-            <ButtonLink href="/register" variant={p.featured ? "primary" : "outline"} className="mt-7 w-full">
-              {p.cta}
-            </ButtonLink>
+            <p className="mt-3 text-sm leading-relaxed">
+              <span className="font-medium text-success">With PactPop: </span>
+              {gain}
+            </p>
           </div>
         ))}
+      </div>
+    </section>
+  );
+}
+
+const COMPARE: { label: string; email: string | boolean; invoicing: string | boolean; pactpop: string | boolean }[] = [
+  { label: "Knows what was agreed", email: "Buried in threads", invoicing: false, pactpop: "Versioned agreement" },
+  { label: "Catches scope creep", email: false, invoicing: false, pactpop: "ScopeWatch" },
+  { label: "Prices extra work from your rates", email: false, invoicing: "Manual", pactpop: true },
+  { label: "Links proof of delivery to payment", email: false, invoicing: false, pactpop: "ProofFlow" },
+  { label: "Collects payment", email: false, invoicing: true, pactpop: "PayPal invoices & checkout" },
+  { label: "Confirms payment automatically", email: false, invoicing: "Varies", pactpop: "Verified PayPal webhooks" },
+  { label: "AI does the busywork, you approve", email: false, invoicing: false, pactpop: true },
+];
+
+function CompareCell({ v, strong }: { v: string | boolean; strong?: boolean }) {
+  if (v === true) return <BadgeCheck className={cn("mx-auto h-5 w-5", strong ? "text-accent" : "text-success")} aria-label="Yes" />;
+  if (v === false) return <span className="text-muted/60" aria-label="No">—</span>;
+  return <span className={cn("text-sm", strong ? "font-medium" : "text-muted")}>{v}</span>;
+}
+
+export function ComparisonSection() {
+  return (
+    <section className="border-y border-border bg-surface-2/60 py-20">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6">
+        <SectionHeading center eyebrow="Why switch" title="Invoicing tools bill for the work. PactPop protects it." />
+        <div className="mt-10 overflow-x-auto rounded-3xl border border-border bg-surface shadow-[var(--shadow-card)]">
+          <table className="w-full min-w-[640px] text-center text-sm">
+            <thead>
+              <tr className="border-b border-border">
+                <th className="px-5 py-4 text-left font-medium text-muted"> </th>
+                <th className="px-5 py-4 font-medium text-muted">Email & spreadsheets</th>
+                <th className="px-5 py-4 font-medium text-muted">Invoicing apps</th>
+                <th className="bg-accent-soft/60 px-5 py-4">
+                  <span className="font-display font-semibold text-accent">PactPop</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {COMPARE.map((r) => (
+                <tr key={r.label} className="border-t border-border">
+                  <td className="px-5 py-3.5 text-left font-medium">{r.label}</td>
+                  <td className="px-5 py-3.5">
+                    <CompareCell v={r.email} />
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <CompareCell v={r.invoicing} />
+                  </td>
+                  <td className="bg-accent-soft/40 px-5 py-3.5">
+                    <CompareCell v={r.pactpop} strong />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
   );
@@ -391,7 +470,10 @@ const FAQ = [
   ["Where do prices come from?", "Your pricing rules. Agents estimate units of work (pages, features, hours), and PactPop's pricing engine calculates the amount, with a breakdown you can review."],
   ["What happens when a client asks for more?", "ScopeWatch compares the request with the accepted agreement, explains what's new, and drafts a change order. Nothing is charged until you and the client approve it."],
   ["Is the AI's deliverable check final?", "No. ProofFlow's verification is advisory. You or your client make the completion decision."],
-  ["Which AI model does it use?", "Anthropic's Claude by default, behind a provider interface so the model can be swapped. Without an API key, a clearly labelled rule-based mode keeps the workflow usable."],
+  ["Is there a free plan?", "Yes. Starter is free forever for up to 3 active commitments. Pro and Studio include a 14-day trial, and annual billing gives you 2 months free."],
+  ["Can I cancel or change plans?", "Yes. You can upgrade, downgrade or cancel at any time. Your commitments, evidence and payment history stay with your account."],
+  ["Does PactPop take a cut of my payments?", "No. Clients pay you directly through PayPal, and PayPal's standard fees apply. PactPop charges only its subscription."],
+  ["Which AI model does it use?","Anthropic's Claude by default, behind a provider interface so the model can be swapped. Without an API key, a clearly labelled rule-based mode keeps the workflow usable."],
 ];
 
 export function FaqSection() {
@@ -420,10 +502,12 @@ export function CtaBand() {
     <section className="px-4 pb-20 sm:px-6">
       <div className="mx-auto max-w-6xl overflow-hidden rounded-[2rem] bg-gradient-to-br from-violet to-[#4b2fb8] px-6 py-14 text-center text-white sm:px-12">
         <h2 className="text-3xl font-semibold sm:text-4xl">Make promises. Make progress. Get paid.</h2>
-        <p className="mx-auto mt-3 max-w-xl text-white/80">Set up your business, share your request link, and let the agents handle the busywork.</p>
+        <p className="mx-auto mt-3 max-w-xl text-white/80">
+          Run your next client project on PactPop for free. If it catches one unbilled extra, it has paid for a year of Pro.
+        </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <ButtonLink href="/register" size="lg" className="bg-white text-violet-strong shadow-none hover:bg-lilac">
-            Get Started
+            Get Started free <ArrowRight className="h-4 w-4" />
           </ButtonLink>
           <ButtonLink href="/login" size="lg" variant="ghost" className="text-white hover:bg-white/10">
             Try the demo account
