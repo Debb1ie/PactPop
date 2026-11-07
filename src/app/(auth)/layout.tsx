@@ -2,13 +2,15 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme";
+import { ScrollGrid } from "@/components/fx/scroll-grid";
 import { getAuthContext } from "@/server/auth/session";
 
 export default async function AuthLayout({ children }: LayoutProps<"/">) {
   // Already signed in → straight to the app (fixes login/register showing for active sessions).
   if (await getAuthContext()) redirect("/app/dashboard");
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="relative isolate flex min-h-screen flex-col">
+      <ScrollGrid intensity={0.8} />
       <header className="flex h-14 items-center justify-between px-4 sm:px-6">
         <Link href="/" className="-ml-1 inline-flex items-center text-[1.0625rem] text-accent hover:opacity-70">
           <ChevronLeft className="h-5 w-5" /> Home

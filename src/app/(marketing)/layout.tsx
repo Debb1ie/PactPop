@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Logo } from "@/components/brand/logo";
 import { ButtonLink } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme";
+import { ScrollGrid } from "@/components/fx/scroll-grid";
 
 const NAV = [
   { href: "/features", label: "Features" },
@@ -11,7 +12,8 @@ const NAV = [
 
 export default function MarketingLayout({ children }: LayoutProps<"/">) {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="relative isolate flex min-h-screen flex-col">
+      <ScrollGrid />
       <header className="sticky top-0 z-40 px-3 pt-3 sm:px-6">
         <div className="glass mx-auto flex h-14 max-w-6xl items-center gap-6 rounded-2xl border border-border px-3 shadow-[var(--shadow-card)] sm:px-4">
           <Link href="/" aria-label="PactPop home">

@@ -44,3 +44,10 @@
 **Redesign** (matching the reference the owner supplied): near-black canvas with a blue-violet ambient glow, translucent glass panels, pastel gradient KPI cards with a wave motif, pill sidebar with a white active item, a top bar with working client search, a quick-add button and a user menu, Quick Actions tiles, a purple "Upgrade to Pro" card, a mobile tab bar and account sheet, and segmented controls. Dark is the default; light mode keeps the same structure. The landing hero now shows a dashboard preview with floating cards.
 
 **Checks:** 15 unit tests pass. Lint and typecheck clean. Production build passes. The Playwright audit (desktop and mobile, light and dark, logged out and logged in) finds no console errors, no horizontal overflow and no broken links.
+
+## 2026-11-07 — Scroll-reactive 3D grid + working demo account
+
+- `src/components/fx/scroll-grid.tsx`: a canvas perspective floor behind the marketing and auth pages. Scroll velocity drives travel along z (forward when scrolling down, back when scrolling up), page progress raises the horizon (the camera tilts), the vanishing point follows the pointer, and there is a slow idle drift. It's DPR-aware, re-reads theme colours when the theme changes, pauses on hidden tabs, and stays static under `prefers-reduced-motion`.
+- Demo workspace moved into `src/server/services/demo.ts`, shared by `db:seed` and a new **Try the demo workspace** button (`demoLoginAction`). The button creates the demo on first use and can only sign into the `is_demo` workspace.
+- The demo now contains realistic records: an in-progress $1,500 commitment with versions, milestones and deliverables; a ScopeWatch scope change with a $300 change order and a pending TrustGate approval; a sent proposal; a new request; a draft; and a timeline. It still has no invoices or payments.
+- Verified in Chrome: canvas frames change on scroll, the demo button lands on a populated dashboard, and there are no console errors.

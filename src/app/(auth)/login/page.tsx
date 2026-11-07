@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LogoMark } from "@/components/brand/logo";
-import { LoginForm } from "../auth-forms";
+import { DEMO_EMAIL, DEMO_PASSWORD } from "@/lib/demo";
+import { DemoLoginButton, LoginForm } from "../auth-forms";
 
 export const metadata: Metadata = { title: "Log in" };
 
@@ -9,19 +10,28 @@ export default function LoginPage() {
   return (
     <>
       <div className="text-center">
-        <LogoMark className="mx-auto h-[4.5rem] w-[4.5rem] drop-shadow-[0_12px_24px_rgb(118_86_232/0.35)]" />
-        <h1 className="mt-5 text-[1.75rem] font-bold">Welcome back</h1>
+        <LogoMark className="mx-auto h-[4.5rem] w-[4.5rem] drop-shadow-[0_12px_30px_rgb(108_92_255/0.55)]" />
+        <h1 className="mt-5 text-[1.75rem] font-semibold">Welcome back</h1>
         <p className="mt-1 text-[0.9375rem] text-muted">Log in to your PactPop workspace.</p>
       </div>
-      <div className="mt-8">
-        <LoginForm />
-      </div>
-      <div className="mt-6 rounded-2xl bg-surface px-4 py-3 text-center text-[0.8125rem] text-muted shadow-[var(--shadow-card)] dark:shadow-none">
-        <p className="font-semibold text-foreground">Demo account</p>
-        <p className="mt-0.5">
-          <span className="font-mono text-xs">demo@pactpop.dev</span> · <span className="font-mono text-xs">pactpop-demo-2026</span>
+
+      <div className="glass mt-8 rounded-[1.5rem] border border-border p-5 shadow-[var(--shadow-card)]">
+        <p className="text-sm font-semibold">Just looking around?</p>
+        <p className="mt-0.5 text-[0.8125rem] text-muted">Open a sample workspace with clients, a live proposal and a change order waiting for approval.</p>
+        <div className="mt-4">
+          <DemoLoginButton />
+        </div>
+        <p className="mt-3 text-center text-xs text-muted">
+          or sign in manually: <span className="font-mono text-foreground">{DEMO_EMAIL}</span> · <span className="font-mono text-foreground">{DEMO_PASSWORD}</span>
         </p>
-        <p className="mt-0.5 text-xs">Available after running npm run db:seed</p>
+      </div>
+
+      <div className="my-6 flex items-center gap-3 text-xs text-muted">
+        <span className="h-px flex-1 bg-border" /> Your account <span className="h-px flex-1 bg-border" />
+      </div>
+
+      <div className="glass rounded-[1.5rem] border border-border p-5 shadow-[var(--shadow-card)]">
+        <LoginForm />
       </div>
       <p className="mt-6 text-center text-[0.9375rem] text-muted">
         New to PactPop?{" "}

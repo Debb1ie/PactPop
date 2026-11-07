@@ -4,7 +4,9 @@ import { redirect } from "next/navigation";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "@/server/db/client";
-import { businessMembers, users } from "@/server/db/schema";
+import { businessMembers, businesses, users } from "@/server/db/schema";
+import { DEMO_EMAIL } from "@/lib/demo";
+import { createDemoWorkspace, demoUserExists } from "@/server/services/demo";
 import { createSession, destroySession, hashPassword, verifyPassword } from "@/server/auth/session";
 import { createAccount, DuplicateEmailError } from "@/server/services/accounts";
 import { rateLimit, RateLimitError } from "@/server/security/rate-limit";
@@ -76,6 +78,34 @@ export async function loginAction(_: AuthState, form: FormData): Promise<AuthSta
 
   await createSession(user.id, membership.businessId);
   await recordAudit(db, { businessId: membership.businessId, actor: { type: "user", id: user.id }, action: "auth.login", entityType: "user", entityId: user.id });
+  redirect("/app/dashboard");
+}
+
+/**
+ * One-click demo login. Signs into the public, seeded demo workspace only (creating it on first
+ * use, so hosted demos work without a manual seed). It can never sign into a real account.
+ */
+export async function demoLoginAction(): Promise<AuthState> {
+  try {
+    await rateLimit("demo-login", 20, 15 * 60 * 1000);
+  } catch (e) {
+    if (e instanceof RateLimitError) return { error: e.message };
+    throw e;
+  }
+  const db = await getDb();
+  if (!(await demoUserExists(db))) await createDemoWorkspace(db);
+
+  const [row] = await db
+    .select({ userId: users.id, businessId: businessMembers.businessId, isDemo: businesses.isDemo })
+    .from(users)
+    .innerJoin(businessMembers, eq(businessMembers.userId, users.id))
+    .innerJoin(businesses, eq(businesses.id, businessMembers.businessId))
+    .where(eq(users.email, DEMO_EMAIL))
+    .limit(1);
+  if (!row || !row.isDemo) return { error: "The demo workspace isn't available right now." };
+
+  await createSession(row.userId, row.businessId);
+  await recordAudit(db, { businessId: row.businessId, actor: { type: "user", id: row.userId }, action: "auth.demo_login", entityType: "user", entityId: row.userId });
   redirect("/app/dashboard");
 }
 

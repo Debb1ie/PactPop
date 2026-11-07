@@ -3,7 +3,8 @@
 import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { ErrorNotice, Field, Input } from "@/components/ui/primitives";
-import { loginAction, registerAction, type AuthState } from "./actions";
+import { Sparkles } from "lucide-react";
+import { demoLoginAction, loginAction, registerAction, type AuthState } from "./actions";
 
 export function LoginForm() {
   const [state, action, pending] = useActionState<AuthState, FormData>(loginAction, undefined);
@@ -18,6 +19,19 @@ export function LoginForm() {
       </Field>
       <Button type="submit" className="w-full" size="lg" loading={pending}>
         Log in
+      </Button>
+    </form>
+  );
+}
+
+/** One-click sign-in to the public demo workspace. */
+export function DemoLoginButton() {
+  const [state, action, pending] = useActionState<AuthState>(demoLoginAction, undefined);
+  return (
+    <form action={action} className="space-y-3">
+      {state?.error && <ErrorNotice title="Demo unavailable" message={state.error} />}
+      <Button type="submit" variant="white" size="lg" className="w-full" loading={pending}>
+        <Sparkles className="h-4 w-4 text-[#5a4af2]" /> Try the demo workspace
       </Button>
     </form>
   );

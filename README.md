@@ -25,7 +25,8 @@ PactPop is under active development. This table is kept honest: anything not mar
 | Dashboard (PayPal-confirmed metrics only), clients (list, search, create, edit, balances) | ✅ Working |
 | Database schema for the whole workflow (24 tables), migrations, demo seed | ✅ Working |
 | Deterministic pricing engine, exact money handling, TrustGate policy table | ✅ Working (unit-tested) |
-| Light & dark themes, responsive layout with a mobile tab bar | ✅ Working |
+| Light & dark themes, responsive layout with a mobile tab bar, scroll-reactive 3D grid background | ✅ Working |
+| One-click demo workspace with sample commitments, scope change and approval | ✅ Working |
 | Customer request portal, proposals, commitments & timeline, Approval Center | 🚧 Next |
 | Agent orchestrator + Command Center (Anthropic Claude via provider abstraction) | 🚧 Planned |
 | PayPal Sandbox: Invoicing v2, Orders v2, webhook verification, reconciliation | 🚧 Planned |
@@ -118,12 +119,19 @@ With no `DATABASE_URL`, data is stored in an embedded PostgreSQL (PGlite) under 
 
 ### Demo account
 
-After seeding, log in with:
+On the login page, click **Try the demo workspace** for one-click access. The demo workspace is created automatically on first use. You can also sign in manually:
 
 - **Email:** `demo@pactpop.dev`
 - **Password:** `pactpop-demo-2026`
 
-Seeded records are tagged **DEMO** in the UI. No invoices or payments are seeded. Payment data only ever comes from the PayPal Sandbox.
+The demo ("Lumen Studio") contains four clients and:
+- the $1,500 Northwind Bakery redesign, in progress
+- a ScopeWatch change order for 3 extra pages ($300), waiting in the approval queue
+- a proposal sent to Becker Legal
+- a brand-new request from Kitefly Tours
+- a draft commitment
+
+`npm run db:seed` resets it to this state. Seeded records are tagged **DEMO**. **No invoices or payments are seeded**, so "Payments received" stays at $0 until a real PayPal Sandbox payment is made.
 
 ### Environment variables
 
