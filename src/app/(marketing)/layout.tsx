@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Logo } from "@/components/brand/logo";
 import { ScrollGrid } from "@/components/fx/scroll-grid";
-import { MenuPill } from "@/components/marketing/menu-pill";
+import { SectionNav } from "@/components/marketing/section-nav";
 
 const NAV = [
   { href: "/features", label: "Features" },
@@ -15,16 +15,21 @@ export default function MarketingLayout({ children }: LayoutProps<"/">) {
       <ScrollGrid forceLight />
       <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md">
         <div className="mx-auto grid h-20 max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 sm:px-6">
-          <Link href="/" aria-label="PactPop home" className="justify-self-start">
+          <Link href="/" aria-label="PactPop home" className="flex items-center gap-4 justify-self-start">
             <span className="font-[family-name:var(--font-brand)] text-[1.35rem] font-semibold uppercase tracking-[0.04em] text-[#0d0d10]">PactPop</span>
           </Link>
-          <MenuPill />
+          <SectionNav />
+          <div className="flex items-center gap-1 justify-self-end">
+          <Link href="/login" className="hidden rounded-xl px-3 py-2.5 text-[0.875rem] font-medium text-[#3a3a42] hover:bg-[#f2f2f5] sm:inline-flex">
+            Log in
+          </Link>
           <Link
             href="/register"
-            className="justify-self-end rounded-xl bg-[#0d0d10] px-4 py-2.5 text-[0.875rem] font-medium text-white transition hover:bg-[#2a2a30] sm:px-5"
+            className="rounded-xl bg-[#0d0d10] px-4 py-2.5 text-[0.875rem] font-medium text-white transition hover:bg-[#2a2a30] sm:px-5"
           >
             Create account
           </Link>
+          </div>
         </div>
       </header>
       <main className="flex-1">{children}</main>

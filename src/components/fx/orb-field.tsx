@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/cn";
 
 export type OrbTone = "violet" | "sky" | "amber" | "rose" | "mint" | "slate";
 
@@ -43,7 +44,7 @@ type Hover = { x: number; y: number; orb: Orb } | null;
  * Hover shows a detail card; click navigates to `href`. A hidden list mirrors the data for
  * screen readers. Rendered on a dark stage in both themes on purpose (glass reads best on dark).
  */
-export function OrbField({ orbs, height = 320, links = false, ariaLabel }: { orbs: Orb[]; height?: number; links?: boolean; ariaLabel: string }) {
+export function OrbField({ orbs, height = 320, links = false, ariaLabel, variant = "dark" }: { orbs: Orb[]; height?: number; links?: boolean; ariaLabel: string; variant?: "dark" | "light" }) {
   const host = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const [hover, setHover] = useState<Hover>(null);
@@ -72,7 +73,7 @@ export function OrbField({ orbs, height = 320, links = false, ariaLabel }: { orb
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
       renderer.setClearColor(0x000000, 0);
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.05;
+      renderer.toneMappingExposure = variant === "light" ? 0.95 : 1.05;
       renderer.outputColorSpace = THREE.SRGBColorSpace;
       renderer.domElement.style.display = "block";
       renderer.domElement.setAttribute("aria-hidden", "true");
@@ -83,10 +84,37 @@ export function OrbField({ orbs, height = 320, links = false, ariaLabel }: { orb
       el.appendChild(labels.domElement);
 
       const scene = new THREE.Scene();
+      if (variant === "light") {
+        // Paint the light backdrop into the scene so the glass refracts it (CSS behind the canvas
+        // is invisible to the transmission pass, which would make the orbs look muddy).
+        const bg = document.createElement("canvas");
+        bg.width = 1024;
+        bg.height = 512;
+        const g2 = bg.getContext("2d")!;
+        g2.fillStyle = "#fbfaff";
+        g2.fillRect(0, 0, 1024, 512);
+        const blob = (x: number, y: number, r: number, c: string) => {
+          const gr = g2.createRadialGradient(x, y, 0, x, y, r);
+          gr.addColorStop(0, c);
+          gr.addColorStop(1, "rgba(255,255,255,0)");
+          g2.fillStyle = gr;
+          g2.fillRect(0, 0, 1024, 512);
+        };
+        blob(180, 40, 420, "rgba(185,165,255,0.55)");
+        blob(900, 470, 420, "rgba(246,200,159,0.5)");
+        blob(560, 260, 300, "rgba(215,238,110,0.18)");
+        g2.strokeStyle = "rgba(108,78,245,0.07)";
+        g2.lineWidth = 1;
+        for (let x = 0; x <= 1024; x += 48) { g2.beginPath(); g2.moveTo(x, 0); g2.lineTo(x, 512); g2.stroke(); }
+        for (let y = 0; y <= 512; y += 48) { g2.beginPath(); g2.moveTo(0, y); g2.lineTo(1024, y); g2.stroke(); }
+        const bgTex = new THREE.CanvasTexture(bg);
+        bgTex.colorSpace = THREE.SRGBColorSpace;
+        scene.background = bgTex;
+      }
       const pmrem = new THREE.PMREMGenerator(renderer);
       const envTex = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
       scene.environment = envTex;
-      scene.environmentIntensity = 0.3;
+      scene.environmentIntensity = variant === "light" ? 0.55 : 0.3;
 
       const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
 
@@ -245,7 +273,7 @@ export function OrbField({ orbs, height = 320, links = false, ariaLabel }: { orb
       // links with packets
       const packets: { mesh: import("three").Mesh; curve: import("three").CatmullRomCurve3; t: number }[] = [];
       if (links && n > 1) {
-        const linkMat = track(new THREE.MeshBasicMaterial({ color: 0x8f82f0, transparent: true, opacity: 0.28 }));
+        const linkMat = track(new THREE.MeshBasicMaterial({ color: 0x8f82f0, transparent: true, opacity: variant === "light" ? 0.55 : 0.28 }));
         const packetMat = track(new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x8f82f0, emissiveIntensity: 0.6 }));
         for (let i = 0; i < n - 1; i++) {
           const a = centers[i].clone().add(new THREE.Vector3(radii[i] * 0.98, 0, 0));
@@ -393,10 +421,10 @@ export function OrbField({ orbs, height = 320, links = false, ariaLabel }: { orb
       disposed = true;
       cleanup();
     };
-  }, [dataKey, links, orbs.length, router]);
+  }, [dataKey, links, orbs.length, router, variant]);
 
   return (
-    <figure className="pp-orb-stage relative m-0 overflow-hidden" style={{ height }}>
+    <figure className={cn("relative m-0 overflow-hidden", variant === "light" ? "pp-orb-stage-light" : "pp-orb-stage")} style={{ height }}>
       {orbs.length === 0 ? (
         <div className="grid h-full place-items-center px-6 text-center text-sm text-[#9a98a6]">Commitments appear here once a client accepts a proposal.</div>
       ) : (

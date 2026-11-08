@@ -18,7 +18,6 @@ import {
   ShieldCheck,
   UserRound,
   Workflow,
-  X,
   type LucideIcon,
 } from "lucide-react";
 import type { ReactNode } from "react";
@@ -27,6 +26,7 @@ import { ButtonLink } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import Link from "next/link";
 import { HeroCards } from "./hero-cards";
+import { FeatureBento } from "./feature-visuals";
 import { ProductMockup } from "./product-mockup";
 
 export const FLOW = [
@@ -65,23 +65,6 @@ function Heading({ eyebrow, title, intro, ink, center }: { eyebrow: string; titl
   );
 }
 
-/** A plain bordered panel with a header row. Used where a feature is shown as the document it produces. */
-function DocPanel({ icon: Icon, name, kind, title, children, className }: { icon: LucideIcon; name: string; kind: string; title: string; children: ReactNode; className?: string }) {
-  return (
-    <div className={cn("flex flex-col rounded-xl border border-border bg-surface", className)}>
-      <div className="flex items-center gap-2.5 border-b border-border px-5 py-3.5">
-        <Icon className="h-4 w-4 text-accent" />
-        <span className="text-[0.9375rem] font-semibold">{name}</span>
-        <span className="ml-auto font-mono text-[0.65rem] uppercase tracking-[0.1em] text-muted">{kind}</span>
-      </div>
-      <div className="flex-1 p-5">
-        <p className="text-[1.25rem] font-semibold leading-snug tracking-tight">{title}</p>
-        <div className="mt-5">{children}</div>
-      </div>
-    </div>
-  );
-}
-
 /* ───────── hero ───────── */
 
 export function Hero() {
@@ -115,7 +98,7 @@ export function Hero() {
 /** Product preview (illustration) shown under the hero. */
 export function PreviewSection() {
   return (
-    <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+    <section id="product" className="mx-auto max-w-6xl scroll-mt-24 px-4 py-16 sm:px-6">
       <ProductMockup />
     </section>
   );
@@ -186,9 +169,9 @@ export function ArchitectureSection() {
           title="Every action passes the same checkpoints."
           intro="Requests come in through the client portal. Agents interpret them and propose actions. TrustGate decides what runs and what waits for you. PayPal moves the money, and every step lands in the ledger."
         />
-        <div className="rounded-[var(--radius-card)] border border-border bg-background">
-          <div className="overflow-hidden rounded-t-[var(--radius-card)]">
-            <OrbField links orbs={ARCHITECTURE} height={340} ariaLabel="3D diagram of PactPop's architecture: client portal, AI agents, TrustGate, PayPal Sandbox, ledger" />
+        <div className="overflow-hidden rounded-[1.75rem] border border-border bg-white shadow-[0_30px_70px_-40px_rgb(108_78_245/0.45)]">
+          <div className="overflow-hidden">
+            <OrbField links variant="light" orbs={ARCHITECTURE} height={360} ariaLabel="3D diagram of PactPop's architecture: client portal, AI agents, TrustGate, PayPal Sandbox, ledger" />
           </div>
           <p className="border-t border-border px-4 py-2.5 text-[0.8125rem] text-muted">Rings show each layer&apos;s parts: 8 agent roles, TrustGate&apos;s three decisions, three PayPal APIs. Hover for details.</p>
         </div>
@@ -241,7 +224,7 @@ const AUTHORITY_STYLE = {
 
 export function AgentsSection() {
   return (
-    <Section>
+    <Section id="agents" className="scroll-mt-24">
       <div className="grid gap-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.4fr)]">
         <div className="lg:sticky lg:top-28 lg:self-start">
           <Heading
@@ -280,78 +263,11 @@ export function AgentsSection() {
 
 export function IntelligenceSection() {
   return (
-    <Section band="paper">
+    <Section id="features" className="scroll-mt-24">
       <Heading eyebrow="Signature features" title="Built around the promise, not just the invoice." />
-      <div className="mt-12 grid gap-5 lg:grid-cols-2">
-        <DocPanel icon={Radar} name="ScopeWatch" kind="Redline" title="Extra asks get caught, not absorbed." className="lg:row-span-2">
-          <div className="rounded-xl border border-border bg-background p-4 font-mono text-[0.8125rem] leading-7">
-            <p className="redline-keep">2.1 Deliverables</p>
-            <p>
-              Five (5) designed pages: <span className="redline-keep">Home, Menu, About, Catering, Contact.</span>
-            </p>
-            <p className="flex flex-wrap gap-1.5">
-              <span className="redline-ins rounded px-1">+ Team page</span>
-              <span className="redline-ins rounded px-1">+ Gallery</span>
-              <span className="redline-ins rounded px-1">+ FAQ</span>
-            </p>
-            <p className="mt-2 border-t border-dashed border-border-strong pt-2">
-              Change order: 3 × $100.00 = <span className="font-semibold text-foreground">$300.00</span>
-            </p>
-            <p className="text-warning">Waiting for your approval</p>
-          </div>
-          <p className="mt-4 text-[0.9375rem] leading-relaxed text-muted">
-            New requests are compared with the accepted agreement. Additions are explained, priced by your rules, and turned into a change order. Nothing is charged silently.
-          </p>
-        </DocPanel>
-
-        <DocPanel icon={ScrollText} name="VowGraph" kind="Chain of record" title="See how every promise connects.">
-          <ol className="flex flex-wrap items-center gap-y-2 text-[0.75rem] font-medium">
-            {["Request", "Proposal", "Agreement", "Delivery", "Approval", "Payment"].map((s, i, a) => (
-              <li key={s} className="flex items-center">
-                <span className="rounded-md border border-border-strong bg-background px-2 py-1">{s}</span>
-                {i < a.length - 1 && <span className="h-px w-3 bg-border-strong" aria-hidden />}
-              </li>
-            ))}
-          </ol>
-          <p className="mt-4 text-[0.9375rem] leading-relaxed text-muted">Built from linked records, so any payment traces back to the promise behind it.</p>
-        </DocPanel>
-
-        <DocPanel icon={BadgeCheck} name="ProofFlow" kind="Checklist" title="Proof checked against the promise.">
-          <ul className="space-y-2 text-[0.9375rem]">
-            {(
-              [
-                [true, "8 of 8 pages on staging"],
-                [true, "Mobile layout review"],
-                [false, "SEO meta tags missing on 2 pages"],
-              ] as const
-            ).map(([ok, t]) => (
-              <li key={t} className="flex items-center gap-2.5">
-                <span className={cn("grid h-5 w-5 place-items-center rounded-md", ok ? "bg-success-soft text-success" : "bg-error-soft text-error")}>
-                  {ok ? <Check className="h-3.5 w-3.5" /> : <X className="h-3.5 w-3.5" />}
-                </span>
-                {t}
-              </li>
-            ))}
-          </ul>
-          <p className="mt-4 text-[0.9375rem] leading-relaxed text-muted">The AI&apos;s verdict is advice. The decision is yours.</p>
-        </DocPanel>
+      <div className="mt-12">
+        <FeatureBento />
       </div>
-
-      <DocPanel icon={ShieldCheck} name="TrustGate" kind="Permissions" title="AI prepares. You decide." className="mt-5">
-        <div className="overflow-hidden rounded-xl border border-border">
-          {[
-            ["Read invoices & transactions", "Allowed", "bg-success-soft text-success"],
-            ["Draft proposals & invoices", "Allowed", "bg-success-soft text-success"],
-            ["Send invoices", "Your setting", "bg-fill text-muted"],
-            ["Capture payments, refunds, change agreed amounts", "Always needs approval", "bg-warning-soft text-warning"],
-          ].map(([a, p, c]) => (
-            <div key={a} className="flex items-center justify-between gap-4 border-b border-border px-4 py-3 text-[0.9375rem] last:border-0">
-              <span>{a}</span>
-              <span className={cn("whitespace-nowrap rounded-md px-2 py-1 text-[0.6875rem] font-semibold", c)}>{p}</span>
-            </div>
-          ))}
-        </div>
-      </DocPanel>
     </Section>
   );
 }
@@ -366,7 +282,7 @@ export function PayPalSection() {
     ["Idempotency", "Duplicate deliveries are ignored, and every event is stored with its PayPal ID."],
   ];
   return (
-    <Section>
+    <Section id="paypal" className="scroll-mt-24">
       <div className="grid items-start gap-12 lg:grid-cols-2">
         <Heading
           eyebrow="PayPal integration"
@@ -396,7 +312,7 @@ export function SecuritySection() {
     [LockKeyhole, "Tenant isolation", "Every query is scoped to your business account."],
   ];
   return (
-    <Section band="ink">
+    <Section band="ink" id="security" className="scroll-mt-24">
       <Heading ink eyebrow="Security & controls" title="AI that prepares. People who decide." />
       <ul className="mt-12 grid gap-x-12 gap-y-10 sm:grid-cols-2">
         {items.map(([Icon, t, d]) => (
@@ -520,7 +436,7 @@ const FAQ = [
 
 export function FaqSection() {
   return (
-    <Section band="paper">
+    <Section band="paper" id="faq" className="scroll-mt-24">
       <div className="grid gap-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.4fr)]">
         <Heading eyebrow="FAQ" title="Questions, answered." />
         <div className="divide-y divide-border border-y border-border">

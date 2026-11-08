@@ -334,3 +334,35 @@ input[type="range"] { accent-color: var(--accent); }
 @keyframes pp-drift { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(-12%, 8%, 0); } }
 .card-wall-track { animation: pp-drift 40s ease-in-out infinite alternate; }
 @media (prefers-reduced-motion: reduce) { .card-wall-track { animation: none; } }
+
+/* Light orb stage (landing architecture): matches the scene backdrop painted in WebGL. */
+.pp-orb-stage-light {
+  background:
+    radial-gradient(60% 80% at 18% 0%, rgb(185 165 255 / 0.45), transparent 70%),
+    radial-gradient(60% 80% at 88% 100%, rgb(246 200 159 / 0.45), transparent 70%),
+    #fbfaff;
+}
+.pp-orb-stage-light .pp-orb-title { color: #0d0d10; }
+.pp-orb-stage-light .pp-orb-caption { color: #6a6a74; }
+
+/* Fintech card wall: bright cards with soft blob shapes */
+.fc { position: relative; overflow: hidden; isolation: isolate; }
+.fc::before, .fc::after { content: ""; position: absolute; z-index: -1; border-radius: 40%; }
+.fc::before { width: 70%; height: 80%; left: -18%; top: -45%; transform: rotate(-12deg); background: rgb(255 255 255 / 0.12); }
+.fc::after { width: 55%; height: 70%; right: -14%; bottom: -38%; transform: rotate(-18deg); background: rgb(255 255 255 / 0.1); }
+.fc-orange { background: linear-gradient(135deg, #ff6a00, #ff9f1a); }
+.fc-teal   { background: linear-gradient(135deg, #18d6c0, #2f7cf6 70%, #4b3ff0); }
+.fc-lime   { background: linear-gradient(135deg, #8ee04a, #2fbf4a); }
+.fc-violet { background: linear-gradient(135deg, #c43cff, #7a12ff); }
+.fc-navy   { background: linear-gradient(135deg, #1d2033, #11131f); }
+.fc-pink   { background: linear-gradient(135deg, #ff5cb8, #ff3d8b); }
+.fc-red    { background: linear-gradient(135deg, #ff4141, #ff1f1f); }
+.fc-white  { background: linear-gradient(135deg, #ffffff, #ecebef); color: #121218; }
+.fc-white::before, .fc-white::after { background: rgb(0 0 0 / 0.06); }
+.fc-green  { background: linear-gradient(135deg, #2e8f5c, #1f6b45); }
+
+/* Feature visuals */
+@keyframes pp-pop-in { 0% { transform: scale(0.6); opacity: 0; } 70% { transform: scale(1.06); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+.pp-pop-in { animation: pp-pop-in 600ms var(--ease-ios) both; }
+@keyframes pp-ring { from { stroke-dasharray: 0 400; } }
+.pp-ring { animation: pp-ring 1.4s var(--ease-ios) both; }
