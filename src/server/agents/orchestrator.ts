@@ -17,6 +17,7 @@ import { effectivePolicy, type Policy } from "./policies";
 import { TOOL_BY_NAME, TOOLS, toolJsonSchema, type AgentName, type ToolContext, type ToolSpec } from "./tools";
 import { planHeuristic } from "./planner";
 import { queueApproval } from "@/server/services/workflow";
+import { formatMoney } from "@/lib/money";
 
 export type AgentEvent =
   | { type: "start"; executionId: string; mode: "ai" | "heuristic"; model: string | null }
@@ -41,8 +42,26 @@ export async function trustGate(db: Database, businessId: string, tool: ToolSpec
   return effectivePolicy(tool.policy, row?.policy ?? null);
 }
 
+/**
+ * What the AI model sees: every integer `…Minor` amount becomes a formatted money string under
+ * the same name without the suffix (e.g. agreedMinor: 150000 → agreed: "$1,500.00"), so a model
+ * can never misread cents as dollars. The UI and the rule-based planner keep the raw numbers.
+ */
+function moneyForModel(value: unknown, currency = "USD"): unknown {
+  if (Array.isArray(value)) return value.map((v) => moneyForModel(v, currency));
+  if (!value || typeof value !== "object") return value;
+  const obj = value as Record<string, unknown>;
+  const cur = typeof obj.currency === "string" ? obj.currency : currency;
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (/Minor$/.test(k) && typeof v === "number") out[k.replace(/Minor$/, "")] = formatMoney(v, cur);
+    else out[k] = moneyForModel(v, cur);
+  }
+  return out;
+}
+
 /** Validates, permission-checks, executes and records one tool call. Returns the text for the model. */
-async function invokeTool(ctx: ToolContext, name: string, rawInput: unknown, callId: string, emit: Emit, state: { approvals: number }) {
+async function invokeTool(ctx: ToolContext, name: string, rawInput: unknown, callId: string, emit: Emit, state: { approvals: number }): Promise<{ ok: boolean; content: string; modelContent?: string }> {
   const spec = TOOL_BY_NAME.get(name);
   const started = Date.now();
   if (!spec) {
@@ -89,7 +108,7 @@ async function invokeTool(ctx: ToolContext, name: string, rawInput: unknown, cal
       state.approvals += 1;
       emit({ type: "approval", approvalId: d.approvalId, title: "Change order waiting for approval", amount: d.amount ?? null, reason: ctx.reasoning });
     }
-    return { ok: true, content: JSON.stringify(result.data) };
+    return { ok: true, content: JSON.stringify(result.data), modelContent: JSON.stringify(moneyForModel(result.data)) };
   } catch (e) {
     const message = e instanceof Error ? e.message : "Tool failed";
     await ctx.db.insert(agentToolCalls).values({ businessId: ctx.businessId, executionId: ctx.executionId, tool: name, args: input as object, decision: "error", error: message, durationMs: Date.now() - started });
@@ -212,7 +231,7 @@ async function runWithClaude(run: Run, executionId: string, state: { approvals: 
     for (const call of calls) {
       const ctx: ToolContext = { db: run.db, businessId: run.businessId, userId: run.userId, executionId, mode: "ai", reasoning: (lastText || reasoning).slice(0, 500) };
       const r = await invokeTool(ctx, call.name, call.input, call.id, run.emit, state);
-      results.push({ type: "tool_result", tool_use_id: call.id, content: r.content, is_error: !r.ok });
+      results.push({ type: "tool_result", tool_use_id: call.id, content: r.modelContent ?? r.content, is_error: !r.ok });
     }
     // All results for one assistant turn go back in a single user message.
     messages.push({ role: "user", content: results });
@@ -299,7 +318,7 @@ async function runWithGroq(run: Run, executionId: string, state: { approvals: nu
       }
       const ctx: ToolContext = { db: run.db, businessId: run.businessId, userId: run.userId, executionId, mode: "ai", reasoning: (lastText || reasoning).slice(0, 500) };
       const r = await invokeTool(ctx, call.function.name, args, call.id, run.emit, state);
-      messages.push({ role: "tool", tool_call_id: call.id, content: r.content });
+      messages.push({ role: "tool", tool_call_id: call.id, content: r.modelContent ?? r.content });
     }
     lastText = "";
   }
