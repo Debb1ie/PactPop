@@ -89,7 +89,7 @@ type Palette = { low: string; mid: string; high: string; opacity: number; additi
 const DARK: Palette = { low: "#34313f", mid: "#4d4960", high: "#7c72c8", opacity: 0.75, additive: false };
 const LIGHT: Palette = { low: "#c9c7d8", mid: "#aeaac6", high: "#7a6fd0", opacity: 0.6, additive: false };
 
-export function ScrollGrid({ intensity = 1 }: { intensity?: number }) {
+export function ScrollGrid({ intensity = 1, forceLight = false }: { intensity?: number; forceLight?: boolean }) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -138,7 +138,7 @@ export function ScrollGrid({ intensity = 1 }: { intensity?: number }) {
       scene.add(new THREE.Mesh(geometry, material));
 
       const applyTheme = () => {
-        const p = document.documentElement.classList.contains("dark") ? DARK : LIGHT;
+        const p = !forceLight && document.documentElement.classList.contains("dark") ? DARK : LIGHT;
         uniforms.uLow.value.set(p.low);
         uniforms.uMid.value.set(p.mid);
         uniforms.uHigh.value.set(p.high);
@@ -246,7 +246,7 @@ export function ScrollGrid({ intensity = 1 }: { intensity?: number }) {
       disposed = true;
       cleanup();
     };
-  }, [intensity]);
+  }, [intensity, forceLight]);
 
   return (
     <canvas

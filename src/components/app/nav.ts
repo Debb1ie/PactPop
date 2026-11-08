@@ -32,7 +32,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/app/evidence", label: "Evidence Vault", icon: Archive, group: "money", ready: false },
   { href: "/app/reports", label: "Reports", icon: BarChart3, group: "money", ready: false },
   { href: "/app/agents", label: "AI Agents", icon: Bot, group: "system", ready: false },
-  { href: "/app/settings", label: "Settings", icon: Settings, group: "system", ready: false },
+  { href: "/app/settings", label: "Settings", icon: Settings, group: "system", ready: true },
 ];
 
 export const NAV_GROUPS: { key: NavItem["group"]; label: string }[] = [

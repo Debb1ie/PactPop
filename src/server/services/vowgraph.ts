@@ -27,11 +27,13 @@ export async function vowgraphSummary(db: Database, businessId: string, limit = 
     id: c.id,
     title: c.title,
     status: c.status,
+    version: c.currentVersion,
+    dueDate: c.dueDate ? c.dueDate.toISOString() : null,
     agreedTotalMinor: c.agreedTotalMinor,
     currency: c.currency,
     clientId,
     clientName: company ?? clientName,
-    milestones: ms.filter((m) => m.commitmentId === c.id).sort((a, b) => a.position - b.position).map((m) => ({ title: m.title, paid: m.status === "paid", amountMinor: m.amountMinor })),
+    milestones: ms.filter((m) => m.commitmentId === c.id).sort((a, b) => a.position - b.position).map((m) => ({ title: m.title, paid: m.status === "paid", status: m.status, kind: m.kind, amountMinor: m.amountMinor })),
     pendingChangeOrders: cos.filter((o) => o.commitmentId === c.id).map((o) => ({ title: o.title, amountMinor: o.amountMinor })),
   }));
 }

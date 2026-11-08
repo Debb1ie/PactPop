@@ -30,7 +30,7 @@ export function PositionBoard({ p, currency, sandbox }: { p: Position; currency:
   return (
     <section className="panel" aria-label="Account position">
       <div className="panel-head">
-        <h2 className="label-mono !text-foreground">Account position</h2>
+        <h2 className="panel-title">Account position</h2>
         <span className="ml-auto flex items-center gap-2 font-mono text-[0.65rem] uppercase tracking-[0.08em] text-muted">
           <span className="live-dot" aria-hidden /> Live{sandbox ? " · PayPal Sandbox" : ""} · {currency}
         </span>
@@ -45,7 +45,7 @@ export function PositionBoard({ p, currency, sandbox }: { p: Position; currency:
           </p>
         </div>
         <div>
-          <div className="flex h-3 w-full overflow-hidden rounded-[2px] bg-fill" role="img" aria-label={`Received ${formatMoney(p.receivedMinor)}, invoiced ${formatMoney(p.invoicedMinor)}, scheduled ${formatMoney(p.scheduledMinor)} of ${formatMoney(p.contractedMinor)} contracted`}>
+          <div className="flex h-3 w-full overflow-hidden rounded-full bg-fill" role="img" aria-label={`Received ${formatMoney(p.receivedMinor)}, invoiced ${formatMoney(p.invoicedMinor)}, scheduled ${formatMoney(p.scheduledMinor)} of ${formatMoney(p.contractedMinor)} contracted`}>
             <span className="h-full bg-money-in" style={{ width: seg(p.receivedMinor) }} />
             <span className="h-full border-l border-surface bg-accent" style={{ width: seg(p.invoicedMinor) }} />
             <span className="h-full border-l border-surface bg-faint" style={{ width: seg(p.scheduledMinor) }} />
@@ -61,7 +61,7 @@ export function PositionBoard({ p, currency, sandbox }: { p: Position; currency:
         {cols.map((c, i) => (
           <div key={c.label} className={`min-w-0 px-4 py-3.5 ${i > 0 ? "border-l border-border" : ""} ${i >= 2 ? "max-sm:border-t" : ""} ${i === 2 ? "max-sm:border-l-0" : ""} ${i >= 3 ? "sm:max-lg:border-t" : ""} ${i === 3 ? "sm:max-lg:border-l-0" : ""}`}>
             <dt className="flex items-center gap-1.5 label-mono">
-              {c.swatch && <span className={`h-2 w-2 rounded-[1px] ${c.swatch}`} aria-hidden />}
+              {c.swatch && <span className={`h-2 w-2 rounded-sm ${c.swatch}`} aria-hidden />}
               {c.label}
             </dt>
             <dd className={`money mt-1.5 text-[1.125rem] font-medium ${c.cls}`}>{formatMoney(c.value, currency)}</dd>

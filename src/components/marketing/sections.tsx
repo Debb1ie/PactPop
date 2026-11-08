@@ -25,6 +25,8 @@ import type { ReactNode } from "react";
 import { OrbField, type Orb } from "@/components/fx/orb-field";
 import { ButtonLink } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
+import Link from "next/link";
+import { HeroCards } from "./hero-cards";
 import { ProductMockup } from "./product-mockup";
 
 export const FLOW = [
@@ -66,7 +68,7 @@ function Heading({ eyebrow, title, intro, ink, center }: { eyebrow: string; titl
 /** A plain bordered panel with a header row. Used where a feature is shown as the document it produces. */
 function DocPanel({ icon: Icon, name, kind, title, children, className }: { icon: LucideIcon; name: string; kind: string; title: string; children: ReactNode; className?: string }) {
   return (
-    <div className={cn("flex flex-col rounded-[4px] border border-border bg-surface", className)}>
+    <div className={cn("flex flex-col rounded-xl border border-border bg-surface", className)}>
       <div className="flex items-center gap-2.5 border-b border-border px-5 py-3.5">
         <Icon className="h-4 w-4 text-accent" />
         <span className="text-[0.9375rem] font-semibold">{name}</span>
@@ -85,42 +87,36 @@ function DocPanel({ icon: Icon, name, kind, title, children, className }: { icon
 export function Hero() {
   return (
     <section className="relative overflow-hidden">
-      <div className="relative mx-auto max-w-6xl px-5 pb-20 pt-14 sm:px-6 sm:pt-20">
-        <div className="grid items-end gap-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,0.75fr)]">
-          <div>
-            <p className="animate-rise inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 text-[0.8125rem] text-muted">
-              <span className="h-1.5 w-1.5 rounded-full bg-success" /> AI agents + PayPal · free & open source
-            </p>
-            <h1 className="animate-rise mt-6 text-balance text-[2.9rem] font-semibold leading-[1.02] tracking-[-0.045em] [animation-delay:60ms] sm:text-[4.5rem]">
-              Your business promises.{" "}
-              <span className="relative inline-block text-accent">
-                Handled.
-                <svg viewBox="0 0 200 20" className="absolute -bottom-2 left-0 h-3 w-full text-accent sm:-bottom-3" aria-hidden preserveAspectRatio="none">
-                  <path d="M4 14 C50 14 70 4 100 4 C130 4 150 14 196 14" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-                </svg>
-              </span>
-            </h1>
+      <div className="relative mx-auto max-w-6xl px-4 pb-16 pt-8 sm:px-6 sm:pt-12">
+        <HeroCards />
+        <div className="mx-auto mt-6 max-w-4xl text-center sm:mt-10">
+          <h1 className="animate-rise text-balance text-[2.75rem] font-bold leading-[1.02] tracking-[-0.045em] text-[#0d0d10] sm:text-[5rem]">
+            Your business promises. Handled.
+          </h1>
+          <p className="animate-rise mx-auto mt-5 max-w-2xl text-[1.0625rem] leading-relaxed text-muted [animation-delay:80ms] sm:text-[1.25rem]">
+            From the first client request to the final payment, PactPop&apos;s AI agents help you manage agreements, track deliverables, coordinate approvals, and get paid with
+            confidence.
+          </p>
+          <div className="animate-rise mt-8 flex flex-wrap justify-center gap-3 [animation-delay:160ms]">
+            <Link href="/register" className="inline-flex h-12 items-center gap-2 rounded-xl bg-[#0d0d10] px-6 text-[0.9375rem] font-medium text-white transition hover:bg-[#2a2a30]">
+              Get Started <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link href="/how-it-works" className="inline-flex h-12 items-center rounded-xl border border-[#d9d9e0] bg-white px-6 text-[0.9375rem] font-medium text-[#0d0d10] transition hover:bg-[#f5f5f7]">
+              See How It Works
+            </Link>
           </div>
-          <div className="animate-rise [animation-delay:120ms]">
-            <p className="text-[1.0625rem] leading-relaxed text-muted">
-              From the first client request to the final payment, PactPop&apos;s AI agents help you manage agreements, track deliverables, coordinate approvals, and get paid with
-              confidence.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <ButtonLink href="/register" size="lg" className="px-6">
-                Get Started <ArrowRight className="h-4 w-4" />
-              </ButtonLink>
-              <ButtonLink href="/how-it-works" size="lg" variant="outline" className="px-6">
-                See How It Works
-              </ButtonLink>
-            </div>
-          </div>
-        </div>
-        <div className="animate-rise mt-14 [animation-delay:200ms]">
-          <ProductMockup />
         </div>
       </div>
       <FlowStrip />
+    </section>
+  );
+}
+
+/** Product preview (illustration) shown under the hero. */
+export function PreviewSection() {
+  return (
+    <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+      <ProductMockup />
     </section>
   );
 }
@@ -257,7 +253,7 @@ export function AgentsSection() {
             Ask the <span className="font-semibold text-foreground">Command Center</span> in plain language, for example &ldquo;Which invoices are overdue?&rdquo;
           </p>
         </div>
-        <div className="overflow-hidden rounded-[4px] border border-border bg-surface">
+        <div className="overflow-hidden rounded-xl border border-border bg-surface">
           <div className="flex justify-between border-b border-border bg-surface-2 px-5 py-2.5 text-[0.75rem] font-medium text-muted">
             <span>Agent</span>
             <span>Authority</span>
@@ -377,7 +373,7 @@ export function PayPalSection() {
           title="Payments are part of the agreement."
           intro="The PayFlow Agent works through PayPal's official REST APIs. Amounts come from approved milestones in your records, never from AI-generated text."
         />
-        <dl className="divide-y divide-border rounded-[4px] border border-border bg-surface">
+        <dl className="divide-y divide-border rounded-xl border border-border bg-surface">
           {points.map(([k, v]) => (
             <div key={k} className="grid gap-1 px-5 py-4 sm:grid-cols-[8.5rem_minmax(0,1fr)] sm:gap-6">
               <dt className="text-[0.875rem] font-semibold">{k}</dt>
@@ -468,7 +464,7 @@ export function ComparisonSection() {
   return (
     <Section>
       <Heading eyebrow="Why switch" title="Invoicing tools bill for the work. PactPop protects it." />
-      <div className="mt-12 overflow-x-auto rounded-[4px] border border-border bg-surface">
+      <div className="mt-12 overflow-x-auto rounded-xl border border-border bg-surface">
         <table className="w-full min-w-[600px] text-center">
           <thead>
             <tr className="border-b border-border text-[0.8125rem] text-muted">

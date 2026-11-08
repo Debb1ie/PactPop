@@ -39,7 +39,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               key={t.id}
               onClick={() => dismiss(t.id)}
               aria-label={`${t.title}. Dismiss`}
-              className="material animate-drop pointer-events-auto flex w-full max-w-sm items-center gap-3 rounded-[4px] px-4 py-3 text-left shadow-[var(--shadow-lift)] ring-[0.5px] ring-border"
+              className="material animate-drop pointer-events-auto flex w-full max-w-sm items-center gap-3 rounded-xl px-4 py-3 text-left shadow-[var(--shadow-lift)] ring-[0.5px] ring-border"
             >
               <Icon className={cn("h-6 w-6 shrink-0", tones[t.tone])} />
               <span className="min-w-0 flex-1">

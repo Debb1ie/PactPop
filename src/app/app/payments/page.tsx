@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { desc, eq } from "drizzle-orm";
 import { ReceivablesTable } from "@/components/app/money-tables";
+import { PositionBoard } from "@/components/app/position-board";
 import { RevenueChart } from "@/components/app/revenue-chart";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { formatMoney } from "@/lib/money";
@@ -8,7 +9,7 @@ import { requireAuth } from "@/server/auth/session";
 import { getDb } from "@/server/db/client";
 import { clients, invoices, payments } from "@/server/db/schema";
 import { paypalConfigured } from "@/server/env";
-import { receivablesSchedule, revenueTrend } from "@/server/services/finance";
+import { moneyPosition, receivablesSchedule, revenueTrend } from "@/server/services/finance";
 
 export const metadata: Metadata = { title: "Payments" };
 
@@ -19,7 +20,8 @@ export default async function PaymentsPage() {
   const db = await getDb();
   const bid = ctx.business.id;
   const cur = ctx.business.currency;
-  const [receivables, trend, inv, pays] = await Promise.all([
+  const [position, receivables, trend, inv, pays] = await Promise.all([
+    moneyPosition(db, bid),
     receivablesSchedule(db, bid, 50),
     revenueTrend(db, bid),
     db.select({ i: invoices, client: clients.name, company: clients.company }).from(invoices).innerJoin(clients, eq(clients.id, invoices.clientId)).where(eq(invoices.businessId, bid)).orderBy(desc(invoices.createdAt)).limit(50),
@@ -32,16 +34,18 @@ export default async function PaymentsPage() {
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="label-mono">PayPal Sandbox</p>
-          <h1 className="display-x mt-1 text-[1.9rem] font-bold uppercase leading-none tracking-[-0.01em]">Payments</h1>
+          <h1 className="mt-1 text-[1.75rem] font-bold leading-tight">Payments</h1>
         </div>
-        <span className={`rounded-[4px] border px-2.5 py-1 font-mono text-[0.7rem] uppercase tracking-[0.06em] ${connected ? "border-success/40 text-success" : "border-warning/40 text-warning"}`}>
+        <span className={`rounded-xl border px-2.5 py-1 font-mono text-[0.7rem] uppercase tracking-[0.06em] ${connected ? "border-success/40 text-success" : "border-warning/40 text-warning"}`}>
           {connected ? "PayPal Sandbox connected" : "PayPal Sandbox not connected"}
         </span>
       </div>
 
-      <section className="panel" aria-label="Receivables schedule">
+      <PositionBoard p={position} currency={cur} sandbox />
+
+      <section className="panel mt-4" aria-label="Receivables schedule">
         <div className="panel-head">
-          <h2 className="label-mono !text-foreground">Receivables schedule</h2>
+          <h2 className="panel-title">Receivables schedule</h2>
           <span className="ml-auto font-mono text-[0.65rem] uppercase tracking-[0.06em] text-muted">
             {receivables.length} open · {formatMoney(receivables.reduce((s, r) => s + r.amountMinor, 0), cur)}
           </span>
@@ -52,7 +56,7 @@ export default async function PaymentsPage() {
       <div className="mt-4 grid gap-4 xl:grid-cols-2">
         <section className="panel min-w-0" aria-label="Invoices">
           <div className="panel-head">
-            <h2 className="label-mono !text-foreground">PayPal invoices</h2>
+            <h2 className="panel-title">PayPal invoices</h2>
           </div>
           {inv.length === 0 ? (
             <p className="px-4 py-6 text-[0.875rem] text-muted">
@@ -74,7 +78,7 @@ export default async function PaymentsPage() {
 
         <section className="panel min-w-0" aria-label="Transactions">
           <div className="panel-head">
-            <h2 className="label-mono !text-foreground">Transactions</h2>
+            <h2 className="panel-title">Transactions</h2>
             <span className="ml-auto font-mono text-[0.65rem] uppercase tracking-[0.06em] text-faint">verified by webhook or API</span>
           </div>
           {pays.length === 0 ? (
@@ -96,7 +100,7 @@ export default async function PaymentsPage() {
 
       <section className="panel mt-4" aria-label="Payments received">
         <div className="panel-head">
-          <h2 className="label-mono !text-foreground">Payments received</h2>
+          <h2 className="panel-title">Payments received</h2>
           <span className="ml-auto font-mono text-[0.65rem] uppercase tracking-[0.06em] text-muted">PayPal-confirmed · 6M</span>
         </div>
         <div className="p-4">

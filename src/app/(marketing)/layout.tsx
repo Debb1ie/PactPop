@@ -1,58 +1,34 @@
 import Link from "next/link";
 import { Logo } from "@/components/brand/logo";
-import { ButtonLink } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/ui/theme";
 import { ScrollGrid } from "@/components/fx/scroll-grid";
+import { MenuPill } from "@/components/marketing/menu-pill";
 
 const NAV = [
   { href: "/features", label: "Features" },
   { href: "/how-it-works", label: "How it works" },
 ];
 
+/** Marketing pages: always light, bright landing look. */
 export default function MarketingLayout({ children }: LayoutProps<"/">) {
   return (
-    <div className="relative isolate flex min-h-screen flex-col">
-      <ScrollGrid />
-      <header className="sticky top-0 z-40 px-3 pt-3 sm:px-6">
-        <div className="glass mx-auto flex h-14 max-w-6xl items-center gap-6 rounded-2xl border border-border px-3 shadow-[var(--shadow-card)] sm:px-4">
-          <Link href="/" aria-label="PactPop home">
-            <Logo />
+    <div className="force-light relative isolate flex min-h-screen flex-col">
+      <ScrollGrid forceLight />
+      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md">
+        <div className="mx-auto grid h-20 max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 sm:px-6">
+          <Link href="/" aria-label="PactPop home" className="justify-self-start">
+            <span className="font-[family-name:var(--font-brand)] text-[1.35rem] font-semibold uppercase tracking-[0.04em] text-[#0d0d10]">PactPop</span>
           </Link>
-          <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
-            {NAV.map((n) => (
-              <Link key={n.href} href={n.href} className="rounded-xl px-3 py-2 text-sm text-muted transition-colors hover:bg-fill hover:text-foreground">
-                {n.label}
-              </Link>
-            ))}
-          </nav>
-          <div className="ml-auto flex items-center gap-2">
-            <ThemeToggle />
-            <ButtonLink href="/login" variant="ghost" size="sm" className="hidden sm:inline-flex">
-              Log in
-            </ButtonLink>
-            <ButtonLink href="/register" size="sm">
-              Get Started
-            </ButtonLink>
-          </div>
+          <MenuPill />
+          <Link
+            href="/register"
+            className="justify-self-end rounded-xl bg-[#0d0d10] px-4 py-2.5 text-[0.875rem] font-medium text-white transition hover:bg-[#2a2a30] sm:px-5"
+          >
+            Create account
+          </Link>
         </div>
-        <nav className="mx-auto mt-2 flex max-w-6xl gap-1 overflow-x-auto md:hidden" aria-label="Main mobile">
-          {NAV.map((n) => (
-            <Link key={n.href} href={n.href} className="glass shrink-0 rounded-xl border border-border px-3 py-1.5 text-sm text-muted hover:bg-fill">
-              {n.label}
-            </Link>
-          ))}
-          <Link href="/login" className="glass shrink-0 rounded-xl border border-border px-3 py-1.5 text-sm text-muted hover:bg-fill sm:hidden">
-            Log in
-          </Link>
-        </nav>
       </header>
       <main className="flex-1">{children}</main>
-      <div className="glass fixed inset-x-0 bottom-0 z-40 border-t border-border p-3 md:hidden">
-        <ButtonLink href="/register" className="w-full" size="lg">
-          Get Started
-        </ButtonLink>
-      </div>
-      <footer className="border-t border-border pb-20 md:pb-0">
+      <footer className="border-t border-border">
         <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div>
             <Logo />

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { ArrowUp, Ban, Check, CircleDashed, ShieldAlert, Sparkles } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { LogoMark } from "@/components/brand/logo";
 import { ApprovalCard } from "./approval-card";
 
 type Ev =
@@ -53,7 +54,7 @@ function RunView({ run }: { run: Run }) {
   return (
     <li className="space-y-3">
       <div className="flex justify-end">
-        <p className="max-w-[85%] rounded-[4px] rounded-br-md bg-accent px-4 py-2.5 text-[0.9375rem] text-white">{run.input}</p>
+        <p className="max-w-[85%] rounded-xl rounded-br-md bg-accent px-4 py-2.5 text-[0.9375rem] text-white">{run.input}</p>
       </div>
       <div className="space-y-2.5 border-l border-border pl-4">
         {start && (
@@ -75,7 +76,7 @@ function RunView({ run }: { run: Run }) {
             return (
               <div key={i} className="flex gap-2.5">
                 <AgentBadge name={e.agent} />
-                <div className="min-w-0 flex-1 rounded-[4px] border border-border bg-surface px-3 py-2">
+                <div className="min-w-0 flex-1 rounded-xl border border-border bg-surface px-3 py-2">
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                     <span className="text-[0.75rem] font-semibold">{e.agent}</span>
                     <span className="text-[0.8125rem]">{e.label}</span>
@@ -102,12 +103,12 @@ function RunView({ run }: { run: Run }) {
             return (
               <div key={i} className="flex gap-2.5">
                 <AgentBadge name="Orchestrator" />
-                <p className="min-w-0 flex-1 whitespace-pre-line rounded-[4px] bg-fill px-3.5 py-2.5 text-[0.9375rem] leading-relaxed">{e.text}</p>
+                <p className="min-w-0 flex-1 whitespace-pre-line rounded-xl bg-fill px-3.5 py-2.5 text-[0.9375rem] leading-relaxed">{e.text}</p>
               </div>
             );
           if (e.type === "error")
             return (
-              <p key={i} className="rounded-[4px] bg-error-soft px-3 py-2 text-[0.8125rem] text-error">
+              <p key={i} className="rounded-xl bg-error-soft px-3 py-2 text-[0.8125rem] text-error">
                 {e.message}
               </p>
             );
@@ -123,7 +124,10 @@ function RunView({ run }: { run: Run }) {
   );
 }
 
-export function AgentConsole({ mode, model, suggestions, tall }: { mode: "ai" | "heuristic"; model: string | null; suggestions: string[]; tall?: boolean }) {
+export type Suggestion = { title: string; detail?: string; command: string };
+
+/** Full-page agent chat (ChatGPT / Claude style): greeting + suggestions, centred thread, composer at the bottom. */
+export function AgentConsole({ mode, model, suggestions, greeting }: { mode: "ai" | "heuristic"; model: string | null; suggestions: Suggestion[]; greeting: string }) {
   const [runs, setRuns] = useState<Run[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -192,66 +196,76 @@ export function AgentConsole({ mode, model, suggestions, tall }: { mode: "ai" | 
   };
 
   return (
-    <section className="overflow-hidden rounded-[var(--radius-card)] border border-border bg-surface" aria-label="Agent console">
-      <header className="flex flex-wrap items-center gap-2 border-b border-border px-5 py-3">
-        <Sparkles className="h-4 w-4 text-accent" />
-        <h2 className="text-[0.9375rem] font-semibold">Ask PactPop</h2>
-        <span className={cn("ml-auto rounded-md px-2 py-0.5 font-mono text-[0.65rem] uppercase tracking-[0.06em]", mode === "ai" ? "bg-accent-soft text-accent" : "bg-warning-soft text-warning")}>
-          {mode === "ai" ? model ?? "Claude" : "Rule-based mode"}
-        </span>
-      </header>
-
-      <div ref={scroller} className={cn("overflow-y-auto px-5 py-4", tall ? "h-[min(60vh,560px)]" : runs.length ? "max-h-[440px]" : "")} aria-live="polite">
-        {runs.length === 0 ? (
-          <div>
-            <p className="text-[0.9375rem] text-muted">
-              Tell the agents what you need. They read your records, act through permission-checked tools, and ask before anything sensitive.
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {suggestions.map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => run(s)}
-                  disabled={busy}
-                  className="rounded-full border border-border bg-background px-3 py-1.5 text-left text-[0.8125rem] transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
-                >
-                  {s}
-                </button>
-              ))}
+    <section className="flex h-[calc(100dvh-12.5rem)] flex-col lg:h-[calc(100dvh-6rem)]" aria-label="Agent chat">
+      <div ref={scroller} className="flex-1 overflow-y-auto" aria-live="polite">
+        <div className="mx-auto w-full max-w-3xl px-1 py-6">
+          {runs.length === 0 ? (
+            <div className="flex min-h-[50vh] flex-col items-center justify-center text-center">
+              <LogoMark className="h-12 w-12" />
+              <h1 className="mt-5 text-[1.75rem] font-bold sm:text-[2rem]">{greeting}</h1>
+              <p className="mt-1.5 text-[0.9375rem] text-muted">What should the agents work on?</p>
+              <div className="mt-8 grid w-full gap-2.5 sm:grid-cols-2">
+                {suggestions.map((sg) => (
+                  <button
+                    key={sg.command}
+                    type="button"
+                    onClick={() => run(sg.command)}
+                    disabled={busy}
+                    className="rounded-2xl border border-border bg-surface px-4 py-3 text-left transition-colors hover:border-accent/60 hover:bg-surface-2 disabled:opacity-50"
+                  >
+                    <span className="block text-[0.9375rem] font-medium">{sg.title}</span>
+                    {sg.detail && <span className="mt-0.5 block text-[0.8125rem] text-muted">{sg.detail}</span>}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
-        ) : (
-          <ol className="space-y-6">
-            {runs.map((r) => (
-              <RunView key={r.id} run={r} />
-            ))}
-          </ol>
-        )}
+          ) : (
+            <ol className="space-y-8">
+              {runs.map((r) => (
+                <RunView key={r.id} run={r} />
+              ))}
+            </ol>
+          )}
+        </div>
       </div>
 
-      <form onSubmit={submit} className="flex items-center gap-2 border-t border-border p-3">
-        <label htmlFor="agent-input" className="sr-only">
-          Ask PactPop
-        </label>
-        <input
-          id="agent-input"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder={busy ? "Agents are working…" : "e.g. Northwind asked for a booking system too. Check the scope."}
-          disabled={busy}
-          maxLength={2000}
-          className="h-11 min-w-0 flex-1 rounded-[4px] border border-border bg-background px-3.5 text-[0.9375rem] placeholder:text-faint focus:border-accent focus:outline-none focus:ring-[3px] focus:ring-ring/40 disabled:opacity-60"
-        />
-        <button
-          type="submit"
-          disabled={busy || input.trim().length < 2}
-          aria-label="Send to agents"
-          className="grid h-11 w-11 shrink-0 place-items-center rounded-[4px] bg-accent text-white transition hover:bg-violet-strong disabled:opacity-40"
-        >
-          {busy ? <CircleDashed className="h-[18px] w-[18px] animate-spin" /> : <ArrowUp className="h-[18px] w-[18px]" />}
-        </button>
-      </form>
+      <div className="mx-auto w-full max-w-3xl pb-2 pt-3">
+        <form onSubmit={submit} className="rounded-3xl border border-border bg-surface p-2 shadow-[0_12px_40px_-20px_rgb(0_0_0/0.5)] focus-within:border-accent/60">
+          <label htmlFor="agent-input" className="sr-only">
+            Message PactPop agents
+          </label>
+          <textarea
+            id="agent-input"
+            value={input}
+            rows={1}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                run(input);
+              }
+            }}
+            placeholder={busy ? "Agents are working…" : "Ask PactPop to analyse a request, draft a proposal, check scope…"}
+            disabled={busy}
+            maxLength={2000}
+            className="block max-h-40 min-h-12 w-full resize-none bg-transparent px-3 py-2.5 text-[0.9375rem] leading-relaxed placeholder:text-faint focus:outline-none disabled:opacity-60 [field-sizing:content]"
+          />
+          <div className="flex items-center gap-2 px-1.5 pb-0.5">
+            <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.75rem] font-medium", mode === "ai" ? "bg-accent-soft text-accent" : "bg-warning-soft text-warning")}>
+              <Sparkles className="h-3.5 w-3.5" /> {mode === "ai" ? model ?? "Claude" : "Rule-based mode"}
+            </span>
+            <button
+              type="submit"
+              disabled={busy || input.trim().length < 2}
+              aria-label="Send to agents"
+              className="ml-auto grid h-9 w-9 shrink-0 place-items-center rounded-full bg-foreground text-background transition hover:opacity-90 disabled:opacity-30"
+            >
+              {busy ? <CircleDashed className="h-4 w-4 animate-spin" /> : <ArrowUp className="h-4 w-4" />}
+            </button>
+          </div>
+        </form>
+        <p className="mt-2 text-center text-[0.75rem] text-faint">Every action is checked by TrustGate. Anything sensitive waits for your approval.</p>
+      </div>
     </section>
   );
 }

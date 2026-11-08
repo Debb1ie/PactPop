@@ -105,3 +105,20 @@
   - Payments: receivables, PayPal invoices, transactions and received chart.
   - Approvals.
 - Mobile: five-tab bar, with the remaining pages listed in the account sheet.
+
+## 2026-11-08: Wallet-style dashboard, light landing page, chat-only agents, Settings
+
+- Dashboard adapted from an owner-supplied reference:
+  - Icon rail and centred search; a bell with a live approvals dot.
+  - "My Commitments" cards (selectable).
+  - Commitment details, and Collection with one segment per milestone.
+  - Cash flow with gradient bars on tracks.
+  - Transactions with a working date filter.
+- Landing page adapted from a second reference: always light, a Menu pill with dropdown, Create account, and three gradient agreement cards that tilt toward the pointer and lift on hover (reduced-motion safe).
+- AI Agents is now a single full-page chat, with a greeting, suggestions taken from the agent briefing, and a composer at the bottom.
+- New **Settings** page with four tabs:
+  - AI & agents: engine and tools.
+  - Permissions: editable TrustGate policies; locked floors can't be relaxed; changes are audited.
+  - Agent history.
+  - Workspace.
+- The request-link card moved to the Clients page.

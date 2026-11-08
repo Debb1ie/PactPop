@@ -64,7 +64,7 @@ export default async function CommitmentsPage() {
     <>
       <div className="mb-5">
         <p className="label-mono">{rows.length} agreements</p>
-        <h1 className="display-x mt-1 text-[1.9rem] font-bold uppercase leading-none tracking-[-0.01em]">Commitments</h1>
+        <h1 className="mt-1 text-[1.75rem] font-bold leading-tight">Commitments</h1>
       </div>
 
       <section className="panel overflow-hidden" aria-label="All commitments">
@@ -102,7 +102,7 @@ export default async function CommitmentsPage() {
                           {own
                             .sort((a, b) => a.position - b.position)
                             .map((m) => (
-                              <span key={m.id} title={`${m.title} · ${formatMoney(m.amountMinor, m.currency)} · ${m.status}`} className={`h-2.5 w-5 rounded-[1px] ${m.status === "paid" ? "bg-money-in" : m.kind === "change_order" ? "bg-warning" : "bg-border-strong"}`} />
+                              <span key={m.id} title={`${m.title} · ${formatMoney(m.amountMinor, m.currency)} · ${m.status}`} className={`h-2.5 w-5 rounded-sm ${m.status === "paid" ? "bg-money-in" : m.kind === "change_order" ? "bg-warning" : "bg-border-strong"}`} />
                             ))}
                           <span className="ml-1.5 font-mono text-[0.7rem] text-muted">
                             {paid}/{own.length}
@@ -125,7 +125,7 @@ export default async function CommitmentsPage() {
       <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <section className="panel min-w-0 overflow-hidden" aria-label="VowGraph">
           <div className="panel-head">
-            <h2 className="label-mono !text-foreground">VowGraph</h2>
+            <h2 className="panel-title">VowGraph</h2>
             <span className="font-mono text-[0.65rem] uppercase tracking-[0.06em] text-faint">orb = agreement · ring = milestone (lit when paid) · moon = pending change order</span>
           </div>
           <OrbField orbs={orbs} height={480} ariaLabel="3D view of commitments, milestones and pending change orders" />
@@ -133,7 +133,7 @@ export default async function CommitmentsPage() {
 
         <section className="panel min-w-0" aria-label="Activity">
           <div className="panel-head">
-            <h2 className="label-mono !text-foreground">Activity</h2>
+            <h2 className="panel-title">Activity</h2>
           </div>
           {events.length === 0 ? (
             <p className="px-4 py-6 text-[0.875rem] text-muted">No activity yet.</p>

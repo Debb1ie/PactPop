@@ -3,7 +3,7 @@ import { cn } from "@/lib/cn";
 type Tone = "neutral" | "violet" | "success" | "warning" | "error" | "info";
 
 const tones: Record<Tone, string> = {
-  neutral: "bg-fill text-muted",
+  neutral: "bg-surface-2 text-muted",
   violet: "bg-accent-soft text-accent",
   info: "bg-accent-soft text-accent",
   success: "bg-success-soft text-success",
@@ -78,5 +78,5 @@ export function statusLabel(status: string) {
 
 export function StatusBadge({ status, className }: { status: string; className?: string }) {
   const [label, tone] = STATUS[status] ?? [statusLabel(status), "neutral" as Tone];
-  return <span className={cn("inline-flex items-center whitespace-nowrap rounded-[3px] px-1.5 py-[2px] font-mono text-[0.65rem] font-semibold uppercase tracking-[0.06em]", tones[tone], className)}>{label}</span>;
+  return <span className={cn("inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-1 text-[0.75rem] font-medium", tones[tone], className)}>{label}</span>;
 }

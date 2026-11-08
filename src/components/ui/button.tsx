@@ -14,15 +14,15 @@ const variants: Record<Variant, string> = {
   gray: "bg-fill text-foreground hover:bg-fill-strong",
   outline: "border border-border-strong bg-surface text-foreground hover:bg-surface-2",
   ghost: "text-muted hover:bg-fill hover:text-foreground",
-  white: "bg-white text-[#16151c] hover:bg-[#efeff5]",
+  white: "bg-white text-accent hover:bg-[#f0edff]",
   danger: "bg-error text-white hover:brightness-110",
   success: "bg-success text-white hover:brightness-110",
 };
 
 const sizes: Record<Size, string> = {
-  sm: "h-8 rounded-[4px] px-3 text-[0.8125rem]",
-  md: "h-10 rounded-[4px] px-4 text-[0.875rem]",
-  lg: "h-12 rounded-[4px] px-6 text-[0.9375rem]",
+  sm: "h-9 rounded-xl px-3.5 text-[0.8125rem]",
+  md: "h-10 rounded-xl px-4 text-[0.875rem]",
+  lg: "h-12 rounded-xl px-6 text-[0.9375rem]",
 };
 
 export function buttonClass(variant: Variant = "primary", size: Size = "md", className?: string) {

@@ -6,6 +6,7 @@ import { formatMoney } from "@/lib/money";
 import { requireAuth } from "@/server/auth/session";
 import { getDb } from "@/server/db/client";
 import { listClients } from "@/server/services/clients";
+import { RequestLinkCard } from "@/components/app/shell";
 
 export const metadata: Metadata = { title: "Clients" };
 
@@ -39,6 +40,9 @@ export default async function ClientsPage({ searchParams }: PageProps<"/app/clie
           </ButtonLink>
         }
       />
+      <div className="mb-6 max-w-sm">
+        <RequestLinkCard requestPath={`/request/${ctx.business.slug}`} />
+      </div>
       <form className="relative mb-6" role="search">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
         <input
@@ -46,7 +50,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/app/clie
           defaultValue={q}
           placeholder="Search"
           aria-label="Search clients by name, company or email"
-          className="h-10 w-full rounded-[4px] bg-fill pl-9 pr-3 text-[1.0625rem] placeholder:text-muted focus:outline-none focus:ring-[3px] focus:ring-ring sm:max-w-md"
+          className="h-10 w-full rounded-xl bg-fill pl-9 pr-3 text-[1.0625rem] placeholder:text-muted focus:outline-none focus:ring-[3px] focus:ring-ring sm:max-w-md"
         />
       </form>
 

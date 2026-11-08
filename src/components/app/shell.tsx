@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { Check, ChevronDown, Copy, Link2, LogOut, Moon, Plus, Search, UserRound } from "lucide-react";
-import { Logo } from "@/components/brand/logo";
+import { Bell, Check, ChevronDown, Copy, Link2, LogOut, Moon, Search, UserRound } from "lucide-react";
+import { Logo, LogoMark } from "@/components/brand/logo";
 import { ThemeToggle, toggleTheme } from "@/components/ui/theme";
 import { DemoBadge } from "@/components/ui/primitives";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/cn";
-import { NAV_GROUPS, NAV_ITEMS } from "./nav";
+import { NAV_ITEMS } from "./nav";
 
 type ShellProps = {
   children: ReactNode;
@@ -29,7 +29,7 @@ function isActive(pathname: string, href: string) {
 
 function Avatar({ name, className }: { name: string; className?: string }) {
   return (
-    <span className={cn("grid h-9 w-9 shrink-0 place-items-center rounded-[4px] bg-accent font-mono text-sm font-semibold text-white", className)} aria-hidden>
+    <span className={cn("grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#a18bff] to-[#5b3cd4] text-sm font-semibold text-white", className)} aria-hidden>
       {name.slice(0, 1).toUpperCase()}
     </span>
   );
@@ -71,8 +71,8 @@ export function useCopyRequestLink(requestPath: string) {
   return { copy, copied };
 }
 
-/** Sidebar card: the business's client request link. (Owner-approved design — keep as is.) */
-function RequestLinkCard({ requestPath }: { requestPath: string }) {
+/** The business's client request link. (Owner-approved design — keep as is.) */
+export function RequestLinkCard({ requestPath }: { requestPath: string }) {
   const { copy, copied } = useCopyRequestLink(requestPath);
   return (
     <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#7b6dff] via-[#5b45e8] to-[#2f1aa6] p-4 text-white shadow-[0_16px_40px_-16px_rgb(108_92_255/0.8)]">
@@ -96,70 +96,51 @@ function RequestLinkCard({ requestPath }: { requestPath: string }) {
   );
 }
 
-function Sidebar({ business, pendingApprovals, requestPath, logout, integrations }: Omit<ShellProps, "children" | "user">) {
+/** Icon rail (desktop). Labels appear as tooltips and are read by screen readers. */
+function Rail({ pendingApprovals, logout }: { pendingApprovals: number; logout: () => Promise<void> }) {
   const pathname = usePathname();
   return (
-    <div className="flex h-full flex-col gap-6 px-4 py-5">
-      <div className="px-2">
-        <Link href="/app/dashboard" aria-label="Dashboard">
-          <Logo size="sm" />
-        </Link>
-        <div className="mt-3 flex items-center gap-2 text-[0.8125rem]">
-          <span className="truncate font-medium">{business.name}</span>
-          {business.isDemo && <DemoBadge />}
-        </div>
-      </div>
-
-      <nav className="flex-1 space-y-5 overflow-y-auto" aria-label="App">
-        {NAV_GROUPS.map((g) => {
-          const items = READY.filter((i) => i.group === g.key);
-          if (!items.length) return null;
+    <nav aria-label="App" className="flex h-full flex-col items-center py-6">
+      <Link href="/app/dashboard" aria-label="PactPop dashboard" className="mb-10">
+        <LogoMark className="h-10 w-10" />
+      </Link>
+      <ul className="flex flex-1 flex-col items-center gap-3">
+        {READY.map(({ href, label, icon: Icon }) => {
+          const active = isActive(pathname, href);
           return (
-            <div key={g.key}>
-              <p className="px-3 text-[0.75rem] font-medium text-faint">{g.label}</p>
-              <ul className="mt-1.5 space-y-0.5">
-                {items.map(({ href, label, icon: Icon }) => {
-                  const active = isActive(pathname, href);
-                  return (
-                    <li key={href}>
-                      <Link
-                        href={href}
-                        aria-current={active ? "page" : undefined}
-                        className={cn(
-                          "flex items-center gap-3 rounded-[4px] px-3 py-2 text-[0.9375rem] transition-colors",
-                          active ? "bg-fill-strong font-semibold text-foreground" : "text-muted hover:bg-fill hover:text-foreground",
-                        )}
-                      >
-                        <Icon className={cn("h-[18px] w-[18px] shrink-0", active ? "text-foreground" : "text-faint")} strokeWidth={active ? 2.2 : 1.8} />
-                        <span className="flex-1">{label}</span>
-                        {href === "/app/approvals" && pendingApprovals > 0 && (
-                          <span className="money rounded-full bg-error px-1.5 text-xs font-semibold text-white">{pendingApprovals}</span>
-                        )}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
+            <li key={href} className="group relative">
+              <Link
+                href={href}
+                aria-label={label}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "grid h-11 w-11 place-items-center rounded-xl transition-colors",
+                  active ? "bg-white text-[#1c1d23] shadow-[0_6px_20px_-8px_rgb(0_0_0/0.6)]" : "text-muted hover:bg-surface hover:text-foreground",
+                )}
+              >
+                <Icon className="h-5 w-5" strokeWidth={active ? 2.2 : 1.8} />
+                {href === "/app/approvals" && pendingApprovals > 0 && (
+                  <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-error px-1 text-[0.6rem] font-bold text-white">{pendingApprovals}</span>
+                )}
+              </Link>
+              <span className="pointer-events-none absolute left-full top-1/2 z-50 ml-3 -translate-y-1/2 whitespace-nowrap rounded-lg bg-surface-2 px-2.5 py-1 text-xs font-medium opacity-0 shadow-[var(--shadow-lift)] transition-opacity group-hover:opacity-100 group-focus-within:opacity-100" aria-hidden>
+                {label}
+              </span>
+            </li>
           );
         })}
-      </nav>
-
-      <RequestLinkCard requestPath={requestPath} />
-      <div className="px-2">
-        <Integrations integrations={integrations} />
-      </div>
+      </ul>
       <form action={logout}>
-        <button className="flex w-full items-center gap-3 rounded-[4px] px-3 py-2.5 text-[0.9375rem] text-muted transition-colors hover:bg-fill hover:text-error">
-          <LogOut className="h-[18px] w-[18px]" /> Log out
+        <button className="grid h-11 w-11 place-items-center rounded-xl text-muted transition-colors hover:bg-surface hover:text-error" aria-label="Log out" title="Log out">
+          <LogOut className="h-5 w-5" strokeWidth={1.8} />
         </button>
       </form>
-    </div>
+    </nav>
   );
 }
 
-/** Top bar: client search (works), quick add, theme, and the account menu. */
-function TopBar({ user, onAccount }: { user: ShellProps["user"]; onAccount: () => void }) {
+/** Top bar: centred search (clients), theme, approvals bell, account menu. */
+function TopBar({ user, pendingApprovals, onAccount }: { user: ShellProps["user"]; pendingApprovals: number; onAccount: () => void }) {
   const router = useRouter();
   const [q, setQ] = useState("");
   const submit = (e: FormEvent) => {
@@ -168,36 +149,30 @@ function TopBar({ user, onAccount }: { user: ShellProps["user"]; onAccount: () =
     router.push(term ? `/app/clients?q=${encodeURIComponent(term)}` : "/app/clients");
   };
   return (
-    <header className="glass sticky top-0 z-30 border-b border-border">
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-md">
+      <div className="mx-auto flex h-20 max-w-[1280px] items-center gap-3 px-4 sm:px-6 lg:px-8">
         <Link href="/app/dashboard" aria-label="Dashboard" className="lg:hidden">
           <Logo size="sm" />
         </Link>
-        <form onSubmit={submit} role="search" className="relative hidden flex-1 sm:block">
-          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-faint" />
+        <form onSubmit={submit} role="search" className="relative mx-auto hidden w-full max-w-sm sm:block">
+          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search clients, companies or emails…"
+            placeholder="Search"
             aria-label="Search clients"
-            className="h-10 w-full max-w-xl rounded-[4px] border border-border bg-surface pl-11 pr-4 text-[0.9375rem] placeholder:text-faint focus:border-accent focus:outline-none focus:ring-[3px] focus:ring-ring/40"
+            className="h-10 w-full rounded-full border border-transparent bg-surface pl-11 pr-4 text-[0.875rem] placeholder:text-muted focus:border-accent focus:outline-none focus:ring-[3px] focus:ring-ring/40"
           />
         </form>
-        <div className="ml-auto flex items-center gap-2">
-          <Link
-            href="/app/clients/new"
-            className="hidden h-10 items-center gap-1.5 rounded-[4px] bg-accent px-4 text-sm font-semibold text-white transition hover:bg-violet-strong sm:flex"
-          >
-            <Plus className="h-4 w-4" /> New client
+        <div className="ml-auto flex items-center gap-1 sm:ml-0">
+          <ThemeToggle className="text-muted" />
+          <Link href="/app/approvals" aria-label={`Approvals${pendingApprovals ? `, ${pendingApprovals} waiting` : ""}`} className="relative grid h-10 w-10 place-items-center rounded-full text-muted transition-colors hover:bg-surface hover:text-foreground">
+            <Bell className="h-[18px] w-[18px]" />
+            {pendingApprovals > 0 && <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-error ring-2 ring-background" aria-hidden />}
           </Link>
-          <Link href="/app/clients/new" aria-label="New client" className="grid h-10 w-10 place-items-center rounded-[4px] bg-accent text-white sm:hidden">
-            <Plus className="h-[18px] w-[18px]" />
-          </Link>
-          <ThemeToggle className="!rounded-[4px] border border-border" />
-          <button onClick={onAccount} className="flex h-10 items-center gap-2 rounded-[4px] border border-border py-0.5 pl-0.5 pr-0.5 transition-colors hover:bg-fill sm:pr-3" aria-label="Account menu">
+          <button onClick={onAccount} className="ml-1 flex items-center gap-1.5 rounded-full p-0.5 pr-1.5 transition-colors hover:bg-surface" aria-label="Account menu">
             <Avatar name={user.name} />
-            <span className="hidden text-sm font-medium sm:inline">{user.name.split(" ")[0]}</span>
-            <ChevronDown className="hidden h-4 w-4 text-muted sm:block" />
+            <ChevronDown className="h-4 w-4 text-muted" />
           </button>
         </div>
       </div>
@@ -205,7 +180,7 @@ function TopBar({ user, onAccount }: { user: ShellProps["user"]; onAccount: () =
   );
 }
 
-/** Account sheet: profile, workspace, request link, appearance, integrations, logout. */
+/** Account sheet: profile, workspace, request link, more pages, appearance, integrations, logout. */
 function AccountSheet({ open, onClose, ...p }: Omit<ShellProps, "children" | "pendingApprovals"> & { open: boolean; onClose: () => void }) {
   const ref = useRef<HTMLDialogElement>(null);
   const { copy, copied } = useCopyRequestLink(p.requestPath);
@@ -224,23 +199,23 @@ function AccountSheet({ open, onClose, ...p }: Omit<ShellProps, "children" | "pe
         onClose();
       }}
       onClick={(e) => e.target === ref.current && onClose()}
-      className="mx-auto mb-0 mt-auto w-full max-w-md rounded-t-[6px] border border-border bg-surface p-0 text-foreground sm:mb-auto sm:rounded-[6px]"
+      className="mx-auto mb-0 mt-auto w-full max-w-md rounded-t-2xl bg-surface p-0 text-foreground sm:mb-auto sm:rounded-2xl"
     >
       <div className="pb-safe p-5">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Account</h2>
+          <h2 className="text-lg font-bold">Account</h2>
           <button onClick={onClose} className="rounded-full px-3 py-1 text-sm font-semibold text-accent hover:bg-fill">
             Done
           </button>
         </div>
-        <div className="mt-4 flex items-center gap-3 rounded-[4px] border border-border bg-surface-2 px-4 py-3">
+        <div className="mt-4 flex items-center gap-3 rounded-xl bg-surface-2 px-4 py-3">
           <Avatar name={p.user.name} className="h-12 w-12 text-lg" />
           <div className="min-w-0 flex-1">
             <p className="truncate font-semibold">{p.user.name}</p>
             <p className="truncate text-sm text-muted">{p.user.email}</p>
           </div>
         </div>
-        <div className="mt-3 flex items-center justify-between gap-3 rounded-[4px] border border-border bg-surface-2 px-4 py-3 text-sm">
+        <div className="mt-3 flex items-center justify-between gap-3 rounded-xl bg-surface-2 px-4 py-3 text-sm">
           <span className="flex min-w-0 items-center gap-2 truncate font-medium">
             {p.business.name} {p.business.isDemo && <DemoBadge />}
           </span>
@@ -248,16 +223,14 @@ function AccountSheet({ open, onClose, ...p }: Omit<ShellProps, "children" | "pe
             {copied ? <Check className="h-3 w-3" /> : <Link2 className="h-3 w-3" />} Request link
           </button>
         </div>
-        {READY.length > 4 && (
-          <nav aria-label="More pages" className="mt-3 divide-y divide-border rounded-[4px] border border-border bg-surface-2">
-            {READY.slice(4).map(({ href, label, icon: Icon }) => (
-              <Link key={href} href={href} onClick={onClose} className="flex items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-fill">
-                <Icon className="h-4 w-4 text-muted" /> {label}
-              </Link>
-            ))}
-          </nav>
-        )}
-        <button onClick={toggleTheme} className="mt-3 flex w-full items-center gap-3 rounded-[4px] border border-border bg-surface-2 px-4 py-3 text-left text-sm">
+        <nav aria-label="All pages" className="mt-3 grid grid-cols-2 gap-2 lg:hidden">
+          {READY.map(({ href, label, icon: Icon }) => (
+            <Link key={href} href={href} onClick={onClose} className="flex items-center gap-2.5 rounded-xl bg-surface-2 px-3 py-2.5 text-sm font-medium hover:bg-fill">
+              <Icon className="h-4 w-4 text-muted" /> {label}
+            </Link>
+          ))}
+        </nav>
+        <button onClick={toggleTheme} className="mt-3 flex w-full items-center gap-3 rounded-xl bg-surface-2 px-4 py-3 text-left text-sm">
           <Moon className="h-4 w-4 text-accent" />
           <span className="flex-1 font-medium">Appearance</span>
           <span className="text-muted">
@@ -265,11 +238,11 @@ function AccountSheet({ open, onClose, ...p }: Omit<ShellProps, "children" | "pe
             <span className="hidden dark:inline">Dark</span>
           </span>
         </button>
-        <div className="mt-3 rounded-[4px] border border-border bg-surface-2 px-4 py-3">
+        <div className="mt-3 rounded-xl bg-surface-2 px-4 py-3">
           <Integrations integrations={p.integrations} />
         </div>
         <form action={p.logout} className="mt-4">
-          <button className="h-12 w-full rounded-[4px] border border-error/30 bg-error-soft text-base font-semibold text-error">Log out</button>
+          <button className="h-12 w-full rounded-xl bg-error-soft text-base font-semibold text-error">Log out</button>
         </form>
       </div>
     </dialog>
@@ -286,11 +259,7 @@ function TabBar({ onAccount, pendingApprovals }: { onAccount: () => void; pendin
           const active = isActive(pathname, href);
           return (
             <li key={href} className="flex-1">
-              <Link
-                href={href}
-                aria-current={active ? "page" : undefined}
-                className={cn("flex flex-col items-center gap-0.5 pt-2 text-[0.6875rem] font-medium", active ? "text-accent" : "text-muted")}
-              >
+              <Link href={href} aria-current={active ? "page" : undefined} className={cn("flex flex-col items-center gap-0.5 pt-2 text-[0.6875rem] font-medium", active ? "text-accent" : "text-muted")}>
                 <span className="relative">
                   <Icon className="h-6 w-6" strokeWidth={active ? 2.3 : 1.8} />
                   {href === "/app/approvals" && pendingApprovals > 0 && (
@@ -305,7 +274,7 @@ function TabBar({ onAccount, pendingApprovals }: { onAccount: () => void; pendin
         <li className="flex-1">
           <button onClick={onAccount} className="flex w-full flex-col items-center gap-0.5 pt-2 text-[0.6875rem] font-medium text-muted">
             <UserRound className="h-6 w-6" strokeWidth={1.8} />
-            Account
+            More
           </button>
         </li>
       </ul>
@@ -316,15 +285,15 @@ function TabBar({ onAccount, pendingApprovals }: { onAccount: () => void; pendin
 export function AppShell({ children, ...props }: ShellProps) {
   const [sheet, setSheet] = useState(false);
   return (
-    <div className="min-h-screen lg:grid lg:grid-cols-[17rem_1fr]">
-      <aside className="hidden border-r border-border bg-surface lg:block">
+    <div className="min-h-screen lg:grid lg:grid-cols-[88px_1fr]">
+      <aside className="hidden lg:block">
         <div className="sticky top-0 h-screen">
-          <Sidebar {...props} />
+          <Rail pendingApprovals={props.pendingApprovals} logout={props.logout} />
         </div>
       </aside>
       <div className="min-w-0">
-        <TopBar user={props.user} onAccount={() => setSheet(true)} />
-        <main className="mx-auto w-full max-w-7xl px-4 pb-28 pt-6 sm:px-6 lg:px-8 lg:pb-12 lg:pt-8">{children}</main>
+        <TopBar user={props.user} pendingApprovals={props.pendingApprovals} onAccount={() => setSheet(true)} />
+        <main className="mx-auto w-full max-w-[1280px] px-4 pb-28 pt-2 sm:px-6 lg:px-8 lg:pb-12">{children}</main>
       </div>
       <TabBar onAccount={() => setSheet(true)} pendingApprovals={props.pendingApprovals} />
       <AccountSheet open={sheet} onClose={() => setSheet(false)} {...props} />

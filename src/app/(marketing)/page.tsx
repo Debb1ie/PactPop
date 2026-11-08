@@ -8,6 +8,7 @@ import {
   CtaBand,
   FaqSection,
   Hero,
+  PreviewSection,
   IntelligenceSection,
   PayPalSection,
   Problem,
@@ -18,6 +19,7 @@ export default function LandingPage() {
   return (
     <>
       <Hero />
+      <PreviewSection />
       <Problem />
       <LeakCalculator />
       <ProductTour />
