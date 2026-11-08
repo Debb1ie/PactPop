@@ -43,16 +43,19 @@ export default async function ClientsPage({ searchParams }: PageProps<"/app/clie
       <div className="mb-6 max-w-sm">
         <RequestLinkCard requestPath={`/request/${ctx.business.slug}`} />
       </div>
-      <form className="relative mb-6" role="search">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
-        <input
-          name="q"
-          defaultValue={q}
-          placeholder="Search"
-          aria-label="Search clients by name, company or email"
-          className="h-10 w-full rounded-xl bg-fill pl-9 pr-3 text-[1.0625rem] placeholder:text-muted focus:outline-none focus:ring-[3px] focus:ring-ring sm:max-w-md"
-        />
-      </form>
+      <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h2 className="panel-title">{q ? `Results for "${q}"` : "All clients"}</h2>
+        <form className="relative w-full sm:w-72" role="search">
+          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
+          <input
+            name="q"
+            defaultValue={q}
+            placeholder="Search clients"
+            aria-label="Search clients by name, company or email"
+            className="pure h-10 w-full rounded-full pl-10 pr-4 text-[0.875rem] placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-ring"
+          />
+        </form>
+      </div>
 
       {rows.length === 0 ? (
         <Card>
@@ -64,7 +67,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/app/clie
           />
         </Card>
       ) : (
-        <ListGroup header={q ? `Results for "${q}"` : "All clients"}>
+        <ListGroup>
           {rows.map((c, i) => (
             <ListRow
               key={c.id}

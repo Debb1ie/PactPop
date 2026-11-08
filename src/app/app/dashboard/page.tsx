@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { MoreHorizontal } from "lucide-react";
+import { ChevronRight, Info, MoreHorizontal } from "lucide-react";
 import { CashflowChart } from "@/components/app/cashflow-chart";
 import { CommitmentWallet } from "@/components/app/commitment-wallet";
 import { MoneyActivity } from "@/components/app/money-activity";
@@ -28,26 +28,28 @@ export default async function DashboardPage() {
   return (
     <>
       {!paypalConfigured() && (
-        <p className="mb-4 inline-flex rounded-full border border-warning/40 px-3 py-1 text-[0.75rem] font-medium text-warning">PayPal Sandbox isn&apos;t connected yet. Received amounts only count PayPal-confirmed payments.</p>
+        <p className="pure mb-5 inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[0.75rem] text-muted">
+          <Info className="h-3.5 w-3.5" /> PayPal Sandbox isn&apos;t connected yet. Received amounts only count PayPal-confirmed payments.
+        </p>
       )}
 
       <div className="mb-6">
         <h1 className="text-[1.75rem] font-bold leading-tight sm:text-[2rem]">{hello} 👋</h1>
-        <div className="mt-3 flex flex-wrap gap-2 text-[0.8125rem]">
-          <span className="rounded-full bg-accent-soft px-3 py-1.5 font-medium text-accent">
-            <span className="money">{formatMoney(position.contractedMinor, cur)}</span> under agreement
+        <div className="mt-4 flex flex-wrap gap-2.5 text-[0.8125rem]">
+          <span className="pure rounded-full px-3.5 py-1.5 text-muted">
+            <span className="money font-semibold text-foreground">{formatMoney(position.contractedMinor, cur)}</span> under agreement
           </span>
-          <span className="rounded-full bg-success-soft px-3 py-1.5 font-medium text-success">
-            <span className="money">{formatMoney(position.receivedMinor, cur)}</span> received
+          <span className="pure rounded-full px-3.5 py-1.5 text-muted">
+            <span className="money font-semibold text-foreground">{formatMoney(position.receivedMinor, cur)}</span> received
           </span>
           {pending.length > 0 && (
-            <Link href="/app/approvals" className="rounded-full bg-warning-soft px-3 py-1.5 font-medium text-warning hover:brightness-110">
-              {pending.length} approval{pending.length === 1 ? "" : "s"} waiting →
+            <Link href="/app/approvals" className="pure inline-flex items-center gap-1 rounded-full px-3.5 py-1.5 text-muted transition-colors hover:text-foreground">
+              <span className="font-semibold text-foreground">{pending.length}</span> approval{pending.length === 1 ? "" : "s"} waiting <ChevronRight className="h-3.5 w-3.5" />
             </Link>
           )}
           {position.pipelineMinor > 0 && (
-            <span className="rounded-full bg-surface px-3 py-1.5 font-medium text-muted">
-              <span className="money">{formatMoney(position.pipelineMinor, cur)}</span> in pipeline
+            <span className="pure rounded-full px-3.5 py-1.5 text-muted">
+              <span className="money font-semibold text-foreground">{formatMoney(position.pipelineMinor, cur)}</span> in pipeline
             </span>
           )}
         </div>

@@ -36,9 +36,11 @@ export function ApprovalCard({ approval, compact }: { approval: ApprovalView; co
     });
 
   return (
-    <div className={cn("rounded-xl border bg-surface", state === "pending" ? "border-warning/40" : "border-border", compact ? "p-3.5" : "p-4")}>
-      <div className="flex items-start gap-3">
-        <ShieldCheck className={cn("mt-0.5 h-[18px] w-[18px] shrink-0", state === "pending" ? "text-warning" : state === "executed" ? "text-success" : "text-muted")} />
+    <div className={cn("pure rounded-2xl", compact ? "p-3.5" : "p-5")}>
+      <div className="flex items-start gap-3.5">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-fill">
+          <ShieldCheck className={cn("h-[18px] w-[18px]", state === "executed" ? "text-success" : "text-foreground/70")} />
+        </span>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-baseline justify-between gap-x-3">
             <p className="text-[0.9375rem] font-semibold">{approval.title}</p>

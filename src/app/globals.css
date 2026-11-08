@@ -377,3 +377,12 @@ input[type="range"] { accent-color: var(--accent); }
     .pp-reveal { animation: pp-reveal-in linear both; animation-timeline: view(); animation-range: entry 0% entry 55%; }
   }
 }
+
+/* Pure container: same colour as the page, defined only by a soft shadow. */
+.pure {
+  background: var(--background);
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.8) inset, 0 1px 2px rgb(20 20 40 / 0.06), 0 10px 26px -14px rgb(20 20 40 / 0.22);
+}
+.dark .pure {
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.045) inset, 0 1px 2px rgb(0 0 0 / 0.35), 0 14px 30px -16px rgb(0 0 0 / 0.75);
+}
