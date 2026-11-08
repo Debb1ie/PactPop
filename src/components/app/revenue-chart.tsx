@@ -11,10 +11,10 @@ export function RevenueChart({ data, currency }: { data: Point[]; currency: stri
   const hasData = data.some((d) => d.receivedMinor > 0);
   if (!hasData) {
     return (
-      <div className="relative flex h-56 flex-col items-center justify-center overflow-hidden rounded-xl text-center">
+      <div className="relative flex h-64 flex-col items-center justify-start overflow-hidden rounded-xl pt-2 text-center">
         {/* ghost bars hint at the chart to come */}
-        <div className="absolute inset-x-8 bottom-0 flex h-full items-end justify-around opacity-40 [mask-image:linear-gradient(to_top,black_10%,transparent_75%)]" aria-hidden>
-          {[26, 38, 20, 34, 30, 42].map((h, i) => (
+        <div className="absolute inset-x-8 bottom-0 flex h-full items-end justify-around opacity-25 [mask-image:linear-gradient(to_top,black_0%,transparent_100%)]" aria-hidden>
+          {[12, 18, 9, 15, 13, 20].map((h, i) => (
             <span key={i} className="w-5 rounded-full bg-gradient-to-t from-[#7c5cff] to-[#f6c89f]" style={{ height: `${h}%` }} />
           ))}
         </div>

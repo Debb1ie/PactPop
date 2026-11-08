@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 import { decideApprovalAction } from "@/app/app/approvals/actions";
 import { cn } from "@/lib/cn";
+import { Mascot, type MascotMood } from "@/components/brand/mascot";
 
 export type ApprovalView = {
   id: string;
@@ -17,6 +18,15 @@ export type ApprovalView = {
   commitment?: string | null;
   status?: string;
   createdAt?: string;
+  /** TrustGate action type; picks Poppy's mood on the card. */
+  actionType?: string;
+};
+
+const MOOD: Record<string, MascotMood> = {
+  "change_orders.apply": "thinking",
+  "paypal.send_invoice": "wink-card",
+  "deliverables.approve": "thumbs-up",
+  "proposals.send": "love",
 };
 
 /** A TrustGate approval with Approve / Reject. Approving executes the action server-side. */
@@ -38,9 +48,13 @@ export function ApprovalCard({ approval, compact }: { approval: ApprovalView; co
   return (
     <div className={cn("pure rounded-2xl", compact ? "p-3.5" : "p-5")}>
       <div className="flex items-start gap-3.5">
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-fill">
-          <ShieldCheck className={cn("h-[18px] w-[18px]", state === "executed" ? "text-success" : "text-foreground/70")} />
-        </span>
+        {approval.actionType && !compact ? (
+          <Mascot mood={state === "executed" ? "party" : state === "rejected" ? "crying" : MOOD[approval.actionType] ?? "thinking"} width={64} decorative className="shrink-0" />
+        ) : (
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-fill">
+            <ShieldCheck className={cn("h-[18px] w-[18px]", state === "executed" ? "text-success" : "text-foreground/70")} />
+          </span>
+        )}
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-baseline justify-between gap-x-3">
             <p className="text-[0.9375rem] font-semibold">{approval.title}</p>

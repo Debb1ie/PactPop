@@ -1,7 +1,8 @@
 "use client";
 
 import { LogoMark } from "@/components/brand/logo";
-import { useRef, type CSSProperties, type PointerEvent } from "react";
+import { useId, useRef, type CSSProperties, type PointerEvent } from "react";
+
 import { cn } from "@/lib/cn";
 
 type CardSpec = { art: string; ref: string; label: string; className: string; rot: number; z: number };
@@ -14,6 +15,30 @@ const CARDS: CardSpec[] = [
 
 function PactMark() {
   return <LogoMark variant="mono" className="h-7 w-7 sm:h-9 sm:w-9" title="" />;
+}
+
+/** Gold EMV-style contact chip. */
+function Chip({ className }: { className?: string }) {
+  const id = `chip-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
+  return (
+    <svg viewBox="0 0 50 38" className={className} aria-hidden>
+      <defs>
+        <linearGradient id={id} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#fbe7a1" />
+          <stop offset="0.45" stopColor="#e1b54f" />
+          <stop offset="1" stopColor="#a8792a" />
+        </linearGradient>
+      </defs>
+      <rect x="0.5" y="0.5" width="49" height="37" rx="7" fill={`url(#${id})`} stroke="#8a6220" strokeOpacity="0.5" />
+      <g fill="none" stroke="#7a5418" strokeOpacity="0.55" strokeWidth="1.2">
+        <path d="M0.5 13 H15 M0.5 25 H15 M35 13 H49.5 M35 25 H49.5" />
+        <path d="M15 0.5 V37.5 M35 0.5 V37.5" />
+        <rect x="18.5" y="9" width="13" height="20" rx="3" />
+        <path d="M25 0.5 V9 M25 29 V37.5" />
+      </g>
+      <rect x="0.5" y="0.5" width="49" height="18" rx="7" fill="#fff" opacity="0.18" />
+    </svg>
+  );
 }
 
 /** One agreement card that tilts toward the pointer and lifts on hover. */
@@ -53,7 +78,7 @@ function TiltCard({ spec }: { spec: CardSpec }) {
       <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(40%_50%_at_var(--gx,50%)_var(--gy,30%),rgb(255_255_255/0.22),transparent_70%)]" />
       {/* chip */}
       {/* the right-hand card is mirrored: its left side sits behind the centre card */}
-      <span className={`absolute top-[34%] h-[18%] w-[12%] rounded-[18%] border border-white/25 bg-white/10 backdrop-blur-[2px] ${spec.rot > 0 ? "right-[8%]" : "left-[8%]"}`} />
+      <Chip className={`absolute top-[32%] w-[15%] ${spec.rot > 0 ? "right-[8%]" : "left-[8%]"}`} />
       <span className={`absolute bottom-[10%] font-mono text-[clamp(0.7rem,1.6vw,1.35rem)] tracking-wide text-white ${spec.rot > 0 ? "right-[26%]" : "left-[8%]"}`}>
         **** {spec.ref}
       </span>
