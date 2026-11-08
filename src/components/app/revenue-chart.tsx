@@ -11,10 +11,18 @@ export function RevenueChart({ data, currency }: { data: Point[]; currency: stri
   const hasData = data.some((d) => d.receivedMinor > 0);
   if (!hasData) {
     return (
-      <div className="flex h-56 flex-col items-center justify-center rounded-xl bg-fill/60 text-center">
-        <BarChart3 className="h-7 w-7 text-faint" />
-        <p className="mt-2 text-[0.9375rem] font-medium">No payments yet</p>
-        <p className="mt-0.5 max-w-xs text-[0.8125rem] text-muted">Monthly totals appear here once PayPal confirms your first payment.</p>
+      <div className="relative flex h-56 flex-col items-center justify-center overflow-hidden rounded-xl text-center">
+        {/* ghost bars hint at the chart to come */}
+        <div className="absolute inset-x-8 bottom-0 flex h-full items-end justify-around opacity-40 [mask-image:linear-gradient(to_top,black_10%,transparent_75%)]" aria-hidden>
+          {[26, 38, 20, 34, 30, 42].map((h, i) => (
+            <span key={i} className="w-5 rounded-full bg-gradient-to-t from-[#7c5cff] to-[#f6c89f]" style={{ height: `${h}%` }} />
+          ))}
+        </div>
+        <span className="relative grid h-12 w-12 place-items-center rounded-[0.95rem] bg-gradient-to-br from-[#b18cff] to-[#6c4ef5] text-white shadow-[0_12px_24px_-12px_rgb(0_0_0/0.6),inset_0_1px_0_rgb(255_255_255/0.3)]">
+          <BarChart3 className="h-6 w-6" />
+        </span>
+        <p className="relative mt-3 text-[0.9375rem] font-semibold">No payments yet</p>
+        <p className="relative mt-0.5 max-w-xs text-[0.8125rem] text-muted">Monthly totals appear here once PayPal confirms your first payment.</p>
       </div>
     );
   }

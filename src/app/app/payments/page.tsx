@@ -5,6 +5,23 @@ import { PositionBoard } from "@/components/app/position-board";
 import { RevenueChart } from "@/components/app/revenue-chart";
 import { Pill, StatusBadge } from "@/components/ui/status-badge";
 import { formatMoney } from "@/lib/money";
+import { CircleDollarSign, ReceiptText, type LucideIcon } from "lucide-react";
+import type { ReactNode } from "react";
+
+/** Empty state with an iOS-style gradient icon tile. */
+function EmptyTile({ icon: Icon, tile, title, children }: { icon: LucideIcon; tile: string; title: string; children: ReactNode }) {
+  return (
+    <div className="flex items-center gap-4 px-5 pb-6 pt-3">
+      <span className={`grid h-12 w-12 shrink-0 place-items-center rounded-[0.95rem] bg-gradient-to-br text-white shadow-[0_12px_24px_-12px_rgb(0_0_0/0.6),inset_0_1px_0_rgb(255_255_255/0.3)] ${tile}`}>
+        <Icon className="h-6 w-6" strokeWidth={2} />
+      </span>
+      <div className="min-w-0">
+        <p className="text-[0.9375rem] font-semibold">{title}</p>
+        <p className="mt-0.5 text-[0.8125rem] text-muted">{children}</p>
+      </div>
+    </div>
+  );
+}
 import { requireAuth } from "@/server/auth/session";
 import { getDb } from "@/server/db/client";
 import { clients, invoices, payments } from "@/server/db/schema";
@@ -57,9 +74,9 @@ export default async function PaymentsPage() {
             <h2 className="panel-title">PayPal invoices</h2>
           </div>
           {inv.length === 0 ? (
-            <p className="px-4 py-6 text-[0.875rem] text-muted">
-              No invoices yet. {connected ? "The PayFlow Agent creates them from approved milestones." : "Connect the PayPal Sandbox to issue invoices from approved milestones."}
-            </p>
+            <EmptyTile icon={ReceiptText} tile="from-[#ff8ad8] to-[#7656e8]" title="No invoices yet">
+              {connected ? "The PayFlow Agent creates them from approved milestones." : "Connect the PayPal Sandbox to issue invoices from approved milestones."}
+            </EmptyTile>
           ) : (
             <ul className="divide-y divide-border text-[0.8125rem]">
               {inv.map(({ i, company, client }) => (
@@ -80,7 +97,9 @@ export default async function PaymentsPage() {
             <span className="ml-auto font-mono text-[0.65rem] uppercase tracking-[0.06em] text-faint">verified by webhook or API</span>
           </div>
           {pays.length === 0 ? (
-            <p className="px-4 py-6 text-[0.875rem] text-muted">No transactions yet. Payments appear here only after PayPal confirms them.</p>
+            <EmptyTile icon={CircleDollarSign} tile="from-[#d7ee6e] to-[#1f8f7a]" title="No transactions yet">
+              Payments appear here only after PayPal confirms them.
+            </EmptyTile>
           ) : (
             <ul className="divide-y divide-border text-[0.8125rem]">
               {pays.map((p) => (

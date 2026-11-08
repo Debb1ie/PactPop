@@ -5,6 +5,9 @@ import { Pill, StatusBadge } from "@/components/ui/status-badge";
 
 const date = (d: Date | null) => (d ? d.toLocaleDateString("en-US", { month: "short", day: "2-digit" }).toUpperCase() : "—");
 
+const TONE = ["bg-[#ff9f0a]", "bg-[#7656e8]", "bg-[#30b0c7]", "bg-[#34c759]", "bg-[#ff6b8b]"];
+const hash = (s: string) => [...s].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
+
 export type Receivable = {
   id: string;
   dueDate: Date | null;
@@ -44,10 +47,17 @@ export function ReceivablesTable({ rows, compact }: { rows: Receivable[]; compac
                 )}
               </td>
               <td className="px-2 py-2.5">
-                <Link href={`/app/clients/${r.clientId}`} className="font-medium hover:text-accent">
-                  {r.client}
-                </Link>
-                <span className="text-muted"> · {r.milestone}</span>
+                <span className="flex items-center gap-2.5">
+                  <span className={cn("grid h-7 w-7 shrink-0 place-items-center rounded-full text-[0.65rem] font-semibold text-white", TONE[hash(r.clientId) % TONE.length])} aria-hidden>
+                    {r.client.slice(0, 1).toUpperCase()}
+                  </span>
+                  <span className="min-w-0">
+                    <Link href={`/app/clients/${r.clientId}`} className="font-medium hover:text-accent">
+                      {r.client}
+                    </Link>
+                    <span className="text-muted"> · {r.milestone}</span>
+                  </span>
+                </span>
               </td>
               {!compact && (
                 <td className="px-2 py-2.5">
