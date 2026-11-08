@@ -2,6 +2,7 @@ import Link from "next/link";
 import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/money";
 import { Pill, StatusBadge } from "@/components/ui/status-badge";
+import { SendInvoiceButton } from "./paypal-buttons";
 
 const date = (d: Date | null) => (d ? d.toLocaleDateString("en-US", { month: "short", day: "2-digit" }).toUpperCase() : "—");
 
@@ -22,7 +23,8 @@ export type Receivable = {
 };
 
 /** Upcoming money, by due date. */
-export function ReceivablesTable({ rows, compact }: { rows: Receivable[]; compact?: boolean }) {
+/** `invoiceable` adds a "Send PayPal invoice" action (PayPal configured, owner view). */
+export function ReceivablesTable({ rows, compact, invoiceable }: { rows: Receivable[]; compact?: boolean; invoiceable?: boolean }) {
   if (!rows.length) return <p className="px-4 py-6 text-[0.875rem] text-muted">No scheduled payments. Milestones appear here once a client accepts an agreement.</p>;
   return (
     <div className="overflow-x-auto">
@@ -33,6 +35,7 @@ export function ReceivablesTable({ rows, compact }: { rows: Receivable[]; compac
             <th className="label-mono px-2 py-2 font-normal">Client · milestone</th>
             {!compact && <th className="label-mono px-2 py-2 font-normal">Status</th>}
             <th className="label-mono px-4 py-2 text-right font-normal">Amount</th>
+            {invoiceable && <th className="label-mono px-4 py-2 text-right font-normal">PayPal</th>}
           </tr>
         </thead>
         <tbody className="divide-y divide-border">
@@ -65,6 +68,7 @@ export function ReceivablesTable({ rows, compact }: { rows: Receivable[]; compac
                 </td>
               )}
               <td className="money whitespace-nowrap px-4 py-2.5 text-right">{formatMoney(r.amountMinor, r.currency)}</td>
+              {invoiceable && <td className="px-4 py-2.5 text-right">{r.status === "invoiced" ? <span className="text-[0.75rem] text-muted">Invoice sent</span> : <SendInvoiceButton milestoneId={r.id} />}</td>}
             </tr>
           ))}
         </tbody>

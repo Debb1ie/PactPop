@@ -5,7 +5,8 @@ import { PositionBoard } from "@/components/app/position-board";
 import { RevenueChart } from "@/components/app/revenue-chart";
 import { Pill, StatusBadge } from "@/components/ui/status-badge";
 import { formatMoney } from "@/lib/money";
-import { CircleDollarSign, ReceiptText, type LucideIcon } from "lucide-react";
+import { CircleDollarSign, ExternalLink, ReceiptText, type LucideIcon } from "lucide-react";
+import { SyncInvoiceButton } from "@/components/app/paypal-buttons";
 import type { ReactNode } from "react";
 
 /** Empty state with an iOS-style gradient icon tile. */
@@ -65,7 +66,7 @@ export default async function PaymentsPage() {
             {receivables.length} open · {formatMoney(receivables.reduce((s, r) => s + r.amountMinor, 0), cur)}
           </span>
         </div>
-        <ReceivablesTable rows={receivables} />
+        <ReceivablesTable rows={receivables} invoiceable={connected} />
       </section>
 
       <div className="mt-4 grid gap-4 xl:grid-cols-2">
@@ -80,11 +81,17 @@ export default async function PaymentsPage() {
           ) : (
             <ul className="divide-y divide-border text-[0.8125rem]">
               {inv.map(({ i, company, client }) => (
-                <li key={i.id} className="flex items-center gap-3 px-4 py-2.5">
+                <li key={i.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2.5">
                   <span className="font-mono text-[0.7rem] text-muted">{i.invoiceNumber ?? i.paypalInvoiceId ?? "DRAFT"}</span>
                   <span className="min-w-0 flex-1 truncate">{company ?? client}</span>
                   <StatusBadge status={i.status} />
                   <span className="money">{formatMoney(i.amountMinor, i.currency)}</span>
+                  {i.payerViewUrl && !i.paidAt && (
+                    <a href={i.payerViewUrl} target="_blank" rel="noreferrer" className="pure inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[0.75rem] font-medium hover:opacity-80">
+                      Payer page <ExternalLink className="h-3 w-3 text-muted" />
+                    </a>
+                  )}
+                  {!i.paidAt && <SyncInvoiceButton invoiceId={i.id} />}
                 </li>
               ))}
             </ul>
