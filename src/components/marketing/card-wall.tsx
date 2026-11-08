@@ -22,6 +22,11 @@ const COLUMNS: CardData[][] = [
     { color: "fc-pink", client: "Harbor & Co", ref: "PP26 6614 3390 5100", amount: "5,100.00", date: "01/27", version: "v2" },
     { color: "fc-green", client: "Field Notes", ref: "PP26 9915 2208 750", amount: "750.00", date: "12/26", version: "v1" },
   ],
+  [
+    { color: "fc-navy", client: "Orbit Labs", ref: "PP26 4471 8820 6400", amount: "6,400.00", date: "02/27", version: "v2" },
+    { color: "fc-orange", client: "Maple & Pine", ref: "PP26 7302 1149 1950", amount: "1,950.00", date: "12/26", version: "v1" },
+    { color: "fc-teal", client: "Nova Fitness", ref: "PP26 5518 0076 2800", amount: "2,800.00", date: "01/27", version: "v1" },
+  ],
 ];
 
 function Mark({ dark }: { dark?: boolean }) {
@@ -40,7 +45,7 @@ function FinCard({ d }: { d: CardData }) {
   return (
     <div
       className={cn(
-        "fc aspect-[1.586] w-[18rem] rounded-[1.1rem] p-5 text-white transition-transform duration-500 ease-[var(--ease-ios)] hover:-translate-y-3 hover:[transform:translateZ(40px)] sm:w-[20rem]",
+        "fc aspect-[1.586] w-[18rem] rounded-[1.1rem] p-5 text-white lg:w-[clamp(18rem,17vw,23rem)] transition-transform duration-500 ease-[var(--ease-ios)] hover:-translate-y-3 hover:[transform:translateZ(40px)] sm:w-[20rem]",
         "shadow-[0_2px_0_rgb(255_255_255/0.15)_inset,0_30px_45px_-18px_rgb(0_0_0/0.85),0_12px_20px_-12px_rgb(0_0_0/0.6)]",
         d.color,
       )}
@@ -102,9 +107,10 @@ export function CardWallSection() {
   }, []);
 
   return (
-    <section ref={section} className="px-4 py-16 sm:px-6">
-      <div className="relative mx-auto grid min-h-[40rem] max-w-6xl overflow-hidden rounded-[2rem] bg-black lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.6fr)]">
-        <div className="relative z-10 flex flex-col justify-center px-8 py-12 sm:px-12">
+    <section ref={section} className="my-16 w-full bg-black">
+      {/* full-bleed: the black band spans the whole viewport; copy aligns with the page container */}
+      <div className="relative grid min-h-[44rem] overflow-hidden lg:grid-cols-[calc(max(2.5rem,(100vw-72rem)/2+1.5rem)+30rem)_minmax(0,1fr)]">
+        <div className="relative z-10 flex flex-col justify-center px-6 py-14 sm:px-10 lg:py-20 lg:pl-[max(2.5rem,calc((100vw-72rem)/2+1.5rem))] lg:pr-8">
           <h2 className="text-[2.75rem] font-bold leading-[0.98] tracking-[-0.04em] text-white sm:text-[4rem]">
             Every promise, on one card.
           </h2>
@@ -122,7 +128,7 @@ export function CardWallSection() {
         </div>
 
         {/* 3D card plane */}
-        <div className="relative h-[34rem] [perspective:1400px] lg:h-auto" aria-hidden>
+        <div className="relative h-[36rem] [perspective:1400px] lg:h-auto" aria-hidden>
           <div className="absolute left-[2%] top-1/2 flex gap-6 [transform-style:preserve-3d] [transform:translateY(-50%)_rotateX(22deg)_rotateY(-14deg)_rotateZ(-9deg)]">
             {COLUMNS.map((col, i) => (
               <div
