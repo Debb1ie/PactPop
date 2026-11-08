@@ -58,8 +58,9 @@ function TiltCard({ spec }: { spec: CardSpec }) {
       {/* moving sheen follows the pointer */}
       <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(40%_50%_at_var(--gx,50%)_var(--gy,30%),rgb(255_255_255/0.22),transparent_70%)]" />
       {/* chip */}
-      <span className="absolute left-[8%] top-[34%] h-[18%] w-[12%] rounded-[18%] border border-white/25 bg-white/10 backdrop-blur-[2px]" />
-      <span className="absolute bottom-[10%] left-[8%] font-mono text-[clamp(0.7rem,1.6vw,1.35rem)] tracking-wide text-white">
+      {/* the right-hand card is mirrored: its left side sits behind the centre card */}
+      <span className={`absolute top-[34%] h-[18%] w-[12%] rounded-[18%] border border-white/25 bg-white/10 backdrop-blur-[2px] ${spec.rot > 0 ? "right-[8%]" : "left-[8%]"}`} />
+      <span className={`absolute bottom-[10%] font-mono text-[clamp(0.7rem,1.6vw,1.35rem)] tracking-wide text-white ${spec.rot > 0 ? "right-[26%]" : "left-[8%]"}`}>
         **** {spec.ref}
       </span>
       <span className={`absolute top-[10%] text-[clamp(0.55rem,0.9vw,0.8rem)] font-semibold uppercase tracking-[0.14em] text-white/75 ${spec.rot > 0 ? "right-[8%]" : "left-[8%]"}`}>{spec.label}</span>
