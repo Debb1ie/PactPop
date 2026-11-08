@@ -59,7 +59,7 @@ function RunView({ run }: { run: Run }) {
       <div className="space-y-2.5 border-l border-border pl-4">
         {start && (
           <p className="text-[0.75rem] text-muted">
-            {start.mode === "ai" ? `Claude (${start.model}) is coordinating the agents` : "Rule-based mode: deterministic planner, same tools and TrustGate (add AI_API_KEY for Claude)"}
+            {start.mode === "ai" ? `AI orchestrator (${start.model}) is coordinating the agents` : "Rule-based mode: deterministic planner, same tools and TrustGate (add an AI key to turn on the AI orchestrator)"}
           </p>
         )}
         {run.events.map((e, i) => {
@@ -252,7 +252,7 @@ export function AgentConsole({ mode, model, suggestions, greeting }: { mode: "ai
           />
           <div className="flex items-center gap-2 px-1.5 pb-0.5">
             <span className="pure inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.75rem] font-medium text-foreground/85">
-              <Sparkles className="h-3.5 w-3.5 text-muted" /> {mode === "ai" ? model ?? "Claude" : "Rule-based mode"}
+              <Sparkles className="h-3.5 w-3.5 text-muted" /> {mode === "ai" ? model ?? "AI" : "Rule-based mode"}
             </span>
             <button
               type="submit"

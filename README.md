@@ -31,11 +31,12 @@ PactPop is under active development. This table is kept honest: anything not mar
 | **AI Agents** chat page: live, streamed agent runs with every tool call and TrustGate decision visible | ✅ Working |
 | **Settings**: editable TrustGate permissions (locked money controls), agent history, tools, workspace | ✅ Working |
 | **Finance dashboard** (account position, cash flow, receivables, ledger), **Commitments** (table, VowGraph, activity) and **Payments** pages | ✅ Working |
-| Intake, Pricing, Proposal, Scope (ScopeWatch), Operations and Finance agents acting on real records through 12 tools | ✅ Working (Claude Opus 5.5 with `AI_API_KEY`; labelled rule-based mode without) |
+| Intake, Pricing, Proposal, Scope (ScopeWatch), Operations and Finance agents acting on real records through 12 tools | ✅ Working (Groq `openai/gpt-oss-120b` or Claude, set by `AI_PROVIDER`; labelled rule-based mode without a key) |
 | **Approval Center** + inline approvals: approving a change order creates agreement v2 and a change-order milestone | ✅ Working |
 | Agent briefing: next actions found in your records, one click to run | ✅ Working |
 | Customer request portal, proposal acceptance page, commitments pages | 🚧 Next |
-| PayPal Sandbox: Invoicing v2, Orders v2, webhook verification, reconciliation | 🚧 Planned |
+| PayPal Sandbox: server-side OAuth, **Invoicing v2** milestone invoices (create + send), payment confirmed with the PayPal API | ✅ Working |
+| PayPal Sandbox: webhook signature verification, Orders v2 client checkout | 🚧 Next |
 | ScopeWatch, ProofFlow, Evidence Vault, VowGraph, reports, settings | 🚧 Planned |
 
 The full plan is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), the agent system is documented in [docs/AGENTS.md](docs/AGENTS.md), and progress is tracked in [docs/DEVLOG.md](docs/DEVLOG.md).
@@ -44,8 +45,8 @@ The full plan is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), the agent syst
 
 | Requirement | How PactPop meets it | Status |
 |---|---|---|
-| Meaningfully integrate a PayPal technology | Invoicing v2 for deposits, milestones and change orders; Orders v2 checkout; verified webhooks drive the commitment timeline | 🚧 In progress (architecture, schema and money handling done) |
-| Meaningfully incorporate AI | Claude-driven orchestrator coordinating specialist agents through permission-checked tools that change real records ([docs/AGENTS.md](docs/AGENTS.md)) | ✅ Agents working; PayFlow / ProofFlow next |
+| Meaningfully integrate a PayPal technology | Invoicing v2 for deposits, milestones and change orders; Orders v2 checkout; verified webhooks drive the commitment timeline | ✅ Invoicing v2 working in the Sandbox; webhooks and Orders v2 next |
+| Meaningfully incorporate AI | AI orchestrator (Groq or Claude) coordinating specialist agents through permission-checked tools that change real records ([docs/AGENTS.md](docs/AGENTS.md)) | ✅ Agents working; PayFlow / ProofFlow next |
 | Working prototype | One-click demo workspace; setup steps below run on any machine with Node.js | ✅ Runs locally |
 | Documentation | This README plus [docs/](docs/) | ✅ |
 | Public, open-source repo with a license | MIT, see [LICENSE](LICENSE) | ✅ |
@@ -91,7 +92,7 @@ Capturing payments, issuing refunds, changing agreed amounts and applying change
 - **Drizzle ORM** on **PostgreSQL**, with embedded **PGlite** for zero-setup local development
 - **Zod** validation, **bcrypt** password hashing, **Recharts** charts, **three.js** (WebGL background)
 - **Vitest** unit tests, **Playwright** browser checks
-- Planned: **Anthropic Claude** (agents), **PayPal REST APIs**
+- **Groq** (OpenAI-compatible API, `openai/gpt-oss-120b`) or **Anthropic Claude** for the agents; **PayPal REST APIs** (Sandbox)
 
 Key decisions and their reasons are recorded in [docs/DECISIONS.md](docs/DECISIONS.md).
 
@@ -207,7 +208,7 @@ The tests check, among other things, that the demo project prices to **$1,500** 
 ## Known limitations
 
 - The PayPal integration (PayFlow Agent), ProofFlow and the customer portal are not implemented yet (see Project status).
-- In rule-based mode (no `AI_API_KEY`) the planner understands a fixed set of intents. Claude handles free-form requests.
+- In rule-based mode (no `AI_API_KEY`) the planner understands a fixed set of intents. The AI provider (Groq or Claude) handles free-form requests.
 - PGlite is for local development only. Use PostgreSQL in production.
 
 ## Disclaimer
@@ -219,7 +220,8 @@ PayPal is a trademark of PayPal, Inc. PactPop is an independent hackathon projec
 | Tool | How it is used |
 |---|---|
 | **PayPal Developer Platform (Sandbox)** | Invoicing v2, Orders v2 and Webhooks are the payment backbone: deposits, milestone payments and approved change orders are invoiced through PayPal, and only PayPal-verified events mark money as received. |
-| **Anthropic Claude** (runtime, `claude-sonnet-5-5` by default) | Powers PactPop's agents: extracting requirements from client messages, comparing new requests with the accepted scope, drafting proposals and change orders, and checking deliverable evidence. Accessed through a provider interface, so the model can be swapped. Every tool call goes through TrustGate. |
+| **Groq** (runtime, `openai/gpt-oss-120b`) | Default AI provider for PactPop's agents, used through Groq's OpenAI-compatible chat API with tool calling. Free tier; the orchestrator waits and retries when Groq's rate limit asks it to. |
+| **Anthropic Claude** (runtime, optional, `claude-opus-5-5`) | Alternative provider (`AI_PROVIDER=anthropic`). Powers PactPop's agents: extracting requirements from client messages, comparing new requests with the accepted scope, drafting proposals and change orders, and checking deliverable evidence. Accessed through a provider interface, so the model can be swapped. Every tool call goes through TrustGate. |
 | **Claude Code** (development) | AI coding assistant used to plan the architecture, write and review code, and run tests and browser checks during the hackathon. It is not part of the running app. |
 | **three.js** | WebGL grid-terrain background that reacts to scrolling, the VowGraph orb view on the dashboard, and the 3D architecture diagram. |
 

@@ -9,7 +9,7 @@ import { formatMoney } from "@/lib/money";
 import { requireAuth } from "@/server/auth/session";
 import { getDb } from "@/server/db/client";
 import { agentExecutions, agentPermissions, agentToolCalls, businesses } from "@/server/db/schema";
-import { aiConfigured, env, paypalConfigured } from "@/server/env";
+import { aiConfigured, aiModel, aiProviderLabel, paypalConfigured } from "@/server/env";
 import { effectivePolicy, TOOL_POLICIES } from "@/server/agents/policies";
 import { TOOLS } from "@/server/agents/tools";
 import { PolicySelect } from "./policy-select";
@@ -67,8 +67,8 @@ export default async function SettingsPage({ searchParams }: PageProps<"/app/set
               <div className="divide-y divide-border">
                 <Row
                   label="Agent engine"
-                  hint={ai ? "Claude coordinates the agents through permission-checked tools." : "Rule-based planner: same tools and TrustGate checks, fixed set of requests. Add AI_API_KEY to use Claude."}
-                  value={<Pill tone={ai ? "violet" : "neutral"}>{ai ? env().AI_MODEL : "Rule-based mode"}</Pill>}
+                  hint={ai ? `${aiProviderLabel()} coordinates the agents through permission-checked tools.` : "Rule-based planner: same tools and TrustGate checks, fixed set of requests. Add an AI provider key to turn on the AI orchestrator."}
+                  value={<Pill tone={ai ? "violet" : "neutral"}>{ai ? `${aiProviderLabel()} · ${aiModel()}` : "Rule-based mode"}</Pill>}
                 />
                 <Row label="Reasoning shown" hint="A short summary of the orchestrator's thinking appears in the chat." value="Summarised" />
                 <Row label="Prices" hint="Agents estimate units of work; your rate card sets every amount." value="From your rates" />
@@ -153,7 +153,7 @@ async function HistoryTab({ businessId }: { businessId: string }) {
               <StatusBadge status={r.status === "awaiting_approval" ? "approval_required" : r.status} />
             </div>
             <p className="mt-0.5 text-[0.75rem] text-muted">
-              {r.provider === "anthropic" ? r.model : "Rule-based"} · {c?.n ?? 0} tool call(s){c?.gated ? ` · ${c.gated} sent for approval` : ""} ·{" "}
+              {r.provider !== "heuristic" ? r.model : "Rule-based"} · {c?.n ?? 0} tool call(s){c?.gated ? ` · ${c.gated} sent for approval` : ""} ·{" "}
               {r.createdAt.toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
             </p>
           </li>

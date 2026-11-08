@@ -15,9 +15,10 @@ const schema = z.object({
   PAYPAL_BASE_URL: z.string().url().default("https://api-m.sandbox.paypal.com"),
   PAYPAL_WEBHOOK_ID: z.string().optional(),
 
-  AI_PROVIDER: z.enum(["anthropic", "heuristic"]).default("anthropic"),
+  // anthropic → Claude · groq → open models on Groq (OpenAI-compatible) · heuristic → rule-based, no AI calls
+  AI_PROVIDER: z.enum(["anthropic", "groq", "heuristic"]).default("anthropic"),
   AI_API_KEY: z.string().optional(),
-  AI_MODEL: z.string().default("claude-opus-5-5"),
+  AI_MODEL: z.string().optional(),
 });
 
 export type Env = z.infer<typeof schema>;
@@ -46,5 +47,20 @@ export function paypalConfigured(): boolean {
 
 export function aiConfigured(): boolean {
   const e = env();
-  return e.AI_PROVIDER === "anthropic" && Boolean(e.AI_API_KEY);
+  return e.AI_PROVIDER !== "heuristic" && Boolean(e.AI_API_KEY);
+}
+
+const DEFAULT_MODEL = { anthropic: "claude-opus-5-5", groq: "openai/gpt-oss-120b" } as const;
+
+/** The model the agents use, with a sensible default per provider. */
+export function aiModel(): string {
+  const e = env();
+  if (e.AI_PROVIDER === "heuristic") return "rule-based";
+  return e.AI_MODEL?.trim() || DEFAULT_MODEL[e.AI_PROVIDER];
+}
+
+/** Human label for the active AI provider (shown in the UI). */
+export function aiProviderLabel(): string {
+  const p = env().AI_PROVIDER;
+  return p === "groq" ? "Groq" : p === "anthropic" ? "Claude" : "Rule-based";
 }
