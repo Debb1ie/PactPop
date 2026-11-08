@@ -2,22 +2,16 @@ import type React from "react";
 import {
   ArrowRight,
   BadgeCheck,
-  Briefcase,
-  Building2,
-  Check,
   CircleDollarSign,
   FileSignature,
   Inbox,
   KeyRound,
   Layers,
   LockKeyhole,
-  Minus,
   Radar,
   ReceiptText,
   ScrollText,
   ShieldCheck,
-  UserRound,
-  Workflow,
   type LucideIcon,
 } from "lucide-react";
 import type { ReactNode } from "react";
@@ -189,62 +183,6 @@ export function HowItWorks() {
   );
 }
 
-/* ───────── agents ───────── */
-
-export const AGENTS: { name: string; icon: LucideIcon; text: string; authority: "Reads" | "Drafts" | "Prepares, you approve" }[] = [
-  { name: "Intake", icon: Inbox, text: "Turns a client's message into requirements, budget, timeline and open questions.", authority: "Drafts" },
-  { name: "Scope", icon: Radar, text: "Compares new requests against the accepted agreement.", authority: "Drafts" },
-  { name: "Pricing", icon: CircleDollarSign, text: "Estimates units of work. Your rates, not the model, compute the price.", authority: "Drafts" },
-  { name: "Proposal", icon: ScrollText, text: "Writes deliverables, milestones and payment terms.", authority: "Prepares, you approve" },
-  { name: "ProofFlow", icon: BadgeCheck, text: "Checks delivered evidence against the acceptance criteria and flags what's missing.", authority: "Drafts" },
-  { name: "PayFlow", icon: ReceiptText, text: "Prepares PayPal invoices and checkout orders, and tracks payment status.", authority: "Prepares, you approve" },
-  { name: "Finance", icon: CircleDollarSign, text: "Reconciles payments and flags overdue invoices.", authority: "Reads" },
-  { name: "Operations", icon: Workflow, text: "Tracks milestones and drafts reminders before deadlines slip.", authority: "Drafts" },
-];
-
-const AUTHORITY_STYLE = {
-  Reads: "bg-fill text-muted",
-  Drafts: "bg-accent-soft text-accent",
-  "Prepares, you approve": "bg-warning-soft text-warning",
-};
-
-export function AgentsSection() {
-  return (
-    <Section id="agents" className="scroll-mt-24">
-      <div className="grid gap-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.4fr)]">
-        <div className="lg:sticky lg:top-28 lg:self-start">
-          <Heading
-            eyebrow="AI agents"
-            title="Eight specialists, one coordinated team."
-            intro="An orchestrator routes each task to the right agent. Every tool call is permission-checked and logged, so you can see what the AI did and why."
-          />
-          <p className="mt-6 text-[0.9375rem] text-muted">
-            Ask the <span className="font-semibold text-foreground">Command Center</span> in plain language, for example &ldquo;Which invoices are overdue?&rdquo;
-          </p>
-        </div>
-        <div className="overflow-hidden rounded-xl border border-border bg-surface">
-          <div className="flex justify-between border-b border-border bg-surface-2 px-5 py-2.5 text-[0.75rem] font-medium text-muted">
-            <span>Agent</span>
-            <span>Authority</span>
-          </div>
-          <ul className="divide-y divide-border">
-            {AGENTS.map(({ name, icon: Icon, text, authority }) => (
-              <li key={name} className="flex items-start gap-4 px-5 py-4">
-                <Icon className="mt-0.5 h-[18px] w-[18px] shrink-0 text-faint" strokeWidth={1.8} />
-                <div className="min-w-0 flex-1">
-                  <p className="font-semibold">{name} Agent</p>
-                  <p className="mt-0.5 text-[0.875rem] leading-relaxed text-muted">{text}</p>
-                </div>
-                <span className={cn("shrink-0 whitespace-nowrap rounded-md px-2 py-1 text-[0.6875rem] font-semibold", AUTHORITY_STYLE[authority])}>{authority}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </Section>
-  );
-}
-
 /* ───────── signature features, each shown as the document it produces ───────── */
 
 export function IntelligenceSection() {
@@ -289,36 +227,6 @@ export function IntelligenceSection() {
   );
 }
 
-/* ───────── PayPal ───────── */
-
-export function PayPalSection() {
-  const points = [
-    ["Invoicing API", "Deposits, milestones and approved change orders are invoiced through PayPal."],
-    ["Orders API", "Checkout orders are captured only after an approval."],
-    ["Webhooks", "Payments count only after a verified webhook or a server-side check, never a browser redirect."],
-    ["Idempotency", "Duplicate deliveries are ignored, and every event is stored with its PayPal ID."],
-  ];
-  return (
-    <Section id="paypal" className="scroll-mt-24">
-      <div className="grid items-start gap-12 lg:grid-cols-2">
-        <Heading
-          eyebrow="PayPal integration"
-          title="Payments are part of the agreement."
-          intro="The PayFlow Agent works through PayPal's official REST APIs. Amounts come from approved milestones in your records, never from AI-generated text."
-        />
-        <dl className="divide-y divide-border rounded-xl border border-border bg-surface">
-          {points.map(([k, v]) => (
-            <div key={k} className="grid gap-1 px-5 py-4 sm:grid-cols-[8.5rem_minmax(0,1fr)] sm:gap-6">
-              <dt className="text-[0.875rem] font-semibold">{k}</dt>
-              <dd className="text-[0.9375rem] leading-relaxed text-muted">{v}</dd>
-            </div>
-          ))}
-        </dl>
-      </div>
-    </Section>
-  );
-}
-
 /* ───────── security ───────── */
 
 export function SecuritySection() {
@@ -342,89 +250,6 @@ export function SecuritySection() {
         ))}
       </ul>
       <p className="mt-12 text-[0.8125rem] text-[#615f6c]">PactPop helps organise evidence and approvals. It does not provide legal advice or guarantee payment outcomes.</p>
-    </Section>
-  );
-}
-
-/* ───────── audience ───────── */
-
-const AUDIENCES: { icon: LucideIcon; who: string; pain: string; gain: string }[] = [
-  { icon: UserRound, who: "Freelancers", pain: "You say yes to a small extra, then another, and the project quietly doubles.", gain: "ScopeWatch catches every extra ask and prices it as a change order." },
-  { icon: Briefcase, who: "Consultants", pain: "Milestones drift, and invoicing is the last thing you get to.", gain: "Milestones carry their payment terms, and invoices are prepared as work is approved." },
-  { icon: Building2, who: "Small agencies", pain: "Nobody on the team knows exactly what the client agreed to.", gain: "One shared record per client, with approvals and a full evidence trail." },
-];
-
-export function AudienceSection() {
-  return (
-    <Section band="paper">
-      <Heading eyebrow="Who it's for" title="Built for people who sell their time and expertise." />
-      <div className="mt-12 grid gap-px overflow-hidden rounded-[var(--radius-card)] border border-border bg-border md:grid-cols-3">
-        {AUDIENCES.map(({ icon: Icon, who, pain, gain }) => (
-          <div key={who} className="bg-surface p-6">
-            <p className="flex items-center gap-2.5 text-[1.0625rem] font-semibold">
-              <Icon className="h-[18px] w-[18px] text-accent" strokeWidth={1.8} /> {who}
-            </p>
-            <p className="mt-4 text-[0.8125rem] font-medium text-muted">Before</p>
-            <p className="mt-1 text-[0.9375rem] leading-relaxed text-muted">{pain}</p>
-            <p className="mt-4 text-[0.8125rem] font-medium text-accent">With PactPop</p>
-            <p className="mt-1 text-[0.9375rem] leading-relaxed">{gain}</p>
-          </div>
-        ))}
-      </div>
-    </Section>
-  );
-}
-
-/* ───────── comparison ───────── */
-
-const COMPARE: { label: string; email: string | boolean; invoicing: string | boolean; pactpop: string | boolean }[] = [
-  { label: "Knows what was agreed", email: "Buried in threads", invoicing: false, pactpop: "Versioned" },
-  { label: "Catches scope creep", email: false, invoicing: false, pactpop: "ScopeWatch" },
-  { label: "Prices extra work from your rates", email: false, invoicing: "Manual", pactpop: true },
-  { label: "Links proof of delivery to payment", email: false, invoicing: false, pactpop: "ProofFlow" },
-  { label: "Collects payment", email: false, invoicing: true, pactpop: "PayPal" },
-  { label: "Confirms payment automatically", email: false, invoicing: "Varies", pactpop: "Verified webhooks" },
-  { label: "AI does the busywork, you approve", email: false, invoicing: false, pactpop: true },
-];
-
-function CompareCell({ v, strong }: { v: string | boolean; strong?: boolean }) {
-  if (v === true) return <Check className={cn("mx-auto h-4 w-4", strong ? "text-accent" : "text-success")} aria-label="Yes" />;
-  if (v === false) return <Minus className="mx-auto h-4 w-4 text-faint" aria-label="No" />;
-  return <span className={cn("text-[0.875rem]", strong ? "font-semibold text-accent" : "text-muted")}>{v}</span>;
-}
-
-export function ComparisonSection() {
-  return (
-    <Section>
-      <Heading eyebrow="Why switch" title="Invoicing tools bill for the work. PactPop protects it." />
-      <div className="mt-12 overflow-x-auto rounded-xl border border-border bg-surface">
-        <table className="w-full min-w-[600px] text-center">
-          <thead>
-            <tr className="border-b border-border text-[0.8125rem] text-muted">
-              <th className="px-5 py-3.5 text-left font-medium">Capability</th>
-              <th className="px-4 py-3.5 font-medium">Email & spreadsheets</th>
-              <th className="px-4 py-3.5 font-medium">Invoicing apps</th>
-              <th className="border-l border-border bg-accent-soft px-4 py-3.5 font-semibold text-accent">PactPop</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {COMPARE.map((r) => (
-              <tr key={r.label}>
-                <td className="px-5 py-3.5 text-left text-[0.9375rem]">{r.label}</td>
-                <td className="px-4 py-3.5">
-                  <CompareCell v={r.email} />
-                </td>
-                <td className="px-4 py-3.5">
-                  <CompareCell v={r.invoicing} />
-                </td>
-                <td className="border-l border-border bg-accent-soft px-4 py-3.5">
-                  <CompareCell v={r.pactpop} strong />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
     </Section>
   );
 }
@@ -505,3 +330,6 @@ export function CtaBand() {
     </section>
   );
 }
+
+/* Redesigned visual sections live in showcase.tsx; re-exported so every page picks them up. */
+export { AgentsShowcase as AgentsSection, AudienceShowcase as AudienceSection, ComparisonShowcase as ComparisonSection, PayPalShowcase as PayPalSection } from "./showcase";

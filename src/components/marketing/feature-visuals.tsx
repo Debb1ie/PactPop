@@ -164,7 +164,7 @@ const PANELS: Panel[] = [
 ];
 
 /** Thin flowing lines over the gradient, like folded silk. */
-function Silk({ color }: { color: string }) {
+export function Silk({ color }: { color: string }) {
   const paths = Array.from({ length: 28 }, (_, i) => {
     const y = 40 + i * 22;
     return `M-60 ${y} C 140 ${y - 160 + i * 4}, 300 ${y + 140}, 520 ${y - 40} S 820 ${y - 120 + i * 3}, 960 ${y + 30}`;
