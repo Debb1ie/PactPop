@@ -16,7 +16,10 @@ import {
   commitments,
   commitmentVersions,
   deliverables,
+  invoices,
   milestones,
+  paymentEvents,
+  payments,
   projectRequests,
   proposals,
   scopeChanges,
@@ -39,6 +42,13 @@ export async function demoUserExists(db: Database) {
 export async function resetDemoWorkspace(db: Database) {
   const [existing] = await db.select().from(users).where(eq(users.email, DEMO_EMAIL));
   if (existing) {
+    const [biz] = await db.select({ id: businesses.id }).from(businesses).where(eq(businesses.slug, "lumen-studio"));
+    if (biz) {
+      // Invoices restrict deleting their agreements, so money rows go first.
+      await db.delete(paymentEvents).where(eq(paymentEvents.businessId, biz.id));
+      await db.delete(payments).where(eq(payments.businessId, biz.id));
+      await db.delete(invoices).where(eq(invoices.businessId, biz.id));
+    }
     await db.delete(businesses).where(eq(businesses.slug, "lumen-studio"));
     await db.delete(users).where(eq(users.id, existing.id));
   }

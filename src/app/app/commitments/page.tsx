@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { and, desc, eq, inArray } from "drizzle-orm";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { ClientLinkButton } from "@/components/app/client-link-button";
 import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/money";
 import { requireAuth } from "@/server/auth/session";
@@ -99,7 +100,7 @@ export default async function CommitmentsPage() {
 
       <section className="panel overflow-hidden" aria-label="All commitments">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[760px] text-[0.8125rem]">
+          <table className="w-full min-w-[880px] text-[0.8125rem]">
             <thead>
               <tr className="border-b border-border text-left">
                 <th className="label-mono px-4 py-2.5 font-normal">Client · agreement</th>
@@ -108,6 +109,7 @@ export default async function CommitmentsPage() {
                 <th className="label-mono px-2 py-2.5 font-normal">Milestones</th>
                 <th className="label-mono px-2 py-2.5 font-normal">Due</th>
                 <th className="label-mono px-4 py-2.5 text-right font-normal">Agreed</th>
+                <th className="label-mono px-4 py-2.5 text-right font-normal">Client</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -149,6 +151,9 @@ export default async function CommitmentsPage() {
                     </td>
                     <td className="px-2 py-3 font-mono text-[0.75rem] text-muted">{date(c.dueDate)}</td>
                     <td className="money px-4 py-3 text-right">{formatMoney(c.agreedTotalMinor, c.currency)}</td>
+                    <td className="px-4 py-3 text-right">
+                      {c.proposalId && ["awaiting_acceptance", "proposed", "accepted", "in_progress"].includes(c.status) ? <ClientLinkButton commitmentId={c.id} /> : <span className="text-faint">—</span>}
+                    </td>
                   </tr>
                 );
               })}

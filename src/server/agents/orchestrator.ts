@@ -14,7 +14,7 @@ import type { Database } from "@/server/db/create";
 import { agentExecutions, agentPermissions, agentToolCalls } from "@/server/db/schema";
 import { aiConfigured, aiModel, env } from "@/server/env";
 import { effectivePolicy, type Policy } from "./policies";
-import { TOOL_BY_NAME, TOOLS, toolJsonSchema, type AgentName, type ToolContext, type ToolSpec } from "./tools";
+import { TOOL_BY_NAME, TOOLS, toolJsonSchema, type AgentName, type ApprovalSpec, type ToolContext, type ToolSpec } from "./tools";
 import { planHeuristic } from "./planner";
 import { queueApproval } from "@/server/services/workflow";
 import { formatMoney } from "@/lib/money";
@@ -89,13 +89,21 @@ async function invokeTool(ctx: ToolContext, name: string, rawInput: unknown, cal
   }
 
   if (policy === "approval") {
-    const a = spec.approval?.(input) ?? { title: spec.label(input), actionType: spec.policy, payload: input as Record<string, unknown> };
+    let a: ApprovalSpec;
+    try {
+      a = spec.approval ? await spec.approval(input, ctx) : { title: spec.label(input), actionType: spec.policy, payload: input as Record<string, unknown> };
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Could not prepare the approval";
+      await ctx.db.insert(agentToolCalls).values({ businessId: ctx.businessId, executionId: ctx.executionId, tool: name, args: input as object, decision: "error", error: msg, durationMs: Date.now() - started });
+      emit({ type: "tool_result", id: callId, ok: false, summary: msg });
+      return { ok: false, content: `Error: ${msg}` };
+    }
     const approval = await queueApproval(ctx.db, ctx.businessId, { ...a, reasoning: ctx.reasoning || spec.label(input), executionId: ctx.executionId });
     state.approvals += 1;
     await ctx.db.insert(agentToolCalls).values({ businessId: ctx.businessId, executionId: ctx.executionId, tool: name, args: input as object, decision: "approval_required", approvalId: approval.id, durationMs: Date.now() - started });
     emit({ type: "tool_result", id: callId, ok: true, summary: "Queued for your approval" });
-    emit({ type: "approval", approvalId: approval.id, title: approval.title, amount: null, reason: approval.reasoningSummary });
-    return { ok: true, content: `Queued for the owner's approval (approval id ${approval.id}). It has NOT been executed. Tell the user it is waiting for them.` };
+    emit({ type: "approval", approvalId: approval.id, title: approval.title, amount: approval.amountMinor != null ? formatMoney(approval.amountMinor) : null, reason: approval.reasoningSummary });
+    return { ok: true, content: "Queued for the owner's approval in the Approval Center. It has NOT been executed. Tell the user it is waiting for them (do not mention any IDs)." };
   }
 
   try {
@@ -119,7 +127,7 @@ async function invokeTool(ctx: ToolContext, name: string, rawInput: unknown, cal
 
 const SYSTEM_PROMPT = `You are PactPop's orchestrator. PactPop helps freelancers and small agencies run the path from client request to agreement, delivery, approval and PayPal payment.
 
-You coordinate specialist agents by calling tools. Each tool belongs to one specialist (Intake, Scope, Pricing, Proposal, Operations, Finance). Work like an operations lead: gather facts with read tools, act with the right specialist, then report.
+You coordinate specialist agents by calling tools. Each tool belongs to one specialist (Intake, Scope, Pricing, Proposal, Operations, Finance, PayFlow). Work like an operations lead: gather facts with read tools, act with the right specialist, then report.
 
 Rules:
 - Use only facts from tool results. Never invent clients, amounts, dates or payments.
@@ -129,7 +137,8 @@ Rules:
 - Sensitive actions are governed by TrustGate on the server. If a tool says an action is queued for approval, say so plainly; never claim it was done.
 - ScopeWatch: before calling check_scope, read the accepted agreement with get_commitment. Classify the new request as included, clarification, revision or additional, and list only genuinely new items.
 - Intake: when analysing a request, read it with get_request, then call save_request_analysis with only stated facts and list missing information as questions.
-- Payments only count when PayPal confirms them. PayPal invoicing is configured separately; if asked to invoice, explain what is needed.
+- Payments only count when PayPal confirms them. Never say something was paid unless check_payment or the records show PayPal confirmed it.
+- PayFlow (PayPal): to invoice, call list_invoiceable to find the milestone, then send_invoice with its milestoneId. Sending is normally queued for the owner to approve; say so plainly. Use check_payment to ask PayPal whether an invoice is paid.
 - Finish with a short, plain-language summary for the business owner: what you did, what changed, and what needs their decision. No markdown headings; short paragraphs or simple lists are fine.`;
 
 type Run = { db: Database; businessId: string; userId: string; input: string; emit: Emit };

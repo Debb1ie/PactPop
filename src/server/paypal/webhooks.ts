@@ -5,6 +5,7 @@ import { invoices, paymentEvents } from "@/server/db/schema";
 import { env } from "@/server/env";
 import { paypal } from "./client";
 import { syncInvoice } from "./invoices";
+import { applyCaptureWebhook } from "./orders";
 
 export type WebhookEvent = { id: string; event_type: string; resource_type?: string; resource?: Record<string, unknown> };
 
@@ -73,6 +74,8 @@ export async function handleVerifiedEvent(db: Database, event: WebhookEvent): Pr
       applied = r.ok ? r.message : "invoice not found";
     } else if (event.event_type.startsWith("INVOICING.")) {
       applied = "invoice is not managed by PactPop";
+    } else if (event.event_type === "PAYMENT.CAPTURE.COMPLETED" && event.resource) {
+      applied = await applyCaptureWebhook(db, event.resource);
     }
   } catch (e) {
     processingError = e instanceof Error ? e.message : "processing failed";

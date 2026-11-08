@@ -9,6 +9,7 @@ import { formatMoney } from "@/lib/money";
 import { requireAuth } from "@/server/auth/session";
 import { getDb } from "@/server/db/client";
 import { agentExecutions, agentPermissions, agentToolCalls, businesses } from "@/server/db/schema";
+import { ResetDemoButton } from "./reset-demo";
 import { aiConfigured, aiModel, aiProviderLabel, paypalConfigured } from "@/server/env";
 import { effectivePolicy, TOOL_POLICIES } from "@/server/agents/policies";
 import { TOOLS } from "@/server/agents/tools";
@@ -174,6 +175,7 @@ async function WorkspaceTab({ businessId, name, isDemo, user, role }: { business
       <Row label="Client request link" value={<span className="font-mono text-[0.8125rem]">/request/{b.slug}</span>} />
       <Row label="PayPal" hint="Sandbox only. Credentials stay on the server." value={paypalConfigured() ? "Sandbox connected" : "Not connected"} />
       <Row label="Rate card" hint="Used by the pricing engine for every quote and change order." value={<span className="money text-foreground">{formatMoney(r.pageRateMinor)}/page · {formatMoney(r.additionalPageRateMinor)}/extra page · {formatMoney(r.hourlyRateMinor)}/h · {r.depositPercent}% deposit</span>} />
+      {isDemo && role === "owner" && <Row label="Demo data" hint="Rebuild the sample clients, agreements and approvals so a walkthrough starts fresh. Sandbox invoices already sent stay in PayPal." value={<ResetDemoButton />} />}
     </div>
   );
 }

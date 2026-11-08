@@ -342,6 +342,13 @@ async function executeApproved(db: Database, businessId: string, a: typeof appro
     await recordAudit(db, { businessId, actor: user, action: "proposal.sent", entityType: "proposal", entityId: p.id });
     return { proposalId: p.id, status: "sent" };
   }
+  if (a.actionType === "paypal.send_invoice") {
+    // Loaded lazily: the PayPal client is server-only and this module is also used by tests.
+    const { sendMilestoneInvoice } = await import("@/server/paypal/invoices");
+    const r = await sendMilestoneInvoice(db, { businessId, milestoneId: String(a.payload.milestoneId), userId, userName: "You (approved PayFlow Agent)" });
+    if (!r.ok) throw new Error(r.message);
+    return { invoiceNumber: r.invoice.invoiceNumber, status: r.invoice.status, payerViewUrl: r.invoice.payerViewUrl };
+  }
   throw new Error(`No executor for ${a.actionType}`);
 }
 

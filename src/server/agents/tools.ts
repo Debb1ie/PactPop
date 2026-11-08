@@ -8,6 +8,8 @@
  * Tools never accept prices. Units go in, and the pricing engine computes amounts.
  */
 import { z } from "zod";
+import { and, asc, eq, ilike, inArray, or, sql } from "drizzle-orm";
+import { clients, commitments, invoices, milestones } from "@/server/db/schema";
 import type { Database } from "@/server/db/create";
 import type { RequestExtraction } from "@/server/db/schema";
 import { formatMoney } from "@/lib/money";
@@ -38,6 +40,8 @@ export type ToolContext = {
   reasoning: string;
 };
 
+export type ApprovalSpec = { title: string; actionType: string; payload: Record<string, unknown>; amountMinor?: number | null; commitmentId?: string | null; clientId?: string | null };
+
 export type ToolSpec<S extends z.ZodType = z.ZodType> = {
   name: string;
   agent: AgentName;
@@ -47,8 +51,8 @@ export type ToolSpec<S extends z.ZodType = z.ZodType> = {
   /** Human label for the UI, built from validated input. */
   label: (input: z.infer<S>) => string;
   run: (ctx: ToolContext, input: z.infer<S>) => Promise<{ summary: string; data: unknown }>;
-  /** For tools whose TrustGate policy is "approval": describes the queued action. */
-  approval?: (input: z.infer<S>) => { title: string; actionType: string; payload: Record<string, unknown>; amountMinor?: number | null };
+  /** For tools whose TrustGate policy is "approval": describes the queued action (may look up records). */
+  approval?: (input: z.infer<S>, ctx: ToolContext) => Promise<ApprovalSpec> | ApprovalSpec;
 };
 
 const uuid = z.string().uuid();
@@ -288,6 +292,67 @@ export const TOOLS: ToolSpec[] = [
       };
     },
   }),
+  /* ───── PayFlow Agent: PayPal invoicing (amounts always come from milestone rows) ───── */
+  tool({
+    name: "list_invoiceable",
+    agent: "PayFlow Agent",
+    policy: "invoices.list",
+    description: "List unpaid milestones on accepted agreements, with any PayPal invoice already sent. Use this to find the milestoneId before send_invoice or check_payment.",
+    schema: z.object({ client: z.string().max(80).optional() }),
+    label: (i) => (i.client ? `Find payments due from ${i.client}` : "Find payments due"),
+    run: async ({ db, businessId }, i) => {
+      const rows = await invoiceableMilestones(db, businessId, i.client);
+      return {
+        summary: `${rows.length} payment(s) due`,
+        data: rows.map((r) => ({
+          milestoneId: r.id,
+          client: r.client,
+          agreement: r.agreement,
+          milestone: r.title,
+          amountMinor: r.amountMinor,
+          currency: r.currency,
+          status: r.status,
+          due: r.dueDate?.toISOString().slice(0, 10) ?? null,
+          invoice: r.invoiceNumber ? { number: r.invoiceNumber, status: r.invoiceStatus } : null,
+        })),
+      };
+    },
+  }),
+  tool({
+    name: "send_invoice",
+    agent: "PayFlow Agent",
+    policy: "paypal.send_invoice",
+    description: "Send a PayPal (Sandbox) invoice for one milestone. The amount is the stored milestone amount; you never set it. By default this is queued for the owner to approve.",
+    schema: z.object({ milestoneId: uuid }),
+    label: () => "Send PayPal invoice",
+    approval: async (i, { db, businessId }) => {
+      const [r] = await invoiceableMilestones(db, businessId, undefined, i.milestoneId);
+      if (!r) throw new Error("That milestone is not due for invoicing");
+      if (r.invoiceNumber) throw new Error(`Invoice ${r.invoiceNumber} was already sent for this milestone`);
+      return { title: `Send PayPal invoice: ${r.client} · ${r.title}`, actionType: "paypal.send_invoice", payload: { milestoneId: r.id }, amountMinor: r.amountMinor, commitmentId: r.commitmentId, clientId: r.clientId };
+    },
+    run: async ({ db, businessId, userId }, i) => {
+      const { sendMilestoneInvoice } = await import("@/server/paypal/invoices");
+      const r = await sendMilestoneInvoice(db, { businessId, milestoneId: i.milestoneId, userId, userName: "PayFlow Agent" });
+      if (!r.ok) throw new Error(r.message);
+      return { summary: r.message, data: { invoiceNumber: r.invoice.invoiceNumber, status: r.invoice.status, amountMinor: r.invoice.amountMinor } };
+    },
+  }),
+  tool({
+    name: "check_payment",
+    agent: "PayFlow Agent",
+    policy: "paypal.sync_status",
+    description: "Ask PayPal for the current status of the invoice sent for a milestone. Records the payment only if PayPal reports it paid.",
+    schema: z.object({ milestoneId: uuid }),
+    label: () => "Check payment with PayPal",
+    run: async ({ db, businessId }, i) => {
+      const [inv] = await db.select({ id: invoices.id }).from(invoices).where(and(eq(invoices.businessId, businessId), eq(invoices.milestoneId, i.milestoneId))).limit(1);
+      if (!inv) return { summary: "No invoice sent yet", data: { invoiceSent: false } };
+      const { syncInvoice } = await import("@/server/paypal/invoices");
+      const r = await syncInvoice(db, { businessId, invoiceId: inv.id, via: "api" });
+      return { summary: r.message, data: { status: r.ok ? r.status : "unknown", paid: r.ok ? r.paid : false } };
+    },
+  }),
   tool({
     name: "list_approvals",
     agent: "Operations Agent",
@@ -301,6 +366,38 @@ export const TOOLS: ToolSpec[] = [
     },
   }),
 ];
+
+/** Unpaid milestones on contracted agreements, with invoice info. */
+async function invoiceableMilestones(db: Database, businessId: string, client?: string, milestoneId?: string) {
+  const conds = [
+    eq(milestones.businessId, businessId),
+    inArray(milestones.status, ["pending", "in_progress", "submitted", "approved", "invoiced"]),
+    inArray(commitments.status, ["accepted", "in_progress", "awaiting_evidence", "awaiting_approval", "payment_ready"]),
+  ];
+  if (milestoneId) conds.push(eq(milestones.id, milestoneId));
+  if (client) conds.push(or(ilike(clients.name, `%${client}%`), ilike(clients.company, `%${client}%`))!);
+  return db
+    .select({
+      id: milestones.id,
+      title: milestones.title,
+      amountMinor: milestones.amountMinor,
+      currency: milestones.currency,
+      status: milestones.status,
+      dueDate: milestones.dueDate,
+      commitmentId: commitments.id,
+      agreement: commitments.title,
+      clientId: clients.id,
+      client: sql<string>`coalesce(${clients.company}, ${clients.name})`,
+      invoiceNumber: invoices.invoiceNumber,
+      invoiceStatus: invoices.status,
+    })
+    .from(milestones)
+    .innerJoin(commitments, eq(commitments.id, milestones.commitmentId))
+    .innerJoin(clients, eq(clients.id, commitments.clientId))
+    .leftJoin(invoices, eq(invoices.milestoneId, milestones.id))
+    .where(and(...conds))
+    .orderBy(asc(milestones.dueDate));
+}
 
 export const TOOL_BY_NAME = new Map(TOOLS.map((t) => [t.name, t]));
 

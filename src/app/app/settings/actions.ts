@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { requireRole } from "@/server/auth/session";
@@ -10,6 +11,15 @@ import { effectivePolicy, policyDef } from "@/server/agents/policies";
 import { recordAudit } from "@/server/services/audit";
 
 const input = z.object({ tool: z.string().min(1).max(80), policy: z.enum(["allow", "approval", "deny"]) });
+
+/** Demo workspace only: wipe and rebuild the sample data (signs you out; log in again with the demo button). */
+export async function resetDemoAction(): Promise<PolicyResult> {
+  const ctx = await requireRole(["owner"]);
+  if (!ctx.business.isDemo) return { ok: false, message: "Only the demo workspace can be reset" };
+  const { resetDemoWorkspace } = await import("@/server/services/demo");
+  await resetDemoWorkspace(await getDb());
+  redirect("/login");
+}
 
 export type PolicyResult = { ok: boolean; message: string };
 
