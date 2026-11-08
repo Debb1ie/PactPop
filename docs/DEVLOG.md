@@ -122,3 +122,13 @@
   - Agent history.
   - Workspace.
 - The request-link card moved to the Clients page.
+
+## 2026-11-08: PayPal for real, Groq agents, ProofFlow, PayFlow, deployment
+
+- **PayPal Sandbox connected.** Milestone invoices through Invoicing v2; a test buyer paid one and the verified `INVOICING.INVOICE.PAID` webhook recorded it on the live site with no manual step.
+- **One-link client checkout** (`/agreement/[token]`): review scope, accept by name, pay the deposit with PayPal Smart Buttons (Orders v2, server-side create + capture). Found and fixed in testing: React dev mode rendered the buttons twice (duplicate orders, closed popup); and the final milestone was payable right after the deposit (now only due payments can be paid).
+- **Agents on Groq** (`openai/gpt-oss-120b`, free tier) with rate-limit retries. Money is pre-formatted for the model after a live run misread cents as dollars.
+- **PayFlow Agent** (`list_invoiceable`, `send_invoice`, `check_payment`) and **ProofFlow Agent** (`get_delivery_proof`, `save_proof_review`). A passing proof review queues "Approve delivery"; approving makes the payment due.
+- **Client request page** (`/request/[slug]`) fixes the 404 behind the request link.
+- **Deployed** to Vercel with Neon; PayPal webhook registered for the live URL. Settings → Workspace has **Reset demo data**.
+- **Tests:** 29 passing (adds checkout due-rule tests). End-to-end runs against the PayPal Sandbox for invoices, webhooks and checkout, locally and on the live site.

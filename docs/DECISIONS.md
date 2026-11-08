@@ -18,3 +18,9 @@
 | 14 | 2026-11-07 | WebGL (three.js, lazily loaded) for the background grid terrain | A shader-drawn grid on a displaced mesh gives real perspective and anti-aliasing that 2D canvas lines couldn't. |
 | 15 | 2026-11-08 | Visual direction "Trading desk" (owner's choice): dark, hairline panel grid, 4px corners, Archivo expanded headings, JetBrains Mono for all figures and labels, violet for actions, teal for money in | The previous look matched common generated sites; this one is grounded in finance terminals. |
 | 16 | 2026-11-08 | One job per page: Dashboard = money only; AI Agents, Commitments, Payments, Approvals separate | Owner request; keeps the finance overview scannable. |
+| 17 | 2026-11-08 | Groq (`openai/gpt-oss-120b`) as the default AI provider; Claude stays optional | Free tier fits the owner's no-budget constraint; same tools and TrustGate for both providers. |
+| 18 | 2026-11-08 | Hosting on Vercel + Neon instead of Render | Vercel functions don't sleep, so no keep-alive cron is needed; Neon wakes in about a second. Both free. |
+| 19 | 2026-11-08 | Tool results shown to the model use formatted money, never minor units | A live test showed a model reading 150000 cents as $150,000. |
+| 20 | 2026-11-08 | Client agreement links use a random token; only its SHA-256 is stored; a new link revokes the old | A leaked database can't produce working client links. |
+| 21 | 2026-11-08 | Client checkout only for due payments (deposit, or a delivery the owner approved), enforced on the server | A live Sandbox test paid the final milestone right after the deposit. |
+| 22 | 2026-11-08 | Approving a delivery is a locked TrustGate floor (`deliverables.approve`) | It is what makes money due, so a person always decides. |

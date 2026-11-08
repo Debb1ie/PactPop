@@ -112,19 +112,24 @@ One capable model, seven **roles** (Intake, Scope, Pricing, Proposal, Payment, F
 
 Execution loop: orchestrator classifies intent (answer / prepare / execute / needs approval) → runs the role with tool-use → every tool call goes through `TrustGate.check(businessId, tool, args)` → result is `allowed` (handler runs), `approval_required` (an `approvals` row is created with the reasoning summary; nothing executes), or `denied`. All of it is persisted to `agent_executions` / `agent_tool_calls`, so a run is auditable and resumable.
 
-- Provider abstraction: `LLMProvider.complete({system, messages, tools})` → normalised tool calls. Anthropic implementation first; adding OpenAI = one file.
+- Providers: Groq (OpenAI-compatible, default, free tier) and Anthropic Claude, chosen by `AI_PROVIDER`. Both loops share the same tool registry, validation and TrustGate (`src/server/agents/orchestrator.ts`).
 - Pricing is **deterministic code** (business rates × estimated units + rules). The model may *propose* units; the service computes the price and explains it.
 - Prompt-injection posture: customer text is passed as quoted data, never as instructions; tool permissions are server-side config the model cannot change; no tool exists that edits permissions.
 - Without an AI key the app runs a clearly labelled **heuristic mode** (rule-based extraction/comparison) so the workflow can still be demonstrated. It is never presented as AI output.
 
 ## 6. PayPal integration strategy
 
-- Direct, typed REST client (`src/server/paypal`) against `https://api-m.sandbox.paypal.com`: OAuth2 client-credentials with token caching; **Orders v2** (create, get, capture); **Invoicing v2** (create draft, send, get, generate next number); **Webhooks** (`/v1/notifications/verify-webhook-signature`).
+**Built and tested in the Sandbox (live on Vercel):**
+
+- Typed REST client (`src/server/paypal/client.ts`) against `https://api-m.sandbox.paypal.com`: OAuth2 client credentials with token caching.
+- **Invoicing v2** (`invoices.ts`): create + send an invoice for one milestone (amount from the milestone row), then confirm status with a server-side GET.
+- **Orders v2** (`orders.ts`): the client checkout creates an order for a due milestone and captures it on the server after the payer approves in PayPal's window; money is recorded from PayPal's capture response.
+- **Webhooks** (`webhooks.ts`, `/api/paypal/webhook`): signature verified with `/v1/notifications/verify-webhook-signature`; only verified events are stored; `INVOICING.INVOICE.PAID` and `PAYMENT.CAPTURE.COMPLETED` trigger a re-read from PayPal before anything is recorded.
 - Every mutating call sends a `PayPal-Request-Id` derived from our internal record ID → retries are idempotent.
 - Webhook receiver: verify signature with PayPal → insert into `payment_events` (unique `paypal_event_id` makes duplicates no-ops) → update invoice/payment → timeline + audit → notify Finance Agent summary.
 - Payment confirmed **only** by a verified webhook or a server-side GET of the order/invoice from PayPal. Frontend redirects only trigger a server-side re-check.
-- Localhost cannot receive webhooks; documented options: tunnel (cloudflared/ngrok) or "Check status with PayPal" (server-side API reconciliation).
-- PayPal Agent Toolkit / MCP server: evaluated as a **development-time** aid and as a possible tool backend. Runtime uses our own gateway because we need idempotency keys, amount validation and audit around each call. Will be re-verified against current docs before Phase 5.
+- Localhost cannot receive webhooks; locally the **Check** button (server-side API reconciliation) confirms payments. The deployed site (`https://pact-pop.vercel.app`) receives webhooks.
+- PayPal Agent Toolkit / MCP server: evaluated as a development-time aid. Runtime uses our own gateway because we need idempotency keys, amount validation and audit around each call.
 
 ## 7. Security model
 
@@ -140,6 +145,8 @@ Session auth (bcrypt password hash, random token stored hashed, httpOnly SameSit
 6. **Reports, Settings, Agents page, polish, tests, deploy config, docs.**
 
 The demo scenario (website redesign, $750 deposit, $300 change order) is the acceptance test for steps 1–5.
+
+**Status (2026-11-08):** steps 1–6 are built. Hosting is Vercel (serverless Next.js) with Neon Postgres; local development uses embedded PGlite.
 
 ## 9. Critical risks & dependencies
 

@@ -12,6 +12,8 @@ Specialised AI agents read client requests, structure scope and pricing, catch s
 
 > Built for the **PayPal AI Hackathon** (*Build What's Next with PayPal and AI*). Free and open source under the [MIT License](LICENSE). Runs against the **PayPal Sandbox** only, so no real money moves.
 
+**Live demo:** [pact-pop.vercel.app](https://pact-pop.vercel.app). Open **Log in → Try the demo workspace**. Everything runs on the PayPal Sandbox; the demo data is labelled DEMO and can be reset in Settings → Workspace.
+
 ---
 
 ## Project status
@@ -33,13 +35,14 @@ PactPop is under active development. This table is kept honest: anything not mar
 | **AI Agents** chat page: live, streamed agent runs with every tool call and TrustGate decision visible | ✅ Working |
 | **Settings**: editable TrustGate permissions (locked money controls), agent history, tools, workspace | ✅ Working |
 | **Finance dashboard** (account position, cash flow, receivables, ledger), **Commitments** (table, VowGraph, activity) and **Payments** pages | ✅ Working |
-| Intake, Pricing, Proposal, Scope (ScopeWatch), Operations and Finance agents acting on real records through 12 tools | ✅ Working (Groq `openai/gpt-oss-120b` or Claude, set by `AI_PROVIDER`; labelled rule-based mode without a key) |
+| All 8 agents (Intake, Pricing, Proposal, Scope, Operations, Finance, ProofFlow, PayFlow) acting on real records through 18 tools | ✅ Working (Groq `openai/gpt-oss-120b` or Claude, set by `AI_PROVIDER`; labelled rule-based mode without a key) |
 | **Approval Center** + inline approvals: approving a change order creates agreement v2 and a change-order milestone | ✅ Working |
 | Agent briefing: next actions found in your records, one click to run | ✅ Working |
 | Customer request portal, proposal acceptance page, commitments pages | 🚧 Next |
 | PayPal Sandbox: server-side OAuth, **Invoicing v2** milestone invoices (create + send), payment confirmed with the PayPal API | ✅ Working |
 | PayPal **webhooks**: signature verified with PayPal, stored once per event id, invoice/capture re-read from PayPal before money is recorded | ✅ Working (live on Vercel) |
 | **PayFlow Agent**: finds payments due, prepares PayPal invoices (queued in TrustGate for your approval), checks payment status with PayPal | ✅ Working |
+| **ProofFlow Agent**: checks delivery proof against each acceptance criterion; a passing review queues "Approve delivery", which makes the payment due | ✅ Working |
 | Approved ScopeWatch change orders become invoiceable milestones | ✅ Working |
 | ScopeWatch, ProofFlow, Evidence Vault, VowGraph, reports, settings | 🚧 Planned |
 
@@ -50,7 +53,7 @@ The full plan is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), the agent syst
 | Requirement | How PactPop meets it | Status |
 |---|---|---|
 | Meaningfully integrate a PayPal technology | Invoicing v2 for deposits, milestones and change orders; Orders v2 checkout; verified webhooks drive the commitment timeline | ✅ Invoicing v2, Orders v2 checkout and verified webhooks all working in the Sandbox |
-| Meaningfully incorporate AI | AI orchestrator (Groq or Claude) coordinating specialist agents through permission-checked tools that change real records ([docs/AGENTS.md](docs/AGENTS.md)) | ✅ Intake, Scope, Pricing, Proposal, Operations, Finance and PayFlow agents working; ProofFlow next |
+| Meaningfully incorporate AI | AI orchestrator (Groq or Claude) coordinating specialist agents through permission-checked tools that change real records ([docs/AGENTS.md](docs/AGENTS.md)) | ✅ All 8 agents working: Intake, Scope, Pricing, Proposal, Operations, Finance, ProofFlow and PayFlow |
 | Working prototype | One-click demo workspace; setup steps below run on any machine with Node.js | ✅ Runs locally |
 | Documentation | This README plus [docs/](docs/) | ✅ |
 | Public, open-source repo with a license | MIT, see [LICENSE](LICENSE) | ✅ |
