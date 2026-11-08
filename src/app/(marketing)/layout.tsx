@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Logo } from "@/components/brand/logo";
 import { ScrollGrid } from "@/components/fx/scroll-grid";
 import { SectionNav } from "@/components/marketing/section-nav";
 
@@ -33,24 +32,24 @@ export default function MarketingLayout({ children }: LayoutProps<"/">) {
         </div>
       </header>
       <main className="flex-1">{children}</main>
-      <footer className="border-t border-border">
+      <footer className="bg-[#0b0b0e] text-white">
         <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div>
-            <Logo />
-            <p className="mt-2 text-sm text-muted">Make promises. Make progress. Get paid.</p>
+            <span className="font-[family-name:var(--font-brand)] text-[1.35rem] font-semibold uppercase tracking-[0.04em]">PactPop</span>
+            <p className="mt-2 text-sm text-white/55">Make promises. Make progress. Get paid.</p>
           </div>
-          <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted">
+          <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/60">
             {NAV.map((n) => (
-              <Link key={n.href} href={n.href} className="hover:text-foreground">
+              <Link key={n.href} href={n.href} className="transition-colors hover:text-white">
                 {n.label}
               </Link>
             ))}
-            <Link href="/login" className="hover:text-foreground">
+            <Link href="/login" className="transition-colors hover:text-white">
               Log in
             </Link>
           </div>
         </div>
-        <p className="mx-auto max-w-6xl px-4 pb-8 text-xs text-muted sm:px-6">
+        <p className="mx-auto max-w-6xl px-4 pb-8 text-xs text-white/40 sm:px-6">
           Built for the PayPal AI Hackathon. PayPal is a trademark of PayPal, Inc. PactPop is not affiliated with or endorsed by PayPal.
         </p>
       </footer>

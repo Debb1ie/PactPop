@@ -21,7 +21,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import type { ReactNode } from "react";
-import { OrbField, type Orb } from "@/components/fx/orb-field";
+import { ArchVisual } from "./arch-visual";
 import { ButtonLink } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import Link from "next/link";
@@ -44,13 +44,13 @@ function Section({ children, className, band, id }: { children: ReactNode; class
     <section
       id={id}
       className={cn(
-        "py-20 sm:py-28",
+        "scroll-mt-20 py-20 sm:py-28",
         band === "paper" && "border-y border-border bg-surface",
         band === "ink" && "bg-[#0b0a0f] text-[#ecebf0]",
         className,
       )}
     >
-      <div className="mx-auto max-w-6xl px-5 sm:px-6">{children}</div>
+      <div className="pp-reveal mx-auto max-w-6xl px-5 sm:px-6">{children}</div>
     </section>
   );
 }
@@ -151,15 +151,6 @@ export function Problem() {
 
 /* ───────── 3D architecture ───────── */
 
-const ring = (n: number) => Array.from({ length: n }, () => ({ lit: true }));
-const ARCHITECTURE: Orb[] = [
-  { key: "portal", label: "Client portal", caption: "intake", size: 0.25, tone: "sky", rings: ring(2), details: ["Clients submit requests", "and accept proposals"] },
-  { key: "agents", label: "AI agents", caption: "8 roles", size: 0.85, tone: "violet", rings: ring(8), details: ["Intake, Scope, Pricing, Proposal,", "Operations, ProofFlow, PayFlow, Finance"] },
-  { key: "trustgate", label: "TrustGate", caption: "3 decisions", size: 0.5, tone: "amber", rings: ring(3), details: ["Every tool call is checked", "Sensitive actions wait for you"] },
-  { key: "paypal", label: "PayPal Sandbox", caption: "3 APIs", size: 0.65, tone: "sky", rings: ring(3), details: ["Invoicing v2 and Orders v2", "Verified webhooks confirm payment"] },
-  { key: "ledger", label: "Ledger", caption: "audit trail", size: 0.35, tone: "mint", rings: ring(2), details: ["Timeline, Evidence Vault", "and audit records"] },
-];
-
 export function ArchitectureSection() {
   return (
     <Section band="paper">
@@ -169,12 +160,7 @@ export function ArchitectureSection() {
           title="Every action passes the same checkpoints."
           intro="Requests come in through the client portal. Agents interpret them and propose actions. TrustGate decides what runs and what waits for you. PayPal moves the money, and every step lands in the ledger."
         />
-        <div className="overflow-hidden rounded-[1.75rem] border border-border bg-white shadow-[0_30px_70px_-40px_rgb(108_78_245/0.45)]">
-          <div className="overflow-hidden">
-            <OrbField links variant="light" orbs={ARCHITECTURE} height={360} ariaLabel="3D diagram of PactPop's architecture: client portal, AI agents, TrustGate, PayPal Sandbox, ledger" />
-          </div>
-          <p className="border-t border-border px-4 py-2.5 text-[0.8125rem] text-muted">Rings show each layer&apos;s parts: 8 agent roles, TrustGate&apos;s three decisions, three PayPal APIs. Hover for details.</p>
-        </div>
+        <ArchVisual />
       </div>
     </Section>
   );
