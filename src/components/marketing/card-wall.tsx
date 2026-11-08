@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { cn } from "@/lib/cn";
+import { LogoMark } from "@/components/brand/logo";
 
 type CardData = { color: string; client: string; ref: string; amount: string; date: string; version: string };
 
@@ -30,14 +31,7 @@ const COLUMNS: CardData[][] = [
 ];
 
 function Mark({ dark }: { dark?: boolean }) {
-  const c = dark ? "#121218" : "white";
-  return (
-    <svg viewBox="0 0 64 28" className="h-5 w-10" aria-hidden>
-      <path d="M6 22 C18 22 22 6 32 6 C42 6 46 22 58 22" fill="none" stroke={c} strokeWidth="3.5" strokeLinecap="round" />
-      <circle cx="6" cy="22" r="4.5" fill={c} />
-      <circle cx="58" cy="22" r="4.5" fill={c} />
-    </svg>
-  );
+  return <LogoMark variant={dark ? "mark" : "mono"} className="h-6 w-6" title="" />;
 }
 
 function FinCard({ d }: { d: CardData }) {

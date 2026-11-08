@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ScrollGrid } from "@/components/fx/scroll-grid";
+import { LogoMark } from "@/components/brand/logo";
 import { SectionNav } from "@/components/marketing/section-nav";
 
 const NAV = [
@@ -15,7 +16,10 @@ export default function MarketingLayout({ children }: LayoutProps<"/">) {
       <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md">
         <div className="mx-auto grid h-20 max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 sm:px-6">
           <Link href="/" aria-label="PactPop home" className="flex items-center gap-4 justify-self-start">
-            <span className="font-[family-name:var(--font-brand)] text-[1.35rem] font-semibold uppercase tracking-[0.04em] text-[#0d0d10]">PactPop</span>
+            <span className="flex items-center gap-2.5">
+              <LogoMark variant="mark" className="h-8 w-8" />
+              <span className="font-[family-name:var(--font-brand)] text-[1.35rem] font-semibold uppercase tracking-[0.04em] text-[#0d0d10]">PactPop</span>
+            </span>
           </Link>
           <SectionNav />
           <div className="flex items-center gap-1 justify-self-end">
@@ -36,7 +40,10 @@ export default function MarketingLayout({ children }: LayoutProps<"/">) {
       <footer className="bg-[#0b0b0e] text-white">
         <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div>
-            <span className="font-[family-name:var(--font-brand)] text-[1.35rem] font-semibold uppercase tracking-[0.04em]">PactPop</span>
+            <span className="flex items-center gap-2.5">
+              <LogoMark variant="mark" className="h-8 w-8" />
+              <span className="font-[family-name:var(--font-brand)] text-[1.35rem] font-semibold uppercase tracking-[0.04em]">PactPop</span>
+            </span>
             <p className="mt-2 text-sm text-white/55">Make promises. Make progress. Get paid.</p>
           </div>
           <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/60">

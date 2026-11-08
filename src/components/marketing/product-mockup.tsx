@@ -34,7 +34,9 @@ export function ProductMockup() {
           <span className="h-2.5 w-2.5 rounded-full bg-[#3a3743]" />
           <span className="h-2.5 w-2.5 rounded-full bg-[#3a3743]" />
           <span className="h-2.5 w-2.5 rounded-full bg-[#3a3743]" />
-          <span className="ml-3 font-mono text-[0.65rem] text-[#615f6c]">pactpop · Lumen Studio</span>
+          <span className="ml-3 flex items-center gap-1.5 font-mono text-[0.65rem] text-[#615f6c]">
+            <LogoMark variant="mark" className="h-3.5 w-3.5" /> pactpop · Lumen Studio
+          </span>
         </div>
         <div className="grid md:grid-cols-[11rem_1fr]">
           <div className="hidden flex-col gap-1 border-r border-[#2a2832] bg-[#17161d] p-3 md:flex">

@@ -1,5 +1,6 @@
 "use client";
 
+import { LogoMark } from "@/components/brand/logo";
 import { useRef, type CSSProperties, type PointerEvent } from "react";
 import { cn } from "@/lib/cn";
 
@@ -12,14 +13,7 @@ const CARDS: CardSpec[] = [
 ];
 
 function PactMark() {
-  return (
-    <svg viewBox="0 0 64 28" className="h-6 w-14 sm:h-7 sm:w-16" aria-hidden>
-      <path d="M6 22 C18 22 22 6 32 6 C42 6 46 22 58 22" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" />
-      <circle cx="6" cy="22" r="4" fill="white" />
-      <circle cx="58" cy="22" r="4" fill="white" />
-      <circle cx="32" cy="6" r="3" fill="#b9a5ff" stroke="white" strokeWidth="1.5" />
-    </svg>
-  );
+  return <LogoMark variant="mono" className="h-7 w-7 sm:h-9 sm:w-9" title="" />;
 }
 
 /** One agreement card that tilts toward the pointer and lifts on hover. */
