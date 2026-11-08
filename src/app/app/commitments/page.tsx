@@ -3,6 +3,8 @@ import Link from "next/link";
 import { and, desc, eq, inArray } from "drizzle-orm";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ClientLinkButton } from "@/components/app/client-link-button";
+import { ProofButton } from "@/components/app/proof-button";
+import { listProof } from "@/server/services/proof";
 import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/money";
 import { requireAuth } from "@/server/auth/session";
@@ -62,6 +64,7 @@ export default async function CommitmentsPage() {
       .orderBy(desc(timelineEvents.createdAt))
       .limit(14),
   ]);
+  const proof = await listProof(db, bid);
   const ms = rows.length
     ? await db
         .select()
@@ -161,6 +164,48 @@ export default async function CommitmentsPage() {
           </table>
         </div>
       </section>
+
+      {proof.length > 0 && (
+        <section className="panel mt-4 min-w-0" aria-label="Delivery proof">
+          <div className="panel-head">
+            <h2 className="panel-title">Delivery proof</h2>
+            <span className="ml-auto text-[0.75rem] text-muted">ProofFlow checks proof against each agreed criterion</span>
+          </div>
+          <ul className="divide-y divide-border">
+            {proof.map((r) => {
+              const v = r.d.verification;
+              return (
+                <li key={r.d.id} className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-start">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[0.9375rem] font-semibold">
+                      {r.d.title} <span className="font-normal text-muted">· {r.client}{r.milestone ? ` · ${r.milestone}` : ""}</span>
+                    </p>
+                    <ul className="mt-2 flex flex-wrap gap-1.5">
+                      {r.d.acceptanceCriteria.map((c) => {
+                        const ok = v?.verified.includes(c);
+                        const miss = v && !ok;
+                        return (
+                          <li key={c} className="pure inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.75rem]">
+                            <span className={cn("h-1.5 w-1.5 rounded-full", ok ? "bg-money-in" : miss ? "bg-[#ec6b74]" : "bg-faint")} aria-hidden />
+                            {c}
+                            <span className="sr-only">{ok ? " (met)" : miss ? " (not shown)" : " (not checked yet)"}</span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                    {v?.summary && <p className="mt-2 text-[0.8125rem] text-muted">ProofFlow: {v.summary}</p>}
+                    {r.evidence.length > 0 && <p className="mt-1 text-[0.75rem] text-faint">{r.evidence.length} piece(s) of evidence attached</p>}
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <StatusBadge status={r.d.status} />
+                    {r.d.status !== "approved" && <ProofButton deliverableId={r.d.id} title={r.d.title} criteria={r.d.acceptanceCriteria} />}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
 
       <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <section className="panel min-w-0" aria-label="Agreement journey">

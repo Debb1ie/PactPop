@@ -46,6 +46,7 @@ export const TOOL_POLICIES: ToolPolicyDef[] = [
   { tool: "paypal.refund", label: "Issue refunds", category: "financial", defaultPolicy: "approval", floor: "approval" },
   { tool: "commitments.change_amount", label: "Change agreed amounts", category: "financial", defaultPolicy: "approval", floor: "approval" },
   { tool: "change_orders.apply", label: "Apply change orders to agreements", category: "financial", defaultPolicy: "approval", floor: "approval" },
+  { tool: "deliverables.approve", label: "Approve deliveries (makes the payment due)", category: "financial", defaultPolicy: "approval", floor: "approval" },
 ];
 
 const RANK: Record<Policy, number> = { allow: 0, approval: 1, deny: 2 };

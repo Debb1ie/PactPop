@@ -111,10 +111,10 @@ async function invokeTool(ctx: ToolContext, name: string, rawInput: unknown, cal
     await ctx.db.insert(agentToolCalls).values({ businessId: ctx.businessId, executionId: ctx.executionId, tool: name, args: input as object, decision: "allowed", result: result.data as object, durationMs: Date.now() - started });
     emit({ type: "tool_result", id: callId, ok: true, summary: result.summary });
     // a tool may itself queue an approval (e.g. ScopeWatch change orders)
-    const d = result.data as { approvalId?: string; amount?: string } | null;
+    const d = result.data as { approvalId?: string; approvalTitle?: string; amount?: string } | null;
     if (d?.approvalId) {
       state.approvals += 1;
-      emit({ type: "approval", approvalId: d.approvalId, title: "Change order waiting for approval", amount: d.amount ?? null, reason: ctx.reasoning });
+      emit({ type: "approval", approvalId: d.approvalId, title: d.approvalTitle ?? "Change order waiting for approval", amount: d.amount ?? null, reason: ctx.reasoning });
     }
     return { ok: true, content: JSON.stringify(result.data), modelContent: JSON.stringify(moneyForModel(result.data)) };
   } catch (e) {
@@ -127,7 +127,7 @@ async function invokeTool(ctx: ToolContext, name: string, rawInput: unknown, cal
 
 const SYSTEM_PROMPT = `You are PactPop's orchestrator. PactPop helps freelancers and small agencies run the path from client request to agreement, delivery, approval and PayPal payment.
 
-You coordinate specialist agents by calling tools. Each tool belongs to one specialist (Intake, Scope, Pricing, Proposal, Operations, Finance, PayFlow). Work like an operations lead: gather facts with read tools, act with the right specialist, then report.
+You coordinate specialist agents by calling tools. Each tool belongs to one specialist (Intake, Scope, Pricing, Proposal, Operations, Finance, ProofFlow, PayFlow). Work like an operations lead: gather facts with read tools, act with the right specialist, then report.
 
 Rules:
 - Use only facts from tool results. Never invent clients, amounts, dates or payments.
@@ -138,6 +138,7 @@ Rules:
 - ScopeWatch: before calling check_scope, read the accepted agreement with get_commitment. Classify the new request as included, clarification, revision or additional, and list only genuinely new items.
 - Intake: when analysing a request, read it with get_request, then call save_request_analysis with only stated facts and list missing information as questions.
 - Payments only count when PayPal confirms them. Never say something was paid unless check_payment or the records show PayPal confirmed it.
+- ProofFlow: to check delivery proof, call get_delivery_proof, compare every acceptance criterion with the delivery notes and evidence, then call save_proof_review for each deliverable. Put a criterion in verified (exact text) only if the evidence clearly shows it; otherwise list it as missing. If a review passes, a delivery approval is queued for the owner; approving it makes that payment due.
 - PayFlow (PayPal): to invoice, call list_invoiceable to find the milestone, then send_invoice with its milestoneId. Sending is normally queued for the owner to approve; say so plainly. Use check_payment to ask PayPal whether an invoice is paid.
 - Finish with a short, plain-language summary for the business owner: what you did, what changed, and what needs their decision. No markdown headings; short paragraphs or simple lists are fine.`;
 

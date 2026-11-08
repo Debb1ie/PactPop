@@ -21,6 +21,7 @@ import {
 } from "@/server/db/schema";
 import { formatMoney } from "@/lib/money";
 import { recordAudit, recordTimeline } from "./audit";
+import { approveDelivery } from "./proof";
 import { planMilestones, quoteChangeOrder, quoteProject, type Estimate } from "./pricing";
 
 type Actor = { type: "user" | "agent"; id?: string | null; label: string };
@@ -341,6 +342,9 @@ async function executeApproved(db: Database, businessId: string, a: typeof appro
     await db.update(proposals).set({ status: "sent", ownerApprovedAt: new Date(), ownerApprovedBy: userId, updatedAt: new Date() }).where(eq(proposals.id, p.id));
     await recordAudit(db, { businessId, actor: user, action: "proposal.sent", entityType: "proposal", entityId: p.id });
     return { proposalId: p.id, status: "sent" };
+  }
+  if (a.actionType === "deliverables.approve") {
+    return approveDelivery(db, businessId, String(a.payload.milestoneId), userId);
   }
   if (a.actionType === "paypal.send_invoice") {
     // Loaded lazily: the PayPal client is server-only and this module is also used by tests.

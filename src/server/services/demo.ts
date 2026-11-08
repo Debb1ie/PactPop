@@ -16,6 +16,7 @@ import {
   commitments,
   commitmentVersions,
   deliverables,
+  evidenceFiles,
   invoices,
   milestones,
   paymentEvents,
@@ -202,10 +203,28 @@ export async function createDemoWorkspace(db: Database) {
     )
     .returning();
 
-  await db.insert(deliverables).values([
-    { businessId: b, commitmentId: nw.id, milestoneId: nwMilestones[1]?.id, title: "Home, Menu and About pages", acceptanceCriteria: ["Live on staging", "Mobile layout review passed"], status: "submitted", submissionNotes: "Staging link shared with the client.", createdAt: ago(4) },
-    { businessId: b, commitmentId: nw.id, milestoneId: nwMilestones[1]?.id, title: "Catering and Contact pages", acceptanceCriteria: ["Live on staging", "Contact form tested"], status: "pending", createdAt: ago(13) },
-    { businessId: b, commitmentId: nw.id, milestoneId: nwMilestones[1]?.id, title: "Basic SEO", acceptanceCriteria: ["Meta titles and descriptions on every page", "Local business schema"], status: "pending", createdAt: ago(13) },
+  // ProofFlow: two deliverables already checked; one has fresh proof waiting for the ProofFlow Agent.
+  const checked = (criteria: string[], summary: string) => ({ verified: criteria, missing: [], issues: [], suggestions: [], summary, analyzedBy: "ai" as const, analyzedAt: ago(5).toISOString() });
+  const [nwDel] = await db
+    .insert(deliverables)
+    .values([
+      {
+        businessId: b,
+        commitmentId: nw.id,
+        milestoneId: nwMilestones[1]?.id,
+        title: "Home, Menu and About pages",
+        acceptanceCriteria: ["Live on staging", "Mobile layout review passed"],
+        status: "submitted",
+        submissionNotes: "Home, Menu and About are live on staging. Mobile layout review done on iPhone 13 and Pixel 7: no layout issues found.",
+        createdAt: ago(4),
+      },
+      { businessId: b, commitmentId: nw.id, milestoneId: nwMilestones[1]?.id, title: "Catering and Contact pages", acceptanceCriteria: ["Live on staging", "Contact form tested"], status: "verified", submissionNotes: "Both pages on staging; test submission received at the bakery inbox.", verification: checked(["Live on staging", "Contact form tested"], "Both pages are on staging and the contact form delivered a test message."), createdAt: ago(9) },
+      { businessId: b, commitmentId: nw.id, milestoneId: nwMilestones[1]?.id, title: "Basic SEO", acceptanceCriteria: ["Meta titles and descriptions on every page", "Local business schema"], status: "verified", submissionNotes: "Meta tags on all pages; LocalBusiness schema validated.", verification: checked(["Meta titles and descriptions on every page", "Local business schema"], "Every page has a title and description; schema validates."), createdAt: ago(8) },
+    ])
+    .returning();
+  await db.insert(evidenceFiles).values([
+    { businessId: b, commitmentId: nw.id, deliverableId: nwDel.id, kind: "url", label: "staging.northwind-bakery.example", url: "https://staging.northwind-bakery.example", createdAt: ago(4) },
+    { businessId: b, commitmentId: nw.id, deliverableId: nwDel.id, kind: "note", label: "Mobile review", note: "Checked Home, Menu and About on iPhone 13 (Safari) and Pixel 7 (Chrome): navigation, menu cards and images fit the screen, no horizontal scrolling.", createdAt: ago(4) },
   ]);
 
   // ScopeWatch: the client asks for 3 more pages → $300 change order waiting for approval
