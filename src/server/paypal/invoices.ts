@@ -158,7 +158,8 @@ export async function syncInvoice(db: Database, input: { businessId: string; inv
       amountMinor: paidMinor,
       currency: inv.currency,
       verifiedVia: input.via,
-      completedAt: txn?.payment_date ? new Date(txn.payment_date) : new Date(),
+      // PayPal's payment_date is often a bare date in PayPal's own timezone; only trust it when it carries a time.
+      completedAt: txn?.payment_date && /T\d/.test(txn.payment_date) ? new Date(txn.payment_date) : new Date(),
       isSandbox: true,
     });
     await tx.update(milestones).set({ status: "paid", updatedAt: new Date() }).where(eq(milestones.id, inv.milestoneId));
