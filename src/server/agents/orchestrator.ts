@@ -54,6 +54,8 @@ function moneyForModel(value: unknown, currency = "USD"): unknown {
   const cur = typeof obj.currency === "string" ? obj.currency : currency;
   const out: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(obj)) {
+    // Approval ids are for the UI card only; the model would read them out to the user.
+    if (/^(approvalId|pendingApprovalId)$/.test(k)) continue;
     if (/Minor$/.test(k) && typeof v === "number") out[k.replace(/Minor$/, "")] = formatMoney(v, cur);
     else out[k] = moneyForModel(v, cur);
   }
