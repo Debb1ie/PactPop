@@ -3,10 +3,9 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { Bell, Check, ChevronDown, Copy, Link2, LogOut, Moon, Search, UserRound } from "lucide-react";
+import { Bell, Building2, Check, ChevronDown, ChevronRight, Copy, CreditCard, Link2, LogOut, Moon, Search, Sparkles, UserRound } from "lucide-react";
 import { Logo, LogoMark } from "@/components/brand/logo";
 import { ThemeToggle, toggleTheme } from "@/components/ui/theme";
-import { DemoBadge } from "@/components/ui/primitives";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/cn";
 import { NAV_ITEMS } from "./nav";
@@ -32,24 +31,6 @@ function Avatar({ name, className }: { name: string; className?: string }) {
     <span className={cn("grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#a18bff] to-[#5b3cd4] text-sm font-semibold text-white", className)} aria-hidden>
       {name.slice(0, 1).toUpperCase()}
     </span>
-  );
-}
-
-function StatusDot({ ok, label }: { ok: boolean; label: string }) {
-  return (
-    <li className="flex items-center gap-2">
-      <span className={cn("h-2 w-2 rounded-full", ok ? "bg-success" : "bg-warning")} aria-hidden />
-      {label}
-    </li>
-  );
-}
-
-function Integrations({ integrations }: { integrations: ShellProps["integrations"] }) {
-  return (
-    <ul className="space-y-1.5 text-xs text-muted">
-      <StatusDot ok={integrations.paypal} label={integrations.paypal ? "PayPal Sandbox connected" : "PayPal not configured"} />
-      <StatusDot ok={integrations.ai} label={integrations.ai ? "AI agents online" : "AI in rule-based mode"} />
-    </ul>
   );
 }
 
@@ -187,6 +168,61 @@ function TopBar({ user, pendingApprovals, onAccount }: { user: ShellProps["user"
   );
 }
 
+/** iOS-style grouped list: one raised card, hairline dividers between rows. */
+function SheetGroup({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <div
+      className={cn(
+        "divide-y divide-border overflow-hidden rounded-2xl bg-surface-2 shadow-[0_1px_0_rgb(255_255_255/0.04)_inset,0_12px_28px_-16px_rgb(0_0_0/0.55)] ring-1 ring-border",
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+
+type SheetRowProps = {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value?: ReactNode;
+  trailing?: ReactNode;
+  status?: boolean;
+} & ({ as?: "div" } | { as: "button"; onClick: () => void } | { as: "link"; href: string; onClick?: () => void });
+
+function SheetRow(props: SheetRowProps) {
+  const { icon: Icon, label, value, trailing, status } = props;
+  const body = (
+    <>
+      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-[0.6rem] bg-fill">
+        <Icon className="h-4 w-4 text-foreground/75" />
+      </span>
+      <span className="min-w-0 flex-1 truncate text-[0.9375rem] font-medium">{label}</span>
+      {value != null && (
+        <span className="flex min-w-0 items-center gap-1.5 truncate text-[0.875rem] text-muted">
+          {status !== undefined && <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", status ? "bg-money-in" : "bg-muted/50")} aria-hidden />}
+          {value}
+        </span>
+      )}
+      {trailing ?? (props.as === "button" || props.as === "link" ? <ChevronRight className="h-4 w-4 shrink-0 text-muted/70" /> : null)}
+    </>
+  );
+  const cls = "flex w-full items-center gap-3 px-3.5 py-2.5 text-left";
+  if (props.as === "button")
+    return (
+      <button type="button" onClick={props.onClick} className={cn(cls, "transition-colors hover:bg-fill")}>
+        {body}
+      </button>
+    );
+  if (props.as === "link")
+    return (
+      <Link href={props.href} onClick={props.onClick} className={cn(cls, "transition-colors hover:bg-fill")}>
+        {body}
+      </Link>
+    );
+  return <div className={cls}>{body}</div>;
+}
+
 /** Account sheet: profile, workspace, request link, more pages, appearance, integrations, logout. */
 function AccountSheet({ open, onClose, ...p }: Omit<ShellProps, "children" | "pendingApprovals"> & { open: boolean; onClose: () => void }) {
   const ref = useRef<HTMLDialogElement>(null);
@@ -206,50 +242,59 @@ function AccountSheet({ open, onClose, ...p }: Omit<ShellProps, "children" | "pe
         onClose();
       }}
       onClick={(e) => e.target === ref.current && onClose()}
-      className="mx-auto mb-0 mt-auto w-full max-w-md rounded-t-2xl bg-surface p-0 text-foreground sm:mb-auto sm:rounded-2xl"
+      className="mx-auto mb-0 mt-auto w-full max-w-md rounded-t-[1.75rem] bg-surface p-0 text-foreground shadow-[0_40px_100px_-30px_rgb(0_0_0/0.6)] ring-1 ring-border sm:mb-auto sm:rounded-[1.75rem]"
     >
-      <div className="pb-safe p-5">
+      <div className="pb-safe p-5 sm:p-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold">Account</h2>
-          <button onClick={onClose} className="rounded-full px-3 py-1 text-sm font-semibold text-accent hover:bg-fill">
+          <h2 className="text-[1.25rem] font-semibold tracking-[-0.02em]">Account</h2>
+          <button onClick={onClose} className="h-8 rounded-full bg-fill px-3.5 text-[0.8125rem] font-medium text-foreground transition-colors hover:bg-fill-strong">
             Done
           </button>
         </div>
-        <div className="mt-4 flex items-center gap-3 rounded-xl bg-surface-2 px-4 py-3">
-          <Avatar name={p.user.name} className="h-12 w-12 text-lg" />
+
+        <div className="mt-5 flex items-center gap-3.5 px-1">
+          <Avatar name={p.user.name} className="h-14 w-14 text-xl shadow-[0_8px_20px_-8px_rgb(0_0_0/0.5)]" />
           <div className="min-w-0 flex-1">
-            <p className="truncate font-semibold">{p.user.name}</p>
-            <p className="truncate text-sm text-muted">{p.user.email}</p>
+            <p className="truncate text-[1.0625rem] font-semibold tracking-[-0.01em]">{p.user.name}</p>
+            <p className="truncate text-[0.875rem] text-muted">{p.user.email}</p>
           </div>
         </div>
-        <div className="mt-3 flex items-center justify-between gap-3 rounded-xl bg-surface-2 px-4 py-3 text-sm">
-          <span className="flex min-w-0 items-center gap-2 truncate font-medium">
-            {p.business.name} {p.business.isDemo && <DemoBadge />}
-          </span>
-          <button onClick={copy} className="flex shrink-0 items-center gap-1 rounded-full bg-accent-soft px-2.5 py-1 text-xs font-semibold text-accent">
-            {copied ? <Check className="h-3 w-3" /> : <Link2 className="h-3 w-3" />} Request link
-          </button>
-        </div>
-        <nav aria-label="All pages" className="mt-3 grid grid-cols-2 gap-2 lg:hidden">
-          {READY.map(({ href, label, icon: Icon }) => (
-            <Link key={href} href={href} onClick={onClose} className="flex items-center gap-2.5 rounded-xl bg-surface-2 px-3 py-2.5 text-sm font-medium hover:bg-fill">
-              <Icon className="h-4 w-4 text-muted" /> {label}
-            </Link>
-          ))}
+
+        <SheetGroup className="mt-5">
+          <SheetRow icon={Building2} label="Workspace" value={`${p.business.name}${p.business.isDemo ? " · Demo" : ""}`} />
+          <SheetRow as="button" onClick={copy} icon={Link2} label="Request link" value={copied ? "Copied" : "Copy"} trailing={copied ? <Check className="h-4 w-4 text-muted" /> : <Copy className="h-4 w-4 text-muted" />} />
+          <SheetRow
+            as="button"
+            onClick={toggleTheme}
+            icon={Moon}
+            label="Appearance"
+            value={
+              <>
+                <span className="dark:hidden">Light</span>
+                <span className="hidden dark:inline">Dark</span>
+              </>
+            }
+          />
+        </SheetGroup>
+
+        <nav aria-label="All pages" className="lg:hidden">
+          <SheetGroup className="mt-3">
+            {READY.map(({ href, label, icon }) => (
+              <SheetRow key={href} as="link" href={href} onClick={onClose} icon={icon} label={label} />
+            ))}
+          </SheetGroup>
         </nav>
-        <button onClick={toggleTheme} className="mt-3 flex w-full items-center gap-3 rounded-xl bg-surface-2 px-4 py-3 text-left text-sm">
-          <Moon className="h-4 w-4 text-accent" />
-          <span className="flex-1 font-medium">Appearance</span>
-          <span className="text-muted">
-            <span className="dark:hidden">Light</span>
-            <span className="hidden dark:inline">Dark</span>
-          </span>
-        </button>
-        <div className="mt-3 rounded-xl bg-surface-2 px-4 py-3">
-          <Integrations integrations={p.integrations} />
-        </div>
-        <form action={p.logout} className="mt-4">
-          <button className="h-12 w-full rounded-xl bg-error-soft text-base font-semibold text-error">Log out</button>
+
+        <p className="mt-5 px-1 text-[0.75rem] font-medium text-muted">Connections</p>
+        <SheetGroup className="mt-2">
+          <SheetRow icon={CreditCard} label="PayPal Sandbox" value={p.integrations.paypal ? "Connected" : "Not set up"} status={p.integrations.paypal} />
+          <SheetRow icon={Sparkles} label="AI agents" value={p.integrations.ai ? "Online" : "Rule-based"} status={p.integrations.ai} />
+        </SheetGroup>
+
+        <form action={p.logout} className="mt-5">
+          <button className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-surface-2 text-[0.9375rem] font-medium text-foreground shadow-[0_1px_0_rgb(255_255_255/0.04)_inset,0_10px_24px_-14px_rgb(0_0_0/0.5)] ring-1 ring-border transition-colors hover:bg-fill">
+            <LogOut className="h-4 w-4 text-muted" /> Log out
+          </button>
         </form>
       </div>
     </dialog>
