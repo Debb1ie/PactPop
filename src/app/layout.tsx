@@ -13,6 +13,9 @@ export const metadata: Metadata = {
   title: { default: "PactPop — Make promises. Make progress. Get paid.", template: "%s · PactPop" },
   description:
     "PactPop's AI agents manage your client agreements, track deliverables, catch scope changes, coordinate approvals and collect payment through PayPal.",
+  metadataBase: new URL(process.env.APP_URL ?? "http://localhost:3000"),
+  openGraph: { images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Poppy, the PactPop pup, holding a PactPop card" }] },
+  twitter: { card: "summary_large_image", images: ["/og-image.png"] },
 };
 
 export const viewport: Viewport = {

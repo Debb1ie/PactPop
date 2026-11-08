@@ -1,7 +1,7 @@
 "use client";
 
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { BarChart3 } from "lucide-react";
+import { Mascot } from "@/components/brand/mascot";
 import { formatMoney, formatMoneyCompact } from "@/lib/money";
 
 type Point = { month: string; label: string; receivedMinor: number };
@@ -18,9 +18,7 @@ export function RevenueChart({ data, currency }: { data: Point[]; currency: stri
             <span key={i} className="w-5 rounded-full bg-gradient-to-t from-[#7c5cff] to-[#f6c89f]" style={{ height: `${h}%` }} />
           ))}
         </div>
-        <span className="relative grid h-12 w-12 place-items-center rounded-[0.95rem] bg-gradient-to-br from-[#b18cff] to-[#6c4ef5] text-white shadow-[0_12px_24px_-12px_rgb(0_0_0/0.6),inset_0_1px_0_rgb(255_255_255/0.3)]">
-          <BarChart3 className="h-6 w-6" />
-        </span>
+        <Mascot mood="sleeping" width={120} className="relative" />
         <p className="relative mt-3 text-[0.9375rem] font-semibold">No payments yet</p>
         <p className="relative mt-0.5 max-w-xs text-[0.8125rem] text-muted">Monthly totals appear here once PayPal confirms your first payment.</p>
       </div>

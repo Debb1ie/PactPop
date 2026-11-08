@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { CheckCircle2 } from "lucide-react";
+import { Mascot } from "@/components/brand/mascot";
 import { Button } from "@/components/ui/button";
 import { ErrorNotice, Field, Input, Textarea } from "@/components/ui/primitives";
 import { submitRequestAction, type RequestState } from "./actions";
@@ -13,9 +13,7 @@ export function RequestForm({ slug, businessName }: { slug: string; businessName
   if (state?.ok) {
     return (
       <div className="py-10 text-center">
-        <span className="mx-auto grid h-14 w-14 place-items-center rounded-[1.05rem] bg-gradient-to-b from-[#5ee08a] to-[#24a148] text-white shadow-[0_12px_24px_-12px_rgb(0_0_0/0.5)]">
-          <CheckCircle2 className="h-7 w-7" />
-        </span>
+        <Mascot mood="thumbs-up" width={140} className="mx-auto" />
         <h2 className="mt-5 text-[1.5rem] font-semibold tracking-[-0.02em]">Request sent</h2>
         <p className="mx-auto mt-2 max-w-sm text-[0.9375rem] text-muted">{businessName} will review it and reply with a proposal. You don&apos;t need to do anything else for now.</p>
       </div>

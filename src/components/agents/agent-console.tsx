@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { ArrowUp, Ban, Check, CircleDashed, ShieldAlert, Sparkles } from "lucide-react";
 import { cn } from "@/lib/cn";
-import { LogoMark } from "@/components/brand/logo";
+import { Mascot } from "@/components/brand/mascot";
 import { ApprovalCard } from "./approval-card";
 
 type Ev =
@@ -201,8 +201,8 @@ export function AgentConsole({ mode, model, suggestions, greeting }: { mode: "ai
         <div className="mx-auto w-full max-w-3xl px-1 py-6">
           {runs.length === 0 ? (
             <div className="flex min-h-[50vh] flex-col items-center justify-center text-center">
-              <LogoMark className="h-12 w-12" />
-              <h1 className="mt-5 text-[1.75rem] font-bold sm:text-[2rem]">{greeting}</h1>
+              <Mascot mood="thinking" width={110} priority />
+              <h1 className="mt-3 text-[1.75rem] font-bold sm:text-[2rem]">{greeting}</h1>
               <p className="mt-1.5 text-[0.9375rem] text-muted">What should the agents work on?</p>
               <div className="mt-8 grid w-full gap-2.5 sm:grid-cols-2">
                 {suggestions.map((sg) => (

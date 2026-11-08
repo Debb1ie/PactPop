@@ -24,9 +24,10 @@ export default function MarketingLayout({ children }: LayoutProps<"/">) {
           </Link>
           <Link
             href="/register"
-            className="rounded-xl bg-[#0d0d10] px-4 py-2.5 text-[0.875rem] font-medium text-white transition hover:bg-[#2a2a30] sm:px-5"
+            className="whitespace-nowrap rounded-xl bg-[#0d0d10] px-4 py-2.5 text-[0.875rem] font-medium text-white transition hover:bg-[#2a2a30] sm:px-5"
           >
-            Create account
+            <span className="sm:hidden">Sign up</span>
+            <span className="hidden sm:inline">Create account</span>
           </Link>
           </div>
         </div>

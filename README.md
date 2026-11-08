@@ -230,6 +230,7 @@ PayPal is a trademark of PayPal, Inc. PactPop is an independent hackathon projec
 | **Groq** (runtime, `openai/gpt-oss-120b`) | Default AI provider for PactPop's agents, used through Groq's OpenAI-compatible chat API with tool calling. Free tier; the orchestrator waits and retries when Groq's rate limit asks it to. |
 | **Anthropic Claude** (runtime, optional, `claude-opus-5-5`) | Alternative provider (`AI_PROVIDER=anthropic`). Powers PactPop's agents: extracting requirements from client messages, comparing new requests with the accepted scope, drafting proposals and change orders, and checking deliverable evidence. Accessed through a provider interface, so the model can be swapped. Every tool call goes through TrustGate. |
 | **Claude Code** (development) | AI coding assistant used to plan the architecture, write and review code, and run tests and browser checks during the hackathon. It is not part of the running app. |
+| **Mascot artwork (Poppy the pup)** | Sticker set and hero illustration supplied by the project owner; cut into transparent stickers for the app (`public/mascot/`). |
 | **three.js** | WebGL grid-terrain background that reacts to scrolling, the VowGraph orb view on the dashboard, and the 3D architecture diagram. |
 
 ## License

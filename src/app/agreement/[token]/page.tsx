@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Check, CheckCircle2 } from "lucide-react";
+import { Check } from "lucide-react";
 import { formatMoney } from "@/lib/money";
 import { cn } from "@/lib/cn";
 import { getDb } from "@/server/db/client";
 import { env, paypalConfigured } from "@/server/env";
 import { agreementByToken } from "@/server/services/agreements";
+import { Mascot } from "@/components/brand/mascot";
 import { isDueForCheckout } from "@/lib/checkout";
 import { AcceptForm, InvoiceLink, PayButtons } from "./client";
 
@@ -109,7 +110,7 @@ export default async function AgreementPage({ params }: PageProps<"/agreement/[t
 
         {lastPaid && !paidAll && (
           <p className="pure mt-4 flex items-center gap-2.5 rounded-[1.25rem] px-5 py-3.5 text-[0.9375rem]">
-            <CheckCircle2 className="h-5 w-5 shrink-0 text-[#24a148]" />
+            <Mascot mood="laughing" width={44} decorative className="shrink-0" />
             <span>
               <span className="font-semibold">{lastPaid.m.title}</span> received · <span className="money">{formatMoney(lastPaid.m.amountMinor, cur)}</span>, confirmed by PayPal. Thank you!
             </span>
@@ -126,7 +127,7 @@ export default async function AgreementPage({ params }: PageProps<"/agreement/[t
             </>
           ) : paidAll ? (
             <div className="py-4 text-center">
-              <CheckCircle2 className="mx-auto h-10 w-10 text-[#24a148]" />
+              <Mascot mood="party" width={150} className="mx-auto" />
               <p className="mt-3 text-[1.0625rem] font-semibold">All payments are complete. Thank you!</p>
             </div>
           ) : next && !(next.invoiceUrl && next.invoiceStatus !== "paid") && !isDueForCheckout(next.m) ? (

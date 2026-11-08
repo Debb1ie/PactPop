@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { LogoMark } from "@/components/brand/logo";
+import { Mascot } from "@/components/brand/mascot";
 import { DEMO_EMAIL, DEMO_PASSWORD } from "@/lib/demo";
 import { DemoLoginButton, LoginForm } from "../auth-forms";
 
@@ -10,7 +10,7 @@ export default function LoginPage() {
   return (
     <>
       <div className="text-center">
-        <LogoMark className="mx-auto h-[4.5rem] w-[4.5rem]" />
+        <Mascot mood="wink-card" width={132} priority className="mx-auto" />
         <h1 className="mt-5 text-[1.75rem] font-semibold">Welcome back</h1>
         <p className="mt-1 text-[0.9375rem] text-muted">Log in to your PactPop workspace.</p>
       </div>

@@ -17,6 +17,7 @@ import {
 import type { ReactNode } from "react";
 import { ArchVisual } from "./arch-visual";
 import { ButtonLink } from "@/components/ui/button";
+import { Mascot } from "@/components/brand/mascot";
 import { cn } from "@/lib/cn";
 import Link from "next/link";
 import { HeroCards } from "./hero-cards";
@@ -305,7 +306,7 @@ export function CtaBand() {
   return (
     <section className="px-5 py-20 sm:px-6 sm:py-28">
       <div className="stub tone-violet mx-auto max-w-5xl" style={{ "--tear": "13.5rem", "--notch": "14px" } as React.CSSProperties}>
-        <div className="flex h-[13.5rem] flex-col items-center justify-center px-6 text-center sm:px-12">
+        <div className="relative flex h-[13.5rem] flex-col items-center justify-center px-6 text-center sm:px-12">
           <h2 className="text-balance text-[2rem] font-semibold leading-tight tracking-[-0.035em] sm:text-[3rem]">Make promises. Make progress. Get paid.</h2>
           <p className="mx-auto mt-3 max-w-xl text-[1.0625rem] text-muted">Run your next client project on PactPop. Free, open source, and built on PayPal.</p>
         </div>
@@ -317,7 +318,8 @@ export function CtaBand() {
             </div>
             <p className="mt-1.5 text-xs text-muted">Signature</p>
           </div>
-          <div className="flex flex-wrap justify-center gap-3">
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Mascot mood="card-wave" width={88} className="-my-8 hidden rotate-6 md:block" />
             <ButtonLink href="/register" size="lg" className="px-7">
               Get Started <ArrowRight className="h-4 w-4" />
             </ButtonLink>

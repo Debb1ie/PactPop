@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { CheckCheck } from "lucide-react";
 import { ApprovalCard } from "@/components/agents/approval-card";
-import { Card, CardHeader, EmptyState, PageHeader } from "@/components/ui/primitives";
+import { Card, CardHeader, PageHeader } from "@/components/ui/primitives";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { formatMoney } from "@/lib/money";
+import { Mascot } from "@/components/brand/mascot";
 import { requireAuth } from "@/server/auth/session";
 import { getDb } from "@/server/db/client";
 import { listApprovals } from "@/server/services/workflow";
@@ -24,7 +24,11 @@ export default async function ApprovalsPage() {
           <h2 className="text-[0.9375rem] font-semibold">Waiting for you · {pending.length}</h2>
           {pending.length === 0 ? (
             <Card>
-              <EmptyState icon={<CheckCheck className="h-6 w-6" />} title="Nothing to decide" description="When an agent prepares a sensitive action, it waits here for you." />
+              <div className="flex flex-col items-center px-6 py-10 text-center">
+                <Mascot mood="thumbs-up" width={130} />
+                <p className="mt-4 text-[1.0625rem] font-semibold">Nothing to decide</p>
+                <p className="mt-1 max-w-sm text-[0.9375rem] text-muted">When an agent prepares a sensitive action, it waits here for you.</p>
+              </div>
             </Card>
           ) : (
             pending.map(({ a, clientName, commitmentTitle }) => (
