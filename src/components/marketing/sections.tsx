@@ -26,7 +26,7 @@ import { ButtonLink } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import Link from "next/link";
 import { HeroCards } from "./hero-cards";
-import { FeatureBento } from "./feature-visuals";
+import { FeaturePanels } from "./feature-visuals";
 import { ProductMockup } from "./product-mockup";
 
 export const FLOW = [
@@ -250,9 +250,40 @@ export function AgentsSection() {
 export function IntelligenceSection() {
   return (
     <Section id="features" className="scroll-mt-24">
-      <Heading eyebrow="Signature features" title="Built around the promise, not just the invoice." />
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-end">
+        <div>
+          <p className="text-[0.8125rem] font-semibold uppercase tracking-[0.14em] text-[#5a8a3c]">Signature features</p>
+          <h2 className="mt-3 text-[2.5rem] font-medium leading-[1.08] tracking-[-0.04em] sm:text-[3.5rem]">
+            Built around the{" "}
+            <span className="whitespace-nowrap">
+              <span className="relative inline-block">
+                promise
+                <svg viewBox="0 0 220 24" className="absolute -bottom-3 left-0 h-5 w-full" aria-hidden preserveAspectRatio="none">
+                  <path d="M4 16 C 50 4, 90 4, 120 12 S 190 22, 216 6" fill="none" stroke="#8fae6f" strokeWidth="4" strokeLinecap="round" />
+                </svg>
+              </span>
+              ,
+            </span>{" "}
+            not just the invoice
+          </h2>
+        </div>
+        <div className="lg:pb-2">
+          <p className="max-w-sm text-[0.9375rem] leading-relaxed text-muted">
+            Scope control, proof checks, a linked record of every promise and approvals you control, all in one free workspace.
+          </p>
+          <Link
+            href="/login"
+            className="group mt-5 inline-flex h-14 items-center gap-6 rounded-full bg-gradient-to-b from-[#2a2a30] to-[#0d0d10] pl-6 pr-1.5 text-[0.9375rem] font-medium text-white shadow-[0_12px_30px_-14px_rgb(0_0_0/0.6)]"
+          >
+            Try the demo workspace
+            <span className="grid h-11 w-11 place-items-center rounded-full bg-white text-[#0d0d10] transition-transform duration-500 ease-[var(--ease-ios)] group-hover:translate-x-1">
+              <ArrowRight className="h-5 w-5" />
+            </span>
+          </Link>
+        </div>
+      </div>
       <div className="mt-12">
-        <FeatureBento />
+        <FeaturePanels />
       </div>
     </Section>
   );

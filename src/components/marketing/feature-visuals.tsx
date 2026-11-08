@@ -1,16 +1,7 @@
-import type { ReactNode } from "react";
-import { cn } from "@/lib/cn";
+"use client";
 
-/** A bento tile: tinted background, visual on top, short label + headline below. */
-function Tile({ tint, name, title, children, className }: { tint: string; name: string; title: string; children: ReactNode; className?: string }) {
-  return (
-    <div className={cn("group relative flex flex-col overflow-hidden rounded-[1.75rem] p-6 sm:p-7", tint, className)}>
-      <div className="relative flex min-h-[13rem] flex-1 items-center justify-center">{children}</div>
-      <p className="mt-6 text-[0.8125rem] font-semibold uppercase tracking-[0.12em] text-[#0d0d10]/55">{name}</p>
-      <p className="mt-1 text-[1.5rem] font-bold leading-tight tracking-[-0.02em] text-[#0d0d10]">{title}</p>
-    </div>
-  );
-}
+import { useState, type ReactNode } from "react";
+import { cn } from "@/lib/cn";
 
 /** ScopeWatch: five agreed page tiles, three new ones pop in, a change-order chip appears. */
 function ScopeVisual() {
@@ -38,8 +29,8 @@ function ScopeVisual() {
           </div>
         ))}
       </div>
-      <div className="pp-pop-in mx-auto mt-4 flex w-fit items-center gap-2 rounded-full bg-[#0d0d10] px-4 py-2 text-[0.8125rem] font-semibold text-white shadow-lg" style={{ animationDelay: "1.3s" }}>
-        <span className="h-2 w-2 rounded-full bg-[#ffb340]" /> Change order · <span className="money">$300.00</span> · waiting for you
+      <div className="pp-pop-in mx-auto mt-4 flex w-fit items-center gap-2 whitespace-nowrap rounded-full bg-[#0d0d10] px-4 py-2 text-[0.8125rem] font-semibold text-white shadow-lg" style={{ animationDelay: "1.3s" }}>
+        <span className="h-2 w-2 rounded-full bg-[#ffb340]" /> Change order <span className="money">$300</span> <span className="font-medium text-white/60">needs you</span>
       </div>
     </div>
   );
@@ -129,22 +120,115 @@ function GateVisual() {
   );
 }
 
-/** Signature features as a visual bento grid. */
-export function FeatureBento() {
+/* ───────── expanding feature panels ───────── */
+
+type Panel = { key: string; name: string; title: string; text: string; silk: string; line: string; visual: ReactNode };
+
+const PANELS: Panel[] = [
+  {
+    key: "scope",
+    name: "ScopeWatch",
+    title: "Extra asks get caught, not absorbed.",
+    text: "When a client asks for more than the agreement covers, ScopeWatch spots it and drafts a priced change order for you to approve.",
+    silk: "bg-[radial-gradient(80%_70%_at_20%_10%,#cdbdf2_0%,transparent_60%),radial-gradient(70%_60%_at_90%_90%,#8f6fe0_0%,transparent_60%),linear-gradient(160deg,#b9a6e8,#7d62c9)]",
+    line: "#ffffff",
+    visual: <ScopeVisual />,
+  },
+  {
+    key: "vow",
+    name: "VowGraph",
+    title: "Every payment traces to a promise.",
+    text: "Requests, proposals, agreements, deliveries and payments stay linked, so you can always see why money moved.",
+    silk: "bg-[radial-gradient(80%_70%_at_30%_0%,#ffd9a8_0%,transparent_60%),radial-gradient(70%_70%_at_80%_100%,#e8650f_0%,transparent_60%),linear-gradient(170deg,#f7b267,#e07a1f)]",
+    line: "#fff3e4",
+    visual: <ChainVisual />,
+  },
+  {
+    key: "proof",
+    name: "ProofFlow",
+    title: "Proof checked against the promise.",
+    text: "Upload the delivery and the ProofFlow agent checks it against each agreed item before the next invoice goes out.",
+    silk: "bg-[radial-gradient(80%_70%_at_20%_0%,#9fc48a_0%,transparent_60%),radial-gradient(70%_70%_at_90%_100%,#2e5b26_0%,transparent_60%),linear-gradient(165deg,#6f9a5c,#3b6a32)]",
+    line: "#eaf5e2",
+    visual: <ProofVisual />,
+  },
+  {
+    key: "gate",
+    name: "TrustGate",
+    title: "AI prepares. You decide.",
+    text: "Every agent action is checked. Reading is allowed, sending waits for you, and refunds stay locked.",
+    silk: "bg-[radial-gradient(80%_70%_at_30%_0%,#c9d3e6_0%,transparent_60%),radial-gradient(70%_70%_at_90%_100%,#3d4a66_0%,transparent_60%),linear-gradient(165deg,#8b97b3,#4b5878)]",
+    line: "#eef2fa",
+    visual: <GateVisual />,
+  },
+];
+
+/** Thin flowing lines over the gradient, like folded silk. */
+function Silk({ color }: { color: string }) {
+  const paths = Array.from({ length: 28 }, (_, i) => {
+    const y = 40 + i * 22;
+    return `M-60 ${y} C 140 ${y - 160 + i * 4}, 300 ${y + 140}, 520 ${y - 40} S 820 ${y - 120 + i * 3}, 960 ${y + 30}`;
+  });
   return (
-    <div className="grid gap-4 lg:grid-cols-5">
-      <Tile tint="bg-[#f1ecff]" name="ScopeWatch" title="Extra asks get caught, not absorbed." className="lg:col-span-3">
-        <ScopeVisual />
-      </Tile>
-      <Tile tint="bg-[#fff1e6]" name="VowGraph" title="Every payment traces to a promise." className="lg:col-span-2">
-        <ChainVisual />
-      </Tile>
-      <Tile tint="bg-[#e7f7ef]" name="ProofFlow" title="Proof checked against the promise." className="lg:col-span-2">
-        <ProofVisual />
-      </Tile>
-      <Tile tint="bg-[#f4f7dc]" name="TrustGate" title="AI prepares. You decide." className="lg:col-span-3">
-        <GateVisual />
-      </Tile>
+    <svg viewBox="0 0 900 700" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 h-full w-full" aria-hidden>
+      {paths.map((d, i) => (
+        <path key={i} d={d} fill="none" stroke={color} strokeOpacity={0.08 + (i % 5) * 0.025} strokeWidth="1.2" />
+      ))}
+    </svg>
+  );
+}
+
+/** Signature features: a row of panels; the open one shows its story and live widget, the rest stand as tall strips. */
+export function FeaturePanels() {
+  const [open, setOpen] = useState(0);
+  return (
+    <div className="flex flex-col gap-3 lg:h-[36rem] lg:flex-row">
+      {PANELS.map((p, i) => {
+        const on = open === i;
+        return (
+          <div
+            key={p.key}
+            onMouseEnter={() => setOpen(i)}
+            className={cn(
+              "relative overflow-hidden rounded-[2rem] text-white transition-[flex-grow] duration-700 ease-[var(--ease-ios)] lg:min-w-[7.5rem]",
+              p.silk,
+              on ? "lg:flex-[5_1_0%]" : "lg:flex-[1_1_0%] lg:cursor-pointer",
+            )}
+          >
+            <Silk color={p.line} />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-black/10" />
+
+            {/* collapsed strip: vertical title */}
+            <button
+              type="button"
+              onClick={() => setOpen(i)}
+              onFocus={() => setOpen(i)}
+              aria-expanded={on}
+              className={cn(
+                "absolute inset-0 hidden items-center justify-center transition-opacity duration-500 lg:flex",
+                on ? "pointer-events-none opacity-0" : "opacity-100",
+              )}
+            >
+              <span className="rotate-180 whitespace-nowrap text-[2rem] font-semibold tracking-[-0.03em] [writing-mode:vertical-rl]">{p.name}</span>
+            </button>
+
+            {/* open panel */}
+            <div
+              className={cn(
+                "relative flex h-full flex-col p-6 transition-[opacity,transform] duration-700 ease-[var(--ease-ios)] sm:p-8 lg:p-9 lg:absolute lg:inset-y-0 lg:left-0 lg:w-[44rem]",
+                on ? "opacity-100 lg:translate-x-0" : "lg:pointer-events-none lg:-translate-x-6 lg:opacity-0",
+              )}
+            >
+              <p className="text-[0.8125rem] font-semibold uppercase tracking-[0.14em] text-white/75">{p.name}</p>
+              <h3 className="mt-2 max-w-[16ch] text-[2rem] font-semibold leading-[1.05] tracking-[-0.035em] sm:text-[2.5rem]">{p.title}</h3>
+              <p className="mt-3 max-w-[40ch] text-[0.9375rem] leading-relaxed text-white/85">{p.text}</p>
+              <div className="mt-6 flex w-full max-w-[24rem] items-center justify-center rounded-[1.6rem] bg-white p-4 text-[#0d0d10] shadow-[0_24px_50px_-24px_rgb(0_0_0/0.45)] lg:mt-auto">
+                <div className="flex w-full max-w-[19rem] justify-center">{p.visual}</div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
