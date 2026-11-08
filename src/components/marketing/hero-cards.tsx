@@ -6,9 +6,9 @@ import { cn } from "@/lib/cn";
 type CardSpec = { art: string; ref: string; label: string; className: string; rot: number; z: number };
 
 const CARDS: CardSpec[] = [
-  { art: "card-art-ice", ref: "4021", label: "Retainer", className: "left-[-6%] top-[30%] w-[38%] sm:left-[-2%]", rot: -16, z: 1 },
-  { art: "card-art-ember", ref: "1500", label: "Website redesign", className: "left-1/2 top-0 w-[52%] -translate-x-1/2", rot: 0, z: 3 },
-  { art: "card-art-orchid", ref: "0300", label: "Change order", className: "right-[-6%] top-[30%] w-[38%] sm:right-[-2%]", rot: 16, z: 2 },
+  { art: "card-art-ice", ref: "4021", label: "Tide", className: "left-[-6%] top-[30%] w-[38%] sm:left-[-2%]", rot: -16, z: 1 },
+  { art: "card-art-ember", ref: "1500", label: "Vow", className: "left-1/2 top-0 w-[52%] -translate-x-1/2", rot: 0, z: 3 },
+  { art: "card-art-orchid", ref: "0300", label: "Pop", className: "right-[-6%] top-[30%] w-[38%] sm:right-[-2%]", rot: 16, z: 2 },
 ];
 
 function PactMark() {
@@ -62,7 +62,7 @@ function TiltCard({ spec }: { spec: CardSpec }) {
       <span className="absolute bottom-[10%] left-[8%] font-mono text-[clamp(0.7rem,1.6vw,1.35rem)] tracking-wide text-white">
         **** {spec.ref}
       </span>
-      <span className="absolute left-[8%] top-[10%] text-[clamp(0.55rem,0.9vw,0.8rem)] font-semibold uppercase tracking-[0.14em] text-white/75">{spec.label}</span>
+      <span className={`absolute top-[10%] text-[clamp(0.55rem,0.9vw,0.8rem)] font-semibold uppercase tracking-[0.14em] text-white/75 ${spec.rot > 0 ? "right-[8%]" : "left-[8%]"}`}>{spec.label}</span>
       <span className="absolute bottom-[8%] right-[7%] flex flex-col items-end gap-0.5">
         <PactMark />
         <span className="font-[family-name:var(--font-brand)] text-[clamp(0.5rem,0.85vw,0.75rem)] font-semibold tracking-[0.08em] text-white/85">VowCard</span>

@@ -390,3 +390,26 @@ input[type="range"] { accent-color: var(--accent); }
 .dark .pure {
   box-shadow: 0 1px 0 rgb(255 255 255 / 0.045) inset, 0 1px 2px rgb(0 0 0 / 0.35), 0 14px 30px -16px rgb(0 0 0 / 0.75);
 }
+
+/* Colourful range slider: fill colour --c up to --p */
+.pp-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--c) 0 var(--p), rgb(255 255 255 / 0.12) var(--p) 100%);
+  outline: none;
+  cursor: pointer;
+}
+.pp-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 4px var(--c), 0 6px 14px rgb(0 0 0 / 0.45);
+  transition: transform 200ms var(--ease-ios);
+}
+.pp-range::-webkit-slider-thumb:hover { transform: scale(1.12); }
+.pp-range::-moz-range-thumb { width: 20px; height: 20px; border: 0; border-radius: 50%; background: #fff; box-shadow: 0 0 0 4px var(--c), 0 6px 14px rgb(0 0 0 / 0.45); }
+.pp-range:focus-visible { box-shadow: 0 0 0 3px rgb(255 255 255 / 0.4); }
