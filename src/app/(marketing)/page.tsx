@@ -1,3 +1,4 @@
+import { CardWallSection } from "@/components/marketing/card-wall";
 import { LeakCalculator } from "@/components/marketing/leak-calculator";
 import { ProductTour } from "@/components/marketing/product-tour";
 import {
@@ -20,6 +21,7 @@ export default function LandingPage() {
     <>
       <Hero />
       <PreviewSection />
+      <CardWallSection />
       <Problem />
       <LeakCalculator />
       <ProductTour />

@@ -10,6 +10,7 @@ import { getDb } from "@/server/db/client";
 import { paypalConfigured } from "@/server/env";
 import { cashflowByMonth, moneyLedger, moneyPosition } from "@/server/services/finance";
 import { vowgraphSummary } from "@/server/services/vowgraph";
+import { listApprovals } from "@/server/services/workflow";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
@@ -18,7 +19,9 @@ export default async function DashboardPage() {
   const ctx = await requireAuth();
   const db = await getDb();
   const bid = ctx.business.id;
-  const [commitments, cashflow, ledger, position] = await Promise.all([vowgraphSummary(db, bid, 12), cashflowByMonth(db, bid), moneyLedger(db, bid, 12), moneyPosition(db, bid)]);
+  const [commitments, cashflow, ledger, position, pending] = await Promise.all([vowgraphSummary(db, bid, 12), cashflowByMonth(db, bid), moneyLedger(db, bid, 12), moneyPosition(db, bid), listApprovals(db, bid)]);
+  const hour = new Date().getHours();
+  const hello = `${hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening"}, ${ctx.user.name.split(" ")[0]}`;
   const cur = ctx.business.currency;
   const expected = cashflow.reduce((s, d) => s + d.scheduledMinor, 0);
 
@@ -27,6 +30,28 @@ export default async function DashboardPage() {
       {!paypalConfigured() && (
         <p className="mb-4 inline-flex rounded-full border border-warning/40 px-3 py-1 text-[0.75rem] font-medium text-warning">PayPal Sandbox isn&apos;t connected yet. Received amounts only count PayPal-confirmed payments.</p>
       )}
+
+      <div className="mb-6">
+        <h1 className="text-[1.75rem] font-bold leading-tight sm:text-[2rem]">{hello} 👋</h1>
+        <div className="mt-3 flex flex-wrap gap-2 text-[0.8125rem]">
+          <span className="rounded-full bg-accent-soft px-3 py-1.5 font-medium text-accent">
+            <span className="money">{formatMoney(position.contractedMinor, cur)}</span> under agreement
+          </span>
+          <span className="rounded-full bg-success-soft px-3 py-1.5 font-medium text-success">
+            <span className="money">{formatMoney(position.receivedMinor, cur)}</span> received
+          </span>
+          {pending.length > 0 && (
+            <Link href="/app/approvals" className="rounded-full bg-warning-soft px-3 py-1.5 font-medium text-warning hover:brightness-110">
+              {pending.length} approval{pending.length === 1 ? "" : "s"} waiting →
+            </Link>
+          )}
+          {position.pipelineMinor > 0 && (
+            <span className="rounded-full bg-surface px-3 py-1.5 font-medium text-muted">
+              <span className="money">{formatMoney(position.pipelineMinor, cur)}</span> in pipeline
+            </span>
+          )}
+        </div>
+      </div>
 
       <CommitmentWallet items={commitments} />
 

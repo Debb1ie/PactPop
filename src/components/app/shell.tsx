@@ -96,46 +96,53 @@ export function RequestLinkCard({ requestPath }: { requestPath: string }) {
   );
 }
 
-/** Icon rail (desktop). Labels appear as tooltips and are read by screen readers. */
+/** Floating sidebar (desktop): rounded panel, icon + label, gradient highlight on the active page. */
 function Rail({ pendingApprovals, logout }: { pendingApprovals: number; logout: () => Promise<void> }) {
   const pathname = usePathname();
   return (
-    <nav aria-label="App" className="flex h-full flex-col items-center py-6">
-      <Link href="/app/dashboard" aria-label="PactPop dashboard" className="mb-10">
-        <LogoMark className="h-10 w-10" />
-      </Link>
-      <ul className="flex flex-1 flex-col items-center gap-3">
-        {READY.map(({ href, label, icon: Icon }) => {
-          const active = isActive(pathname, href);
-          return (
-            <li key={href} className="group relative">
-              <Link
-                href={href}
-                aria-label={label}
-                aria-current={active ? "page" : undefined}
-                className={cn(
-                  "grid h-11 w-11 place-items-center rounded-xl transition-colors",
-                  active ? "bg-white text-[#1c1d23] shadow-[0_6px_20px_-8px_rgb(0_0_0/0.6)]" : "text-muted hover:bg-surface hover:text-foreground",
-                )}
-              >
-                <Icon className="h-5 w-5" strokeWidth={active ? 2.2 : 1.8} />
-                {href === "/app/approvals" && pendingApprovals > 0 && (
-                  <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-error px-1 text-[0.6rem] font-bold text-white">{pendingApprovals}</span>
-                )}
-              </Link>
-              <span className="pointer-events-none absolute left-full top-1/2 z-50 ml-3 -translate-y-1/2 whitespace-nowrap rounded-lg bg-surface-2 px-2.5 py-1 text-xs font-medium opacity-0 shadow-[var(--shadow-lift)] transition-opacity group-hover:opacity-100 group-focus-within:opacity-100" aria-hidden>
-                {label}
-              </span>
-            </li>
-          );
-        })}
-      </ul>
-      <form action={logout}>
-        <button className="grid h-11 w-11 place-items-center rounded-xl text-muted transition-colors hover:bg-surface hover:text-error" aria-label="Log out" title="Log out">
-          <LogOut className="h-5 w-5" strokeWidth={1.8} />
-        </button>
-      </form>
-    </nav>
+    <div className="flex h-full flex-col p-3">
+      <nav aria-label="App" className="flex flex-1 flex-col items-center rounded-[1.75rem] bg-surface/80 px-2 py-5 shadow-[0_20px_50px_-30px_rgb(20_10_60/0.45)] ring-1 ring-border backdrop-blur-xl">
+        <Link href="/app/dashboard" aria-label="PactPop dashboard" className="mb-6">
+          <LogoMark className="h-10 w-10" />
+        </Link>
+        <ul className="flex w-full flex-1 flex-col items-center gap-1.5">
+          {READY.map(({ href, label, icon: Icon }) => {
+            const active = isActive(pathname, href);
+            return (
+              <li key={href} className="w-full">
+                <Link
+                  href={href}
+                  aria-current={active ? "page" : undefined}
+                  className={cn(
+                    "relative flex w-full flex-col items-center gap-1 rounded-2xl px-1 py-2 text-[0.625rem] font-semibold transition-all",
+                    active ? "text-foreground" : "text-muted hover:bg-fill hover:text-foreground",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "grid h-10 w-10 place-items-center rounded-xl transition-all",
+                      active && "bg-gradient-to-br from-[#9b84ff] to-[#5a3df0] text-white shadow-[0_10px_24px_-10px_rgb(108_78_245/0.9)]",
+                    )}
+                  >
+                    <Icon className="h-[19px] w-[19px]" strokeWidth={active ? 2.2 : 1.8} />
+                  </span>
+                  <span className="max-w-full truncate leading-none">{label.replace("Command Center", "Agents")}</span>
+                  {href === "/app/approvals" && pendingApprovals > 0 && (
+                    <span className="absolute right-2 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-error px-1 text-[0.6rem] font-bold text-white">{pendingApprovals}</span>
+                  )}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+        <form action={logout} className="w-full">
+          <button className="flex w-full flex-col items-center gap-1 rounded-2xl py-2 text-[0.625rem] font-semibold text-muted transition-colors hover:bg-error-soft hover:text-error" aria-label="Log out">
+            <LogOut className="h-[19px] w-[19px]" strokeWidth={1.8} />
+            Log out
+          </button>
+        </form>
+      </nav>
+    </div>
   );
 }
 
@@ -149,7 +156,7 @@ function TopBar({ user, pendingApprovals, onAccount }: { user: ShellProps["user"
     router.push(term ? `/app/clients?q=${encodeURIComponent(term)}` : "/app/clients");
   };
   return (
-    <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-md">
+    <header className="sticky top-0 z-30 bg-background/70 backdrop-blur-xl">
       <div className="mx-auto flex h-20 max-w-[1280px] items-center gap-3 px-4 sm:px-6 lg:px-8">
         <Link href="/app/dashboard" aria-label="Dashboard" className="lg:hidden">
           <Logo size="sm" />
@@ -285,7 +292,7 @@ function TabBar({ onAccount, pendingApprovals }: { onAccount: () => void; pendin
 export function AppShell({ children, ...props }: ShellProps) {
   const [sheet, setSheet] = useState(false);
   return (
-    <div className="min-h-screen lg:grid lg:grid-cols-[88px_1fr]">
+    <div className="app-backdrop min-h-screen lg:grid lg:grid-cols-[120px_1fr]">
       <aside className="hidden lg:block">
         <div className="sticky top-0 h-screen">
           <Rail pendingApprovals={props.pendingApprovals} logout={props.logout} />

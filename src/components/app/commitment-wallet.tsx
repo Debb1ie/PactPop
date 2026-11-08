@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useState } from "react";
 import { MoreHorizontal } from "lucide-react";
-import { LogoMark } from "@/components/brand/logo";
 import { statusLabel } from "@/components/ui/status-badge";
 import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/money";
@@ -22,6 +21,7 @@ export type WalletCommitment = {
   pendingChangeOrders: { title: string; amountMinor: number }[];
 };
 
+const ART = ["card-art-ember", "card-art-ice", "card-art-orchid", "card-art-lime"];
 const ref = (id: string) => `PP-${id.slice(0, 4).toUpperCase()}`;
 const dueLabel = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString("en-US", { month: "2-digit", year: "2-digit" }).replace("/", "/") : "—");
 
@@ -67,8 +67,8 @@ export function CommitmentWallet({ items }: { items: WalletCommitment[] }) {
         </Link>
       </div>
 
-      <div className="-mx-4 mt-4 flex snap-x gap-4 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:-mx-0 sm:px-0" role="listbox" aria-label="Commitments">
-        {items.map((c) => {
+      <div className="-mx-4 mt-4 flex snap-x gap-4 overflow-x-auto px-4 pb-4 pt-1 [scrollbar-width:none] sm:-mx-0 sm:px-0" role="listbox" aria-label="Commitments">
+        {items.map((c, i) => {
           const active = c.id === selected.id;
           return (
             <button
@@ -77,31 +77,29 @@ export function CommitmentWallet({ items }: { items: WalletCommitment[] }) {
               aria-selected={active}
               onClick={() => setSelectedId(c.id)}
               className={cn(
-                "w-[18.5rem] shrink-0 snap-start overflow-hidden rounded-2xl bg-surface text-left transition-all",
-                active ? "p-1 ring-1 ring-white/40 shadow-[0_16px_40px_-20px_rgb(124_92_255/0.6)]" : "opacity-90 hover:opacity-100",
+                "group relative aspect-[1.6] w-[19rem] shrink-0 snap-start overflow-hidden rounded-[1.4rem] p-5 text-left text-white transition-all duration-300 ease-[var(--ease-ios)] hover:-translate-y-1 hover:rotate-[-0.6deg]",
+                ART[i % ART.length],
+                active ? "shadow-[0_24px_50px_-18px_rgb(124_92_255/0.75)] ring-2 ring-white/70 ring-offset-2 ring-offset-background" : "opacity-85 shadow-[0_18px_40px_-24px_rgb(0_0_0/0.6)] hover:opacity-100",
               )}
             >
-              <div
-                className={cn(
-                  "grid grid-cols-[1fr_auto] gap-3 rounded-xl px-5 pb-5 pt-6",
-                  active ? "bg-gradient-to-br from-[#b9a5ff] via-[#8d6cff] to-[#5a3df0] text-white" : "bg-[#1f2026] text-foreground dark:bg-[#1f2026]",
-                )}
-              >
+              <span className="pointer-events-none absolute inset-0 bg-[linear-gradient(115deg,transparent_40%,rgb(255_255_255/0.18)_50%,transparent_60%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" aria-hidden />
+              <div className="relative flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className={cn("text-[0.7rem] font-medium uppercase", active ? "text-white/80" : "text-muted")}>Client</p>
-                  <p className="mt-1 truncate text-[0.875rem] font-medium">{c.clientName}</p>
+                  <p className="text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-white/70">Client</p>
+                  <p className="mt-0.5 truncate text-[0.9375rem] font-semibold">{c.clientName}</p>
                 </div>
-                <div className="text-right">
-                  <p className={cn("text-[0.7rem] font-medium uppercase", active ? "text-white/80" : "text-muted")}>Ref</p>
-                  <p className="money mt-1 text-[0.875rem]">•••• {ref(c.id)}</p>
-                </div>
+                <span className="rounded-full bg-white/15 px-2 py-0.5 text-[0.65rem] font-semibold backdrop-blur">{statusLabel(c.status)}</span>
               </div>
-              <div className="flex items-end justify-between gap-3 px-5 pb-5 pt-4">
+              <div className="absolute inset-x-5 bottom-4 flex items-end justify-between gap-3">
                 <div>
-                  <p className="text-[0.7rem] font-medium uppercase text-muted">Agreed</p>
-                  <p className="money mt-1 text-[1.75rem] font-bold leading-none">{formatMoney(c.agreedTotalMinor, c.currency)}</p>
+                  <p className="money text-[0.75rem] tracking-[0.12em] text-white/80">•••• {ref(c.id)}</p>
+                  <p className="money mt-1 text-[1.6rem] font-bold leading-none">{formatMoney(c.agreedTotalMinor, c.currency)}</p>
                 </div>
-                <LogoMark className="h-7 w-7 opacity-90" />
+                <svg viewBox="0 0 64 28" className="h-6 w-12" aria-hidden>
+                  <path d="M6 22 C18 22 22 6 32 6 C42 6 46 22 58 22" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" />
+                  <circle cx="6" cy="22" r="4" fill="white" />
+                  <circle cx="58" cy="22" r="4" fill="white" />
+                </svg>
               </div>
             </button>
           );

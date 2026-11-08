@@ -287,3 +287,50 @@ input[type="range"] { accent-color: var(--accent); }
     #0b0a2a;
 }
 @media (prefers-reduced-motion: reduce) { .hero-card { transition: none; } }
+
+/* App backdrop: soft colour glow so the workspace isn't flat. */
+.app-backdrop {
+  background-image:
+    radial-gradient(38rem 22rem at 18% -6%, rgb(124 92 255 / 0.16), transparent 70%),
+    radial-gradient(30rem 20rem at 92% 0%, rgb(246 200 159 / 0.18), transparent 70%),
+    radial-gradient(40rem 26rem at 60% 110%, rgb(124 92 255 / 0.08), transparent 70%);
+  background-attachment: fixed;
+}
+.dark .app-backdrop {
+  background-image:
+    radial-gradient(38rem 22rem at 18% -6%, rgb(124 92 255 / 0.22), transparent 70%),
+    radial-gradient(30rem 20rem at 92% 0%, rgb(246 200 159 / 0.08), transparent 70%),
+    radial-gradient(40rem 26rem at 60% 110%, rgb(124 92 255 / 0.1), transparent 70%);
+}
+.card-art-lime {
+  background:
+    radial-gradient(80% 90% at 85% 10%, #d7ee6e 0%, rgb(215 238 110 / 0) 55%),
+    radial-gradient(90% 100% at 10% 95%, #1f8f7a 0%, rgb(31 143 122 / 0) 60%),
+    #07201c;
+}
+
+/* More card art for the card wall */
+.card-art-arcs {
+  background:
+    radial-gradient(circle at 105% -5%, #e0a33e 0 22%, #2aa6c8 22% 34%, #e23a6a 34% 48%, #e7a24a 48% 60%, transparent 60%),
+    #2a3b8f;
+}
+.card-art-plum {
+  background:
+    radial-gradient(60% 70% at 40% 120%, rgb(255 255 255 / 0.08) 0 40%, transparent 41%),
+    linear-gradient(140deg, #6a2a6e, #3a1640 70%);
+}
+.card-art-midnight {
+  background:
+    radial-gradient(70% 80% at 30% 70%, rgb(60 200 80 / 0.7), transparent 60%),
+    radial-gradient(60% 70% at 70% 30%, rgb(200 30 70 / 0.6), transparent 60%),
+    #0b0b10;
+}
+.card-art-sage {
+  background: linear-gradient(135deg, #7fc8a9 0 38%, #1c2a4a 38%);
+}
+
+/* Card wall: a slow diagonal drift */
+@keyframes pp-drift { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(-12%, 8%, 0); } }
+.card-wall-track { animation: pp-drift 40s ease-in-out infinite alternate; }
+@media (prefers-reduced-motion: reduce) { .card-wall-track { animation: none; } }

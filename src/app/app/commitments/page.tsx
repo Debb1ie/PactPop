@@ -1,18 +1,24 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { and, desc, eq, inArray } from "drizzle-orm";
-import { OrbField, type Orb, type OrbTone } from "@/components/fx/orb-field";
-import { StatusBadge, statusLabel } from "@/components/ui/status-badge";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/money";
 import { requireAuth } from "@/server/auth/session";
 import { getDb } from "@/server/db/client";
 import { clients, commitments, milestones, timelineEvents } from "@/server/db/schema";
-import { vowgraphSummary } from "@/server/services/vowgraph";
 
 export const metadata: Metadata = { title: "Commitments" };
 
-const toneFor = (status: string): OrbTone =>
-  status === "completed" ? "mint" : ["in_progress", "accepted", "awaiting_evidence", "awaiting_approval", "payment_ready"].includes(status) ? "violet" : status === "awaiting_acceptance" || status === "proposed" ? "amber" : status === "disputed" ? "rose" : "slate";
+const STAGES = ["Request", "Agreement", "Delivery", "Approval", "Paid"];
+/** Map a commitment status onto the five-step journey. */
+function stageOf(status: string) {
+  if (status === "completed") return 4;
+  if (status === "awaiting_approval" || status === "payment_ready") return 3;
+  if (["accepted", "in_progress", "awaiting_evidence"].includes(status)) return 2;
+  if (status === "proposed" || status === "awaiting_acceptance") return 1;
+  return 0;
+}
 
 const date = (d: Date | null) => (d ? d.toLocaleDateString("en-US", { month: "short", day: "2-digit" }).toUpperCase() : "—");
 
@@ -20,14 +26,13 @@ export default async function CommitmentsPage() {
   const ctx = await requireAuth();
   const db = await getDb();
   const bid = ctx.business.id;
-  const [rows, vow, events] = await Promise.all([
+  const [rows, events] = await Promise.all([
     db
       .select({ c: commitments, clientName: clients.name, company: clients.company, clientId: clients.id })
       .from(commitments)
       .innerJoin(clients, eq(clients.id, commitments.clientId))
       .where(eq(commitments.businessId, bid))
       .orderBy(desc(commitments.updatedAt)),
-    vowgraphSummary(db, bid),
     db
       .select({ e: timelineEvents, title: commitments.title, clientName: clients.name, company: clients.company })
       .from(timelineEvents)
@@ -44,21 +49,6 @@ export default async function CommitmentsPage() {
         .where(and(eq(milestones.businessId, bid), inArray(milestones.commitmentId, rows.map((r) => r.c.id))))
     : [];
 
-  const maxAmount = Math.max(1, ...vow.map((c) => c.agreedTotalMinor));
-  const orbs: Orb[] = vow.map((c) => {
-    const paid = c.milestones.filter((m) => m.paid).length;
-    return {
-      key: c.id,
-      label: c.clientName,
-      caption: `${formatMoney(c.agreedTotalMinor, c.currency)} · ${statusLabel(c.status)}`,
-      size: c.agreedTotalMinor / maxAmount,
-      tone: toneFor(c.status),
-      rings: c.milestones.length ? c.milestones.map((m) => ({ lit: m.paid })) : [{ lit: false }],
-      satellites: c.pendingChangeOrders.map((o) => ({ label: o.title })),
-      details: [c.title, c.milestones.length ? `${paid} of ${c.milestones.length} milestones paid` : "No milestones yet", ...c.pendingChangeOrders.map((o) => `Change order pending: ${o.title} · ${formatMoney(o.amountMinor, c.currency)}`)],
-      href: `/app/clients/${c.clientId}`,
-    };
-  });
 
   return (
     <>
@@ -123,12 +113,34 @@ export default async function CommitmentsPage() {
       </section>
 
       <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
-        <section className="panel min-w-0 overflow-hidden" aria-label="VowGraph">
+        <section className="panel min-w-0" aria-label="Agreement journey">
           <div className="panel-head">
-            <h2 className="panel-title">VowGraph</h2>
-            <span className="font-mono text-[0.65rem] uppercase tracking-[0.06em] text-faint">orb = agreement · ring = milestone (lit when paid) · moon = pending change order</span>
+            <h2 className="panel-title">Agreement journey</h2>
+            <span className="ml-auto text-[0.75rem] text-muted">Where each agreement stands</span>
           </div>
-          <OrbField orbs={orbs} height={480} ariaLabel="3D view of commitments, milestones and pending change orders" />
+          <ul className="space-y-5 px-5 pb-6 pt-3">
+            {rows.map(({ c, company, clientName }) => {
+              const at = stageOf(c.status);
+              return (
+                <li key={c.id}>
+                  <div className="flex items-baseline justify-between gap-3">
+                    <p className="truncate text-[0.9375rem] font-semibold">
+                      {company ?? clientName} <span className="font-normal text-muted">· {c.title}</span>
+                    </p>
+                    <span className="shrink-0 text-[0.75rem] font-medium text-accent">{STAGES[Math.max(0, at)]}</span>
+                  </div>
+                  <ol className="mt-3 grid grid-cols-5 gap-1.5" aria-label={`${company ?? clientName}: ${STAGES[Math.max(0, at)]}`}>
+                    {STAGES.map((st, i) => (
+                      <li key={st} className="min-w-0">
+                        <span className={cn("block h-2 rounded-full", i < at ? "bg-gradient-to-r from-[#9b84ff] to-[#7c5cff]" : i === at ? "bg-gradient-to-r from-[#7c5cff] to-[#f6c89f]" : "bg-surface-2")} />
+                        <span className={cn("mt-1.5 block truncate text-[0.6875rem]", i <= at ? "text-foreground" : "text-faint")}>{st}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </li>
+              );
+            })}
+          </ul>
         </section>
 
         <section className="panel min-w-0" aria-label="Activity">
