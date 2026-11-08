@@ -59,7 +59,36 @@ export function aiModel(): string {
   return e.AI_MODEL?.trim() || DEFAULT_MODEL[e.AI_PROVIDER];
 }
 
-/** Human label for the active AI provider (shown in the UI). */
+export type AiModelOption = { id: string; label: string; note: string };
+
+/** Models the agents may use with the configured key. Users see only these labels. */
+const CATALOGUE: Record<"anthropic" | "groq", AiModelOption[]> = {
+  groq: [
+    { id: "openai/gpt-oss-120b", label: "GPT-OSS 120B", note: "Best reasoning (default)" },
+    { id: "openai/gpt-oss-20b", label: "GPT-OSS 20B", note: "Faster, lighter" },
+    { id: "qwen/qwen3.8-27b", label: "Qwen 3.8 27B", note: "Alternative model" },
+  ],
+  anthropic: [
+    { id: "claude-opus-5-5", label: "Claude Opus 5.5", note: "Most capable" },
+    { id: "claude-sonnet-5-5", label: "Claude Sonnet 5.5", note: "Balanced" },
+    { id: "claude-haiku-5-5", label: "Claude Haiku 5.5", note: "Fastest" },
+  ],
+};
+
+export function aiModels(): AiModelOption[] {
+  const e = env();
+  if (e.AI_PROVIDER === "heuristic") return [];
+  const list = CATALOGUE[e.AI_PROVIDER];
+  const def = aiModel();
+  return list.some((m) => m.id === def) ? list : [{ id: def, label: def.split("/").pop() ?? def, note: "Default" }, ...list];
+}
+
+/** Friendly label for a model id. */
+export function aiModelLabel(id: string): string {
+  return aiModels().find((m) => m.id === id)?.label ?? id.split("/").pop() ?? id;
+}
+
+/** Human label for the active AI provider (internal / docs; not shown in the product UI). */
 export function aiProviderLabel(): string {
   const p = env().AI_PROVIDER;
   return p === "groq" ? "Groq" : p === "anthropic" ? "Claude" : "Rule-based";

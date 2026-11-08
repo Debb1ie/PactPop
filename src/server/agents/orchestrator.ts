@@ -12,7 +12,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { and, desc, eq } from "drizzle-orm";
 import type { Database } from "@/server/db/create";
 import { agentExecutions, agentPermissions, agentToolCalls } from "@/server/db/schema";
-import { aiConfigured, aiModel, env } from "@/server/env";
+import { aiConfigured, aiModel, aiModelLabel, aiModels, env } from "@/server/env";
 import { effectivePolicy, type Policy } from "./policies";
 import { TOOL_BY_NAME, TOOLS, toolJsonSchema, type AgentName, type ApprovalSpec, type ToolContext, type ToolSpec } from "./tools";
 import { planHeuristic } from "./planner";
@@ -22,6 +22,7 @@ import { formatMoney } from "@/lib/money";
 export type AgentEvent =
   | { type: "start"; executionId: string; mode: "ai" | "heuristic"; model: string | null }
   | { type: "thinking"; agent: AgentName; text: string }
+  | { type: "status"; text: string }
   | { type: "tool_call"; id: string; tool: string; agent: AgentName; label: string; decision: "allowed" | "approval_required" | "denied" }
   | { type: "tool_result"; id: string; ok: boolean; summary: string }
   | { type: "approval"; approvalId: string; title: string; amount: string | null; reason: string }
@@ -142,19 +143,22 @@ Rules:
 - Payments only count when PayPal confirms them. Never say something was paid unless check_payment or the records show PayPal confirmed it.
 - ProofFlow: to check delivery proof, call get_delivery_proof, compare every acceptance criterion with the delivery notes and evidence, then call save_proof_review for each deliverable. Put a criterion in verified (exact text) only if the evidence clearly shows it; otherwise list it as missing. If a review passes, a delivery approval is queued for the owner; approving it makes that payment due.
 - PayFlow (PayPal): to invoice, call list_invoiceable to find the milestone, then send_invoice with its milestoneId. Sending is normally queued for the owner to approve; say so plainly. Use check_payment to ask PayPal whether an invoice is paid.
+- Only if the message is purely a greeting or thanks with no request (e.g. "hi", "good morning", "thanks"): reply in one or two friendly sentences and offer two or three concrete things you can do, without calling tools. Any message that asks for information or an action, such as a briefing, summary, status or check, is a real request: use the tools and answer with real figures.
+- Formatting: plain sentences, short bullet lists with "- ", and **bold** only for key figures or names. No tables, no headings.
 - Finish with a short, plain-language summary for the business owner: what you did, what changed, and what needs their decision. No markdown headings; short paragraphs or simple lists are fine.`;
 
-type Run = { db: Database; businessId: string; userId: string; input: string; emit: Emit };
+type Run = { db: Database; businessId: string; userId: string; input: string; emit: Emit; model?: string };
 
-export async function runCommand({ db, businessId, userId, input, emit }: Run) {
+export async function runCommand({ db, businessId, userId, input, emit, model: requested }: Run) {
   const ai = aiConfigured();
   const provider = ai ? env().AI_PROVIDER : "heuristic";
-  const model = ai ? aiModel() : null;
+  // Only models from the allowed list can be chosen; anything else falls back to the default.
+  const model = ai ? (requested && aiModels().some((m) => m.id === requested) ? requested : aiModel()) : null;
   const [exec] = await db
     .insert(agentExecutions)
     .values({ businessId, userId, role: "orchestrator", input, status: "running", provider, model })
     .returning();
-  emit({ type: "start", executionId: exec.id, mode: ai ? "ai" : "heuristic", model });
+  emit({ type: "start", executionId: exec.id, mode: ai ? "ai" : "heuristic", model: model ? aiModelLabel(model) : null });
 
   const state = { approvals: 0 };
   let finalText = "";
@@ -162,7 +166,7 @@ export async function runCommand({ db, businessId, userId, input, emit }: Run) {
   let tokensOut = 0;
   try {
     if (ai) {
-      const r = provider === "groq" ? await runWithGroq({ db, businessId, userId, input, emit }, exec.id, state) : await runWithClaude({ db, businessId, userId, input, emit }, exec.id, state);
+      const r = provider === "groq" ? await runWithGroq({ db, businessId, userId, input, emit, model: model! }, exec.id, state) : await runWithClaude({ db, businessId, userId, input, emit, model: model! }, exec.id, state);
       finalText = r.text;
       tokensIn = r.inputTokens;
       tokensOut = r.outputTokens;
@@ -178,7 +182,7 @@ export async function runCommand({ db, businessId, userId, input, emit }: Run) {
   } catch (e) {
     const message =
       e instanceof Anthropic.APIError || e instanceof ProviderError
-        ? `AI provider error (${e.status ?? "network"}). Try again in a moment.`
+        ? `The AI model is unavailable right now (${e.status ?? "network"}). Try again in a moment.`
         : e instanceof Error
           ? e.message
           : "The agent run failed";
@@ -204,7 +208,7 @@ async function runWithClaude(run: Run, executionId: string, state: { approvals: 
 
   for (let step = 0; step < MAX_STEPS; step++) {
     const response = await client.beta.messages.create({
-      model: aiModel(),
+      model: run.model ?? aiModel(),
       max_tokens: 16000,
       system: [{ type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }],
       thinking: { type: "adaptive", display: "summarized" },
@@ -286,7 +290,7 @@ async function groqChat(payload: Record<string, unknown>, emit: Emit): Promise<R
     if ((res.status !== 429 && res.status !== 503) || attempt >= 3) return res;
     const header = Number(res.headers.get("retry-after"));
     const waitS = Math.min(30, Number.isFinite(header) && header > 0 ? header : 5 * (attempt + 1));
-    emit({ type: "thinking", agent: "Orchestrator", text: `The AI provider asked us to slow down. Retrying in ${Math.ceil(waitS)}s…` });
+    emit({ type: "status", text: `Busy right now. Poppy will try again in ${Math.ceil(waitS)}s…` });
     await new Promise((r) => setTimeout(r, waitS * 1000));
   }
 }
@@ -302,7 +306,7 @@ async function runWithGroq(run: Run, executionId: string, state: { approvals: nu
   let lastText = "";
 
   for (let step = 0; step < MAX_STEPS; step++) {
-    const res = await groqChat({ model: aiModel(), messages, tools, tool_choice: "auto", temperature: 0.2, max_completion_tokens: 2048 }, run.emit);
+    const res = await groqChat({ model: run.model ?? aiModel(), messages, tools, tool_choice: "auto", temperature: 0.2, max_completion_tokens: 2048 }, run.emit);
     const body = (await res.json().catch(() => ({}))) as {
       error?: { message?: string };
       usage?: { prompt_tokens?: number; completion_tokens?: number };

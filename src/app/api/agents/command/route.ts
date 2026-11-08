@@ -4,7 +4,7 @@ import { getDb } from "@/server/db/client";
 import { runCommand, type AgentEvent } from "@/server/agents/orchestrator";
 import { checkRateLimit, RateLimitError } from "@/server/security/rate-limit";
 
-const body = z.object({ input: z.string().trim().min(2).max(2000) });
+const body = z.object({ input: z.string().trim().min(2).max(2000), model: z.string().max(80).optional() });
 
 /** Streams agent events as NDJSON (one JSON object per line). */
 export async function POST(request: Request) {
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
       const emit = (e: AgentEvent) => controller.enqueue(encoder.encode(JSON.stringify(e) + "\n"));
-      await runCommand({ db, businessId: ctx.business.id, userId: ctx.user.id, input: parsed.data.input, emit });
+      await runCommand({ db, businessId: ctx.business.id, userId: ctx.user.id, input: parsed.data.input, model: parsed.data.model, emit });
       controller.close();
     },
   });

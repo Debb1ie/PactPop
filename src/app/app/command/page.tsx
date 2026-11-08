@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { AgentConsole, type Suggestion } from "@/components/agents/agent-console";
 import { requireAuth } from "@/server/auth/session";
 import { getDb } from "@/server/db/client";
-import { aiConfigured, aiModel, aiProviderLabel } from "@/server/env";
+import { aiConfigured, aiModel, aiModels } from "@/server/env";
 import { buildBriefing } from "@/server/services/briefing";
 
 export const metadata: Metadata = { title: "AI Agents" };
@@ -29,5 +29,5 @@ export default async function AgentsPage() {
   ];
   const suggestions = [...fromBriefing, ...defaults].filter((s, i, all) => all.findIndex((x) => x.command === s.command) === i).slice(0, 4);
 
-  return <AgentConsole mode={ai ? "ai" : "heuristic"} model={ai ? `${aiProviderLabel()} · ${aiModel()}` : null} suggestions={suggestions} greeting={greeting(ctx.user.name.split(" ")[0])} />;
+  return <AgentConsole mode={ai ? "ai" : "heuristic"} models={ai ? aiModels() : []} defaultModel={ai ? aiModel() : null} suggestions={suggestions} greeting={greeting(ctx.user.name.split(" ")[0])} />;
 }
