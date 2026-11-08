@@ -3,6 +3,7 @@ import { and, eq } from "drizzle-orm";
 import type { Database } from "@/server/db/create";
 import { commitments, milestones, payments } from "@/server/db/schema";
 import { fromPayPalValue, toPayPalValue } from "@/lib/money";
+import { isDueForCheckout } from "@/lib/checkout";
 import { recordAudit, recordTimeline } from "@/server/services/audit";
 import { paypal, PayPalError } from "./client";
 
@@ -11,7 +12,7 @@ type Capture = { id: string; status: string; amount: Money; seller_receivable_br
 type Order = { id: string; status: string; payer?: { email_address?: string }; purchase_units?: { reference_id?: string; payments?: { captures?: Capture[] } }[] };
 
 /**
- * Create (or reuse) a PayPal checkout order for one milestone. The amount is the milestone's
+ * Create a PayPal checkout order for one milestone. The amount is the milestone's
  * stored amount; the client approves it in PayPal's own window.
  */
 export async function createMilestoneOrder(db: Database, input: { businessId: string; milestoneId: string }) {
@@ -25,6 +26,8 @@ export async function createMilestoneOrder(db: Database, input: { businessId: st
   const { m, c } = row;
   if (!["pending", "in_progress", "submitted", "approved"].includes(m.status)) throw new Error(`This payment is already ${m.status}`);
   if (!["accepted", "in_progress", "awaiting_evidence", "awaiting_approval", "payment_ready"].includes(c.status)) throw new Error("The agreement must be accepted first");
+  // Only money that is due can be paid by checkout: the deposit, or work the owner has approved.
+  if (!isDueForCheckout(m)) throw new Error("This payment isn't due yet. It becomes payable when the work is delivered and approved.");
 
   // A fresh order per checkout attempt: PayPal won't reopen an order an earlier popup already used.
   // Unfinished attempts stay "created" and never count as money.

@@ -6,6 +6,7 @@ import { cn } from "@/lib/cn";
 import { getDb } from "@/server/db/client";
 import { env, paypalConfigured } from "@/server/env";
 import { agreementByToken } from "@/server/services/agreements";
+import { isDueForCheckout } from "@/lib/checkout";
 import { AcceptForm, InvoiceLink, PayButtons } from "./client";
 
 export const metadata: Metadata = { title: "Your agreement", robots: { index: false } };
@@ -127,6 +128,13 @@ export default async function AgreementPage({ params }: PageProps<"/agreement/[t
             <div className="py-4 text-center">
               <CheckCircle2 className="mx-auto h-10 w-10 text-[#24a148]" />
               <p className="mt-3 text-[1.0625rem] font-semibold">All payments are complete. Thank you!</p>
+            </div>
+          ) : next && !(next.invoiceUrl && next.invoiceStatus !== "paid") && !isDueForCheckout(next.m) ? (
+            <div className="py-2">
+              <h2 className="text-[1.0625rem] font-semibold">
+                Next payment: {next.m.title.toLowerCase()} · <span className="money">{formatMoney(next.m.amountMinor, cur)}</span>
+              </h2>
+              <p className="mt-1 text-[0.875rem] text-muted">Nothing is due right now. This payment becomes due when {a.biz.name} delivers the work and you approve it. You&apos;ll get a PayPal payment request then.</p>
             </div>
           ) : next ? (
             <>
