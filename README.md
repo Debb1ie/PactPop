@@ -28,7 +28,8 @@ PactPop is under active development. This table is kept honest: anything not mar
 | Light & dark themes, responsive layout with a mobile tab bar, scroll-reactive WebGL grid terrain | ✅ Working |
 | VowGraph 3D view (commitments as glass orbs: milestones as rings, change orders as satellites) and 3D architecture diagram | ✅ Working (live data) |
 | One-click demo workspace with sample commitments, scope change and approval | ✅ Working |
-| **Agent console** on the dashboard and **Command Center**: live, streamed agent runs with every tool call and TrustGate decision visible | ✅ Working |
+| **AI Agents** page: live, streamed agent runs with every tool call and TrustGate decision visible, plus agent briefing and run history | ✅ Working |
+| **Finance dashboard** (account position, cash flow, receivables, ledger), **Commitments** (table, VowGraph, activity) and **Payments** pages | ✅ Working |
 | Intake, Pricing, Proposal, Scope (ScopeWatch), Operations and Finance agents acting on real records through 12 tools | ✅ Working (Claude Opus 5.5 with `AI_API_KEY`; labelled rule-based mode without) |
 | **Approval Center** + inline approvals: approving a change order creates agreement v2 and a change-order milestone | ✅ Working |
 | Agent briefing: next actions found in your records, one click to run | ✅ Working |

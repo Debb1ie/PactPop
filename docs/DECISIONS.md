@@ -16,3 +16,5 @@
 | 12 | 2026-11-07 | PactPop is entirely free; subscription plans, trials and pricing page removed (migration `0002`) | Owner decision. Keeps the hackathon submission focused on PayPal + AI rather than SaaS monetisation. |
 | 13 | 2026-11-07 | Visual identity: dark glass UI with PactPop's own "aurora" KPI cards, tide-mark motif and accent-bar navigation | Inspired by a reference shot the owner liked, deliberately reworked so it isn't a copy. |
 | 14 | 2026-11-07 | WebGL (three.js, lazily loaded) for the background grid terrain | A shader-drawn grid on a displaced mesh gives real perspective and anti-aliasing that 2D canvas lines couldn't. |
+| 15 | 2026-11-08 | Visual direction "Trading desk" (owner's choice): dark, hairline panel grid, 4px corners, Archivo expanded headings, JetBrains Mono for all figures and labels, violet for actions, teal for money in | The previous look matched common generated sites; this one is grounded in finance terminals. |
+| 16 | 2026-11-08 | One job per page: Dashboard = money only; AI Agents, Commitments, Payments, Approvals separate | Owner request; keeps the finance overview scannable. |

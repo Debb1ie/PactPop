@@ -1,11 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono, Sora } from "next/font/google";
+import { Archivo, JetBrains_Mono, Sora } from "next/font/google";
 import { ToastProvider } from "@/components/ui/toast";
 import { themeScript } from "@/components/ui/theme";
 import "./globals.css";
 
-const sora = Sora({ variable: "--font-sora", subsets: ["latin"], weight: ["400", "500", "600", "700"] });
-const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
+// Sora is kept for the PactPop wordmark only.
+const sora = Sora({ variable: "--font-sora", subsets: ["latin"], weight: ["600"] });
+// Archivo is variable on weight and width: wide cuts for headings, normal width for text.
+const archivo = Archivo({ variable: "--font-archivo", subsets: ["latin"], axes: ["wdth"] });
 const jetbrains = JetBrains_Mono({ variable: "--font-jetbrains", subsets: ["latin"], weight: ["400", "500", "600"] });
 
 export const metadata: Metadata = {
@@ -16,14 +18,14 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#faf8ff" },
-    { media: "(prefers-color-scheme: dark)", color: "#120c22" },
+    { media: "(prefers-color-scheme: light)", color: "#f4f4f6" },
+    { media: "(prefers-color-scheme: dark)", color: "#08080a" },
   ],
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${sora.variable} ${inter.variable} ${jetbrains.variable} h-full antialiased`}>
+    <html lang="en" suppressHydrationWarning className={`${sora.variable} ${archivo.variable} ${jetbrains.variable} h-full antialiased`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>

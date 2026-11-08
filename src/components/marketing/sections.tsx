@@ -66,7 +66,7 @@ function Heading({ eyebrow, title, intro, ink, center }: { eyebrow: string; titl
 /** A plain bordered panel with a header row. Used where a feature is shown as the document it produces. */
 function DocPanel({ icon: Icon, name, kind, title, children, className }: { icon: LucideIcon; name: string; kind: string; title: string; children: ReactNode; className?: string }) {
   return (
-    <div className={cn("flex flex-col rounded-[var(--radius-card)] border border-border bg-surface", className)}>
+    <div className={cn("flex flex-col rounded-[4px] border border-border bg-surface", className)}>
       <div className="flex items-center gap-2.5 border-b border-border px-5 py-3.5">
         <Icon className="h-4 w-4 text-accent" />
         <span className="text-[0.9375rem] font-semibold">{name}</span>
@@ -107,10 +107,10 @@ export function Hero() {
               confidence.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <ButtonLink href="/register" size="lg" className="rounded-full px-6">
+              <ButtonLink href="/register" size="lg" className="px-6">
                 Get Started <ArrowRight className="h-4 w-4" />
               </ButtonLink>
-              <ButtonLink href="/how-it-works" size="lg" variant="outline" className="rounded-full px-6">
+              <ButtonLink href="/how-it-works" size="lg" variant="outline" className="px-6">
                 See How It Works
               </ButtonLink>
             </div>
@@ -257,7 +257,7 @@ export function AgentsSection() {
             Ask the <span className="font-semibold text-foreground">Command Center</span> in plain language, for example &ldquo;Which invoices are overdue?&rdquo;
           </p>
         </div>
-        <div className="overflow-hidden rounded-[var(--radius-card)] border border-border bg-surface">
+        <div className="overflow-hidden rounded-[4px] border border-border bg-surface">
           <div className="flex justify-between border-b border-border bg-surface-2 px-5 py-2.5 text-[0.75rem] font-medium text-muted">
             <span>Agent</span>
             <span>Authority</span>
@@ -377,7 +377,7 @@ export function PayPalSection() {
           title="Payments are part of the agreement."
           intro="The PayFlow Agent works through PayPal's official REST APIs. Amounts come from approved milestones in your records, never from AI-generated text."
         />
-        <dl className="divide-y divide-border rounded-[var(--radius-card)] border border-border bg-surface">
+        <dl className="divide-y divide-border rounded-[4px] border border-border bg-surface">
           {points.map(([k, v]) => (
             <div key={k} className="grid gap-1 px-5 py-4 sm:grid-cols-[8.5rem_minmax(0,1fr)] sm:gap-6">
               <dt className="text-[0.875rem] font-semibold">{k}</dt>
@@ -468,7 +468,7 @@ export function ComparisonSection() {
   return (
     <Section>
       <Heading eyebrow="Why switch" title="Invoicing tools bill for the work. PactPop protects it." />
-      <div className="mt-12 overflow-x-auto rounded-[var(--radius-card)] border border-border bg-surface">
+      <div className="mt-12 overflow-x-auto rounded-[4px] border border-border bg-surface">
         <table className="w-full min-w-[600px] text-center">
           <thead>
             <tr className="border-b border-border text-[0.8125rem] text-muted">
@@ -564,10 +564,10 @@ export function CtaBand() {
             <p className="mt-1.5 text-xs text-muted">Signature</p>
           </div>
           <div className="flex flex-wrap justify-center gap-3">
-            <ButtonLink href="/register" size="lg" className="rounded-full px-7">
+            <ButtonLink href="/register" size="lg" className="px-7">
               Get Started <ArrowRight className="h-4 w-4" />
             </ButtonLink>
-            <ButtonLink href="/login" size="lg" variant="outline" className="rounded-full px-7">
+            <ButtonLink href="/login" size="lg" variant="outline" className="px-7">
               Try the demo
             </ButtonLink>
           </div>

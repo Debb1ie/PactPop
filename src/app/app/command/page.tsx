@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { desc, eq, inArray, sql } from "drizzle-orm";
 import { AgentConsole } from "@/components/agents/agent-console";
+import { BriefingList } from "@/components/agents/briefing-list";
+import { buildBriefing } from "@/server/services/briefing";
 import { Card, CardHeader, PageHeader } from "@/components/ui/primitives";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { requireAuth } from "@/server/auth/session";
@@ -9,7 +11,7 @@ import { agentExecutions, agentToolCalls } from "@/server/db/schema";
 import { aiConfigured, env } from "@/server/env";
 import { TOOLS } from "@/server/agents/tools";
 
-export const metadata: Metadata = { title: "Command Center" };
+export const metadata: Metadata = { title: "AI Agents" };
 
 export default async function CommandCenterPage() {
   const ctx = await requireAuth();
@@ -24,11 +26,12 @@ export default async function CommandCenterPage() {
         .groupBy(agentToolCalls.executionId)
     : [];
   const byRun = new Map(counts.map((c) => [c.executionId, c]));
+  const briefing = await buildBriefing(db, ctx.business.id);
 
   return (
     <>
-      <PageHeader title="Command Center" description="Give the agents work in plain language. Every tool call is checked by TrustGate and recorded." />
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+      <PageHeader title="AI Agents" description="Give the agents work in plain language. Every tool call is checked by TrustGate and recorded." />
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
         <div className="min-w-0">
           <AgentConsole
             tall
@@ -44,7 +47,11 @@ export default async function CommandCenterPage() {
             ]}
           />
         </div>
-        <div className="min-w-0 space-y-6">
+        <div className="min-w-0 space-y-4">
+          <Card>
+            <CardHeader title="Agent briefing" description="Next actions found in your records. Run hands one to the agents." />
+            <BriefingList items={briefing} />
+          </Card>
           <Card>
             <CardHeader title="Run history" description="Persisted executions, with tool calls and approvals" />
             {runs.length === 0 ? (

@@ -38,7 +38,7 @@ export function ConfirmDialog({
         e.preventDefault();
         onCancel();
       }}
-      className="material m-auto w-[min(86vw,17.5rem)] overflow-hidden rounded-[0.9rem] p-0 text-center text-foreground shadow-[var(--shadow-lift)]"
+      className="material m-auto w-[min(86vw,17.5rem)] overflow-hidden rounded-[6px] p-0 text-center text-foreground shadow-[var(--shadow-lift)]"
     >
       <div className="px-4 pb-4 pt-5">
         <h2 className="text-[1.0625rem] font-semibold">{title}</h2>

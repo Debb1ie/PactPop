@@ -29,7 +29,7 @@ function isActive(pathname: string, href: string) {
 
 function Avatar({ name, className }: { name: string; className?: string }) {
   return (
-    <span className={cn("grid h-9 w-9 shrink-0 place-items-center rounded-full bg-accent text-sm font-semibold text-white", className)} aria-hidden>
+    <span className={cn("grid h-9 w-9 shrink-0 place-items-center rounded-[4px] bg-accent font-mono text-sm font-semibold text-white", className)} aria-hidden>
       {name.slice(0, 1).toUpperCase()}
     </span>
   );
@@ -126,7 +126,7 @@ function Sidebar({ business, pendingApprovals, requestPath, logout, integrations
                         href={href}
                         aria-current={active ? "page" : undefined}
                         className={cn(
-                          "flex items-center gap-3 rounded-lg px-3 py-2 text-[0.9375rem] transition-colors",
+                          "flex items-center gap-3 rounded-[4px] px-3 py-2 text-[0.9375rem] transition-colors",
                           active ? "bg-fill-strong font-semibold text-foreground" : "text-muted hover:bg-fill hover:text-foreground",
                         )}
                       >
@@ -150,7 +150,7 @@ function Sidebar({ business, pendingApprovals, requestPath, logout, integrations
         <Integrations integrations={integrations} />
       </div>
       <form action={logout}>
-        <button className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] text-muted transition-colors hover:bg-fill hover:text-error">
+        <button className="flex w-full items-center gap-3 rounded-[4px] px-3 py-2.5 text-[0.9375rem] text-muted transition-colors hover:bg-fill hover:text-error">
           <LogOut className="h-[18px] w-[18px]" /> Log out
         </button>
       </form>
@@ -180,21 +180,21 @@ function TopBar({ user, onAccount }: { user: ShellProps["user"]; onAccount: () =
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search clients, companies or emails…"
             aria-label="Search clients"
-            className="h-11 w-full max-w-xl rounded-full border border-border bg-surface pl-11 pr-4 text-[0.9375rem] placeholder:text-faint focus:border-accent focus:outline-none focus:ring-[3px] focus:ring-ring/40"
+            className="h-10 w-full max-w-xl rounded-[4px] border border-border bg-surface pl-11 pr-4 text-[0.9375rem] placeholder:text-faint focus:border-accent focus:outline-none focus:ring-[3px] focus:ring-ring/40"
           />
         </form>
         <div className="ml-auto flex items-center gap-2">
           <Link
             href="/app/clients/new"
-            className="hidden h-10 items-center gap-1.5 rounded-full bg-accent px-4 text-sm font-semibold text-white transition hover:bg-violet-strong sm:flex"
+            className="hidden h-10 items-center gap-1.5 rounded-[4px] bg-accent px-4 text-sm font-semibold text-white transition hover:bg-violet-strong sm:flex"
           >
             <Plus className="h-4 w-4" /> New client
           </Link>
-          <Link href="/app/clients/new" aria-label="New client" className="grid h-10 w-10 place-items-center rounded-full bg-accent text-white sm:hidden">
+          <Link href="/app/clients/new" aria-label="New client" className="grid h-10 w-10 place-items-center rounded-[4px] bg-accent text-white sm:hidden">
             <Plus className="h-[18px] w-[18px]" />
           </Link>
-          <ThemeToggle className="border border-border" />
-          <button onClick={onAccount} className="flex h-10 items-center gap-2 rounded-full border border-border py-0.5 pl-0.5 pr-0.5 transition-colors hover:bg-fill sm:pr-3" aria-label="Account menu">
+          <ThemeToggle className="!rounded-[4px] border border-border" />
+          <button onClick={onAccount} className="flex h-10 items-center gap-2 rounded-[4px] border border-border py-0.5 pl-0.5 pr-0.5 transition-colors hover:bg-fill sm:pr-3" aria-label="Account menu">
             <Avatar name={user.name} />
             <span className="hidden text-sm font-medium sm:inline">{user.name.split(" ")[0]}</span>
             <ChevronDown className="hidden h-4 w-4 text-muted sm:block" />
@@ -224,7 +224,7 @@ function AccountSheet({ open, onClose, ...p }: Omit<ShellProps, "children" | "pe
         onClose();
       }}
       onClick={(e) => e.target === ref.current && onClose()}
-      className="mx-auto mb-0 mt-auto w-full max-w-md rounded-t-[1.75rem] border border-border bg-surface p-0 text-foreground sm:mb-auto sm:rounded-[1.75rem]"
+      className="mx-auto mb-0 mt-auto w-full max-w-md rounded-t-[6px] border border-border bg-surface p-0 text-foreground sm:mb-auto sm:rounded-[6px]"
     >
       <div className="pb-safe p-5">
         <div className="flex items-center justify-between">
@@ -233,14 +233,14 @@ function AccountSheet({ open, onClose, ...p }: Omit<ShellProps, "children" | "pe
             Done
           </button>
         </div>
-        <div className="mt-4 flex items-center gap-3 rounded-2xl border border-border bg-surface-2 px-4 py-3">
+        <div className="mt-4 flex items-center gap-3 rounded-[4px] border border-border bg-surface-2 px-4 py-3">
           <Avatar name={p.user.name} className="h-12 w-12 text-lg" />
           <div className="min-w-0 flex-1">
             <p className="truncate font-semibold">{p.user.name}</p>
             <p className="truncate text-sm text-muted">{p.user.email}</p>
           </div>
         </div>
-        <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-border bg-surface-2 px-4 py-3 text-sm">
+        <div className="mt-3 flex items-center justify-between gap-3 rounded-[4px] border border-border bg-surface-2 px-4 py-3 text-sm">
           <span className="flex min-w-0 items-center gap-2 truncate font-medium">
             {p.business.name} {p.business.isDemo && <DemoBadge />}
           </span>
@@ -248,7 +248,16 @@ function AccountSheet({ open, onClose, ...p }: Omit<ShellProps, "children" | "pe
             {copied ? <Check className="h-3 w-3" /> : <Link2 className="h-3 w-3" />} Request link
           </button>
         </div>
-        <button onClick={toggleTheme} className="mt-3 flex w-full items-center gap-3 rounded-2xl border border-border bg-surface-2 px-4 py-3 text-left text-sm">
+        {READY.length > 4 && (
+          <nav aria-label="More pages" className="mt-3 divide-y divide-border rounded-[4px] border border-border bg-surface-2">
+            {READY.slice(4).map(({ href, label, icon: Icon }) => (
+              <Link key={href} href={href} onClick={onClose} className="flex items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-fill">
+                <Icon className="h-4 w-4 text-muted" /> {label}
+              </Link>
+            ))}
+          </nav>
+        )}
+        <button onClick={toggleTheme} className="mt-3 flex w-full items-center gap-3 rounded-[4px] border border-border bg-surface-2 px-4 py-3 text-left text-sm">
           <Moon className="h-4 w-4 text-accent" />
           <span className="flex-1 font-medium">Appearance</span>
           <span className="text-muted">
@@ -256,11 +265,11 @@ function AccountSheet({ open, onClose, ...p }: Omit<ShellProps, "children" | "pe
             <span className="hidden dark:inline">Dark</span>
           </span>
         </button>
-        <div className="mt-3 rounded-2xl border border-border bg-surface-2 px-4 py-3">
+        <div className="mt-3 rounded-[4px] border border-border bg-surface-2 px-4 py-3">
           <Integrations integrations={p.integrations} />
         </div>
         <form action={p.logout} className="mt-4">
-          <button className="h-12 w-full rounded-2xl border border-error/30 bg-error-soft text-base font-semibold text-error">Log out</button>
+          <button className="h-12 w-full rounded-[4px] border border-error/30 bg-error-soft text-base font-semibold text-error">Log out</button>
         </form>
       </div>
     </dialog>

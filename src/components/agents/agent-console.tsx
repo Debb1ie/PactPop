@@ -53,7 +53,7 @@ function RunView({ run }: { run: Run }) {
   return (
     <li className="space-y-3">
       <div className="flex justify-end">
-        <p className="max-w-[85%] rounded-2xl rounded-br-md bg-accent px-4 py-2.5 text-[0.9375rem] text-white">{run.input}</p>
+        <p className="max-w-[85%] rounded-[4px] rounded-br-md bg-accent px-4 py-2.5 text-[0.9375rem] text-white">{run.input}</p>
       </div>
       <div className="space-y-2.5 border-l border-border pl-4">
         {start && (
@@ -75,7 +75,7 @@ function RunView({ run }: { run: Run }) {
             return (
               <div key={i} className="flex gap-2.5">
                 <AgentBadge name={e.agent} />
-                <div className="min-w-0 flex-1 rounded-lg border border-border bg-surface px-3 py-2">
+                <div className="min-w-0 flex-1 rounded-[4px] border border-border bg-surface px-3 py-2">
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                     <span className="text-[0.75rem] font-semibold">{e.agent}</span>
                     <span className="text-[0.8125rem]">{e.label}</span>
@@ -102,12 +102,12 @@ function RunView({ run }: { run: Run }) {
             return (
               <div key={i} className="flex gap-2.5">
                 <AgentBadge name="Orchestrator" />
-                <p className="min-w-0 flex-1 whitespace-pre-line rounded-lg bg-fill px-3.5 py-2.5 text-[0.9375rem] leading-relaxed">{e.text}</p>
+                <p className="min-w-0 flex-1 whitespace-pre-line rounded-[4px] bg-fill px-3.5 py-2.5 text-[0.9375rem] leading-relaxed">{e.text}</p>
               </div>
             );
           if (e.type === "error")
             return (
-              <p key={i} className="rounded-lg bg-error-soft px-3 py-2 text-[0.8125rem] text-error">
+              <p key={i} className="rounded-[4px] bg-error-soft px-3 py-2 text-[0.8125rem] text-error">
                 {e.message}
               </p>
             );
@@ -241,13 +241,13 @@ export function AgentConsole({ mode, model, suggestions, tall }: { mode: "ai" | 
           placeholder={busy ? "Agents are working…" : "e.g. Northwind asked for a booking system too. Check the scope."}
           disabled={busy}
           maxLength={2000}
-          className="h-11 min-w-0 flex-1 rounded-xl border border-border bg-background px-3.5 text-[0.9375rem] placeholder:text-faint focus:border-accent focus:outline-none focus:ring-[3px] focus:ring-ring/40 disabled:opacity-60"
+          className="h-11 min-w-0 flex-1 rounded-[4px] border border-border bg-background px-3.5 text-[0.9375rem] placeholder:text-faint focus:border-accent focus:outline-none focus:ring-[3px] focus:ring-ring/40 disabled:opacity-60"
         />
         <button
           type="submit"
           disabled={busy || input.trim().length < 2}
           aria-label="Send to agents"
-          className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-accent text-white transition hover:bg-violet-strong disabled:opacity-40"
+          className="grid h-11 w-11 shrink-0 place-items-center rounded-[4px] bg-accent text-white transition hover:bg-violet-strong disabled:opacity-40"
         >
           {busy ? <CircleDashed className="h-[18px] w-[18px] animate-spin" /> : <ArrowUp className="h-[18px] w-[18px]" />}
         </button>

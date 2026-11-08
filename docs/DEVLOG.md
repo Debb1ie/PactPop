@@ -89,3 +89,19 @@
 - ScopeWatch reads lists ("a Team page, a Gallery and an FAQ") and doesn't duplicate a pending change order.
 - Default `AI_MODEL` is now `claude-opus-5-5`.
 - Tests: 25 passing, including an end-to-end agent workflow on in-memory Postgres. Verified live in Chrome: $1,500 agreement → ScopeWatch $300 change order → approve → $1,800, with the dashboard updating.
+
+## 2026-11-08: Trading-desk redesign and page split
+
+- New visual system (owner chose "Trading desk"): hairline panel grid, 4px corners, Archivo with expanded headings, JetBrains Mono for every figure and label, violet only for actions, teal for money in, live indicator.
+- **Dashboard is money only**:
+  - Account position: contracted revenue, segmented received / invoiced / scheduled bar, change orders and pipeline.
+  - Cash flow chart, scheduled vs received, with a validated violet/teal palette and a table view.
+  - Receivables schedule with late flags.
+  - Ledger.
+  - One-line approval alert.
+- **Separate pages**:
+  - AI Agents: console, briefing and run history.
+  - Commitments: agreements table with milestone bars, VowGraph and activity.
+  - Payments: receivables, PayPal invoices, transactions and received chart.
+  - Approvals.
+- Mobile: five-tab bar, with the remaining pages listed in the account sheet.

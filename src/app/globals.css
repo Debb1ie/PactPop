@@ -3,10 +3,10 @@
 /* Dark mode is class-driven (.dark on <html>) and is the default; see themeScript in theme.tsx. */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* ───────── PactPop design tokens ─────────
-   Matte, document-like UI. No glows, no neon: solid surfaces, crisp 1px rules, flat violet accent.
-   Signature containers are "stubs" (agreement / receipt stubs with a dashed tear line and punched
-   notches) and "clauses" (numbered contract-style rows). */
+/* ───────── PactPop · "Trading desk" design system ─────────
+   Layout: a hairline grid of panels (1px rules, 4px corners, no floating cards or shadows).
+   Type: Archivo expanded for headings, Archivo for text, JetBrains Mono for every figure and label.
+   Colour: near-black ink, cool greys; violet only for actions and live data; teal = money in. */
 :root {
   /* brand */
   --pp-aubergine: #1b1230;
@@ -14,56 +14,57 @@
   --pp-violet-strong: #5646c9;
   --pp-lavender: #b9a5ff;
   --pp-lilac: #f1ecff;
-  --pp-ink: #16151c;
+  --pp-ink: #0b0b0f;
 
   /* state */
-  --pp-success: #1e8a5a;
+  --pp-success: #0f9182;
   --pp-warning: #b8740c;
   --pp-error: #cc3d4a;
 
-  /* light: cool neutral, biased toward the violet accent */
-  --background: #f4f4f8;
+  /* light */
+  --background: #f4f4f6;
   --surface: #ffffff;
-  --surface-2: #efeff5;
-  --glass: rgb(244 244 248 / 0.86);
-  --border: #e3e2ec;
-  --border-strong: #cdcbdb;
-  --foreground: #16151c;
-  --muted: #646273;
-  --faint: #a09eb0;
-  --fill: rgb(22 21 28 / 0.045);
-  --fill-strong: rgb(22 21 28 / 0.08);
-  --accent: #5b4bd6;
+  --surface-2: #f8f8fa;
+  --glass: rgb(244 244 246 / 0.92);
+  --border: #e2e2e8;
+  --border-strong: #cdcdd6;
+  --foreground: #0b0b0f;
+  --muted: #62626e;
+  --faint: #9a9aa6;
+  --fill: rgb(11 11 15 / 0.04);
+  --fill-strong: rgb(11 11 15 / 0.08);
+  --accent: #6a5ae0;
   --accent-fg: #ffffff;
-  --accent-soft: rgb(91 75 214 / 0.09);
-  --ring: rgb(91 75 214 / 0.35);
-  --success-soft: rgb(30 138 90 / 0.1);
+  --accent-soft: rgb(106 90 224 / 0.1);
+  --ring: rgb(106 90 224 / 0.4);
+  --money-in: #0f9182;
+  --success-soft: rgb(15 145 130 / 0.1);
   --warning-soft: rgb(184 116 12 / 0.11);
   --error-soft: rgb(204 61 74 / 0.1);
-  --shadow-color: 245 15% 30%;
+  --shadow-color: 240 10% 20%;
 }
 
 .dark {
-  /* dark: matte ink */
-  --background: #0e0d12;
-  --surface: #17161d;
-  --surface-2: #1e1d25;
-  --glass: rgb(14 13 18 / 0.86);
-  --border: #2a2832;
-  --border-strong: #3a3743;
-  --foreground: #ecebf0;
-  --muted: #9a98a6;
-  --faint: #615f6c;
-  --fill: rgb(255 255 255 / 0.045);
-  --fill-strong: rgb(255 255 255 / 0.08);
+  --background: #08080a;
+  --surface: #0e0e11;
+  --surface-2: #131317;
+  --glass: rgb(8 8 10 / 0.9);
+  --border: #1e1e24;
+  --border-strong: #2c2c34;
+  --foreground: #ececf1;
+  --muted: #8d8d9a;
+  --faint: #55555f;
+  --fill: rgb(255 255 255 / 0.035);
+  --fill-strong: rgb(255 255 255 / 0.07);
   --accent: #8f82f0;
   --accent-fg: #ffffff;
-  --accent-soft: rgb(143 130 240 / 0.13);
+  --accent-soft: rgb(143 130 240 / 0.12);
   --ring: rgb(143 130 240 / 0.45);
-  --pp-success: #4fbf87;
+  --money-in: #2fa898;
+  --pp-success: #2fa898;
   --pp-warning: #e0a33e;
   --pp-error: #ec6b74;
-  --success-soft: rgb(79 191 135 / 0.12);
+  --success-soft: rgb(47 168 152 / 0.12);
   --warning-soft: rgb(224 163 62 / 0.12);
   --error-soft: rgb(236 107 116 / 0.12);
   --shadow-color: 0 0% 0%;
@@ -85,6 +86,7 @@
   --color-accent-fg: var(--accent-fg);
   --color-accent-soft: var(--accent-soft);
   --color-ring: var(--ring);
+  --color-money-in: var(--money-in);
   --color-aubergine: var(--pp-aubergine);
   --color-violet: var(--pp-violet);
   --color-violet-strong: var(--pp-violet-strong);
@@ -98,14 +100,14 @@
   --color-warning-soft: var(--warning-soft);
   --color-error-soft: var(--error-soft);
 
-  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-display: var(--font-sora), var(--font-inter), system-ui, sans-serif;
-  --font-brand: var(--font-sora), var(--font-inter), sans-serif;
-  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-brand: var(--font-sora), var(--font-archivo), sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, "SF Mono", monospace;
 
-  --radius-card: 1.125rem;
-  --shadow-card: 0 1px 0 hsl(var(--shadow-color) / 0.04), 0 1px 3px hsl(var(--shadow-color) / 0.05);
-  --shadow-lift: 0 2px 4px hsl(var(--shadow-color) / 0.08), 0 16px 40px -16px hsl(var(--shadow-color) / 0.28);
+  --radius-card: 4px;
+  --shadow-card: none;
+  --shadow-lift: 0 12px 32px -12px hsl(var(--shadow-color) / 0.45);
   --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
@@ -116,15 +118,24 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  font-size: 15px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.025em; }
+/* Headings: Archivo expanded. */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-stretch: 118%;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.display-x { font-stretch: 125%; }
 
-.money { font-variant-numeric: tabular-nums; letter-spacing: -0.015em; }
+/* Every figure is mono with tabular numerals. */
+.money { font-family: var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
 
-/* Small mono eyebrow / clause label */
+/* Terminal-style label: small mono caps. */
 .label-mono {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
@@ -133,16 +144,24 @@ h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.025em; }
   color: var(--muted);
 }
 
-/* Frosted bars (navigation only) */
-.glass, .material {
-  background: var(--glass);
-  -webkit-backdrop-filter: saturate(140%) blur(14px);
-  backdrop-filter: saturate(140%) blur(14px);
+/* A grid of panels separated by hairlines (the core layout device). */
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-card); }
+.panel-head {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.7rem 1rem; border-bottom: 1px solid var(--border);
 }
 
-/* ───────── Stub: PactPop's signature container ─────────
-   A card with a dashed tear line and two punched notches at --tear (distance from the top).
-   Tone colour via --t ("r g b"). */
+.glass, .material {
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+/* Live dot */
+@keyframes pp-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+.live-dot { width: 6px; height: 6px; border-radius: 999px; background: var(--money-in); animation: pp-pulse 2s ease-in-out infinite; }
+
+/* Stub (used by the marketing call-to-action): dashed tear line with punched notches. */
 .stub {
   --tear: 3.25rem;
   --notch: 9px;
@@ -162,12 +181,12 @@ h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.025em; }
   border-top: 1.5px dashed var(--border-strong); pointer-events: none;
 }
 .tone-violet { --t: 106 90 224; }
-.tone-mint   { --t: 30 150 100; }
+.tone-mint   { --t: 15 145 130; }
 .tone-amber  { --t: 196 128 20; }
 .tone-rose   { --t: 210 74 100; }
 .tone-sky    { --t: 40 120 210; }
 .dark .tone-violet { --t: 143 130 240; }
-.dark .tone-mint   { --t: 79 191 135; }
+.dark .tone-mint   { --t: 47 168 152; }
 .dark .tone-amber  { --t: 224 163 62; }
 .dark .tone-rose   { --t: 236 107 140; }
 .dark .tone-sky    { --t: 96 160 240; }
@@ -182,30 +201,30 @@ h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.025em; }
 .hairline-b { box-shadow: inset 0 -1px 0 var(--border); }
 .hairline-t { box-shadow: inset 0 1px 0 var(--border); }
 
-:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; border-radius: 10px; }
+:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; border-radius: 2px; }
 
 .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 0.5rem); }
 
 @keyframes pp-shimmer { 100% { transform: translateX(100%); } }
-@keyframes pp-rise { from { transform: translateY(10px); opacity: 0; } to { transform: none; opacity: 1; } }
-@keyframes pp-drop { from { transform: translateY(-16px) scale(0.98); opacity: 0; } to { transform: none; opacity: 1; } }
-@keyframes pp-alert { from { transform: scale(1.06); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes pp-rise { from { transform: translateY(8px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes pp-drop { from { transform: translateY(-12px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes pp-alert { from { transform: scale(1.04); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 @keyframes pp-float { 0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); } 50% { transform: translateY(-6px) rotate(var(--r, 0deg)); } }
-.animate-rise { animation: pp-rise 480ms var(--ease-ios) both; }
-.animate-drop { animation: pp-drop 420ms var(--ease-ios) both; }
+.animate-rise { animation: pp-rise 420ms var(--ease-ios) both; }
+.animate-drop { animation: pp-drop 360ms var(--ease-ios) both; }
 .animate-float { animation: pp-float 7s ease-in-out infinite; }
 
-dialog[open] { animation: pp-alert 220ms var(--ease-ios) both; }
-dialog::backdrop { background: rgb(0 0 0 / 0.5); }
+dialog[open] { animation: pp-alert 200ms var(--ease-ios) both; }
+dialog::backdrop { background: rgb(0 0 0 / 0.6); }
 
 input[type="range"] { accent-color: var(--accent); }
+
+/* VowGraph stage (glass orbs read best on dark; deliberately dark in both themes) */
+.pp-orb-stage { background: radial-gradient(110% 85% at 50% 0%, #17152a 0%, #0b0a12 55%, #08070c 100%); }
+.pp-orb-label { text-align: center; white-space: nowrap; }
+.pp-orb-title { font-size: 0.75rem; font-weight: 600; color: #ececf1; }
+.pp-orb-caption { margin-top: 1px; font-family: var(--font-mono); font-size: 0.65rem; color: #8d8d9a; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
 }
-
-/* VowGraph stage: a dark set for the glass orbs (deliberately dark in both themes) */
-.pp-orb-stage { background: radial-gradient(110% 85% at 50% 0%, #1b1930 0%, #0d0c14 55%, #09080d 100%); }
-.pp-orb-label { text-align: center; white-space: nowrap; }
-.pp-orb-title { font-size: 0.75rem; font-weight: 600; color: #ecebf0; }
-.pp-orb-caption { margin-top: 1px; font-family: var(--font-mono); font-size: 0.65rem; color: #9a98a6; }

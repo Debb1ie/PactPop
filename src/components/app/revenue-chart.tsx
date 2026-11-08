@@ -11,7 +11,7 @@ export function RevenueChart({ data, currency }: { data: Point[]; currency: stri
   const hasData = data.some((d) => d.receivedMinor > 0);
   if (!hasData) {
     return (
-      <div className="flex h-56 flex-col items-center justify-center rounded-2xl bg-fill/60 text-center">
+      <div className="flex h-56 flex-col items-center justify-center rounded-[4px] bg-fill/60 text-center">
         <BarChart3 className="h-7 w-7 text-faint" />
         <p className="mt-2 text-[0.9375rem] font-medium">No payments yet</p>
         <p className="mt-0.5 max-w-xs text-[0.8125rem] text-muted">Monthly totals appear here once PayPal confirms your first payment.</p>
@@ -34,19 +34,19 @@ export function RevenueChart({ data, currency }: { data: Point[]; currency: stri
               tickFormatter={(v: number) => formatMoneyCompact(v, currency)}
             />
             <Tooltip
-              cursor={{ fill: "var(--fill)", radius: 8 }}
+              cursor={{ fill: "var(--fill)" }}
               content={({ active, payload }) => {
                 if (!active || !payload?.length) return null;
                 const p = payload[0].payload as Point;
                 return (
-                  <div className="material rounded-xl px-3 py-2 text-sm shadow-[var(--shadow-lift)] ring-[0.5px] ring-border">
+                  <div className="material rounded-[4px] px-3 py-2 text-sm shadow-[var(--shadow-lift)] ring-[0.5px] ring-border">
                     <p className="text-xs text-muted">{p.month}</p>
                     <p className="money font-semibold">{formatMoney(p.receivedMinor, currency)}</p>
                   </div>
                 );
               }}
             />
-            <Bar dataKey="receivedMinor" fill="var(--accent)" radius={[6, 6, 0, 0]} maxBarSize={40} />
+            <Bar dataKey="receivedMinor" fill="var(--accent)" radius={[2, 2, 0, 0]} maxBarSize={28} />
           </BarChart>
         </ResponsiveContainer>
       </div>

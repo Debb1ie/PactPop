@@ -36,7 +36,7 @@ export function ApprovalCard({ approval, compact }: { approval: ApprovalView; co
     });
 
   return (
-    <div className={cn("rounded-xl border bg-surface", state === "pending" ? "border-warning/40" : "border-border", compact ? "p-3.5" : "p-4")}>
+    <div className={cn("rounded-[4px] border bg-surface", state === "pending" ? "border-warning/40" : "border-border", compact ? "p-3.5" : "p-4")}>
       <div className="flex items-start gap-3">
         <ShieldCheck className={cn("mt-0.5 h-[18px] w-[18px] shrink-0", state === "pending" ? "text-warning" : state === "executed" ? "text-success" : "text-muted")} />
         <div className="min-w-0 flex-1">
