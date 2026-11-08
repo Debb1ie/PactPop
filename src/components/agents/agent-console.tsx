@@ -43,9 +43,9 @@ function AgentBadge({ name }: { name: string }) {
 }
 
 const DECISION = {
-  allowed: { label: "Allowed", cls: "bg-success-soft text-success", icon: Check },
-  approval_required: { label: "Needs approval", cls: "bg-warning-soft text-warning", icon: ShieldAlert },
-  denied: { label: "Blocked", cls: "bg-error-soft text-error", icon: Ban },
+  allowed: { label: "Allowed", cls: "text-money-in", icon: Check },
+  approval_required: { label: "Needs approval", cls: "text-[#f0b13f]", icon: ShieldAlert },
+  denied: { label: "Blocked", cls: "text-[#ec6b74]", icon: Ban },
 };
 
 function RunView({ run }: { run: Run }) {
@@ -81,8 +81,8 @@ function RunView({ run }: { run: Run }) {
                     <span className="text-[0.75rem] font-semibold">{e.agent}</span>
                     <span className="text-[0.8125rem]">{e.label}</span>
                     <span className="font-mono text-[0.65rem] text-faint">{e.tool}()</span>
-                    <span className={cn("ml-auto inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[0.65rem] font-semibold", d.cls)}>
-                      <d.icon className="h-3 w-3" /> TrustGate: {d.label}
+                    <span className="pure ml-auto inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.65rem] font-semibold text-foreground/85">
+                      <d.icon className={cn("h-3 w-3", d.cls)} /> TrustGate: {d.label}
                     </span>
                   </div>
                   <p className={cn("mt-1 flex items-center gap-1.5 text-[0.8125rem]", r ? (r.ok ? "text-muted" : "text-error") : "text-faint")}>
@@ -211,7 +211,7 @@ export function AgentConsole({ mode, model, suggestions, greeting }: { mode: "ai
                     type="button"
                     onClick={() => run(sg.command)}
                     disabled={busy}
-                    className="rounded-2xl border border-border bg-surface px-4 py-3 text-left transition-colors hover:border-accent/60 hover:bg-surface-2 disabled:opacity-50"
+                    className="rounded-2xl border border-border bg-surface px-4 py-3 text-left transition-colors hover:bg-surface-2 disabled:opacity-50"
                   >
                     <span className="block text-[0.9375rem] font-medium">{sg.title}</span>
                     {sg.detail && <span className="mt-0.5 block text-[0.8125rem] text-muted">{sg.detail}</span>}
@@ -230,7 +230,7 @@ export function AgentConsole({ mode, model, suggestions, greeting }: { mode: "ai
       </div>
 
       <div className="mx-auto w-full max-w-3xl pb-2 pt-3">
-        <form onSubmit={submit} className="rounded-3xl border border-border bg-surface p-2 shadow-[0_12px_40px_-20px_rgb(0_0_0/0.5)] focus-within:border-accent/60">
+        <form onSubmit={submit} className="rounded-3xl border border-border bg-surface p-2 shadow-[0_12px_40px_-20px_rgb(0_0_0/0.5)] focus-within:border-border-strong">
           <label htmlFor="agent-input" className="sr-only">
             Message PactPop agents
           </label>
@@ -251,8 +251,8 @@ export function AgentConsole({ mode, model, suggestions, greeting }: { mode: "ai
             className="block max-h-40 min-h-12 w-full resize-none bg-transparent px-3 py-2.5 text-[0.9375rem] leading-relaxed placeholder:text-faint focus:outline-none disabled:opacity-60 [field-sizing:content]"
           />
           <div className="flex items-center gap-2 px-1.5 pb-0.5">
-            <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.75rem] font-medium", mode === "ai" ? "bg-accent-soft text-accent" : "bg-warning-soft text-warning")}>
-              <Sparkles className="h-3.5 w-3.5" /> {mode === "ai" ? model ?? "Claude" : "Rule-based mode"}
+            <span className="pure inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.75rem] font-medium text-foreground/85">
+              <Sparkles className="h-3.5 w-3.5 text-muted" /> {mode === "ai" ? model ?? "Claude" : "Rule-based mode"}
             </span>
             <button
               type="submit"

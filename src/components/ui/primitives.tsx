@@ -155,18 +155,18 @@ export function EmptyState({ icon, title, description, action }: { icon?: ReactN
 
 export function ErrorNotice({ title = "Something went wrong", message }: { title?: string; message: string }) {
   return (
-    <div role="alert" className="rounded-xl border border-error/25 bg-error-soft px-4 py-3 text-[0.9375rem]">
-      <p className="font-semibold text-error">{title}</p>
+    <div role="alert" className="pure rounded-2xl px-4 py-3 text-[0.9375rem]">
+      <p className="flex items-center gap-2 font-semibold"><span className="h-1.5 w-1.5 rounded-full bg-[#ec6b74]" aria-hidden />{title}</p>
       <p className="mt-0.5 text-foreground/80">{message}</p>
     </div>
   );
 }
 
 export function Notice({ tone = "info", children, className, icon }: { tone?: "info" | "warning" | "success"; children: ReactNode; className?: string; icon?: ReactNode }) {
-  const tones = { info: "border-accent/25 bg-accent-soft", warning: "border-warning/25 bg-warning-soft", success: "border-success/25 bg-success-soft" };
+  const dots = { info: "text-[#8b7bff]", warning: "text-[#f0b13f]", success: "text-money-in" };
   return (
-    <div className={cn("flex gap-3 rounded-xl border px-4 py-3 text-[0.875rem]", tones[tone], className)}>
-      {icon && <span className="mt-0.5 shrink-0">{icon}</span>}
+    <div className={cn("pure flex gap-3 rounded-2xl px-4 py-3 text-[0.875rem]", className)}>
+      {icon && <span className={cn("mt-0.5 shrink-0", dots[tone])}>{icon}</span>}
       <div className="min-w-0">{children}</div>
     </div>
   );
@@ -190,7 +190,7 @@ export function DemoBadge({ className }: { className?: string }) {
   return (
     <span
       title="Seeded demonstration record — not real customer or PayPal data"
-      className={cn("inline-flex items-center rounded-full border border-warning/40 px-2 py-px align-middle text-[0.625rem] font-semibold uppercase tracking-[0.06em] text-warning", className)}
+      className={cn("pure inline-flex items-center rounded-full px-2 py-0.5 align-middle text-[0.625rem] font-semibold uppercase tracking-[0.08em] text-muted", className)}
     >
       Demo
     </span>

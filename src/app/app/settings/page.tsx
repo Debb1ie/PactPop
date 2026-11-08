@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { Bot, History, ShieldCheck, Store } from "lucide-react";
-import { StatusBadge } from "@/components/ui/status-badge";
+import { Pill, StatusBadge } from "@/components/ui/status-badge";
 import { DemoBadge } from "@/components/ui/primitives";
 import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/money";
@@ -68,7 +68,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/app/set
                 <Row
                   label="Agent engine"
                   hint={ai ? "Claude coordinates the agents through permission-checked tools." : "Rule-based planner: same tools and TrustGate checks, fixed set of requests. Add AI_API_KEY to use Claude."}
-                  value={<span className={cn("rounded-full px-2.5 py-1 text-[0.75rem] font-medium", ai ? "bg-accent-soft text-accent" : "bg-warning-soft text-warning")}>{ai ? env().AI_MODEL : "Rule-based mode"}</span>}
+                  value={<Pill tone={ai ? "violet" : "neutral"}>{ai ? env().AI_MODEL : "Rule-based mode"}</Pill>}
                 />
                 <Row label="Reasoning shown" hint="A short summary of the orchestrator's thinking appears in the chat." value="Summarised" />
                 <Row label="Prices" hint="Agents estimate units of work; your rate card sets every amount." value="From your rates" />

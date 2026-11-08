@@ -1,15 +1,29 @@
+import type React from "react";
 import { cn } from "@/lib/cn";
 
 type Tone = "neutral" | "violet" | "success" | "warning" | "error" | "info";
 
-const tones: Record<Tone, string> = {
-  neutral: "bg-surface-2 text-muted",
-  violet: "bg-accent-soft text-accent",
-  info: "bg-accent-soft text-accent",
-  success: "bg-success-soft text-success",
-  warning: "bg-warning-soft text-warning",
-  error: "bg-error-soft text-error",
+/** Tone shows only as a small dot; the pill itself is the page colour with a soft shadow. */
+export const DOT: Record<Tone, string> = {
+  neutral: "bg-faint",
+  violet: "bg-[#8b7bff]",
+  info: "bg-[#5ac8fa]",
+  success: "bg-money-in",
+  warning: "bg-[#f0b13f]",
+  error: "bg-[#ec6b74]",
 };
+
+export type PillTone = Tone;
+
+/** The one pill style: same colour as the page, defined by shadow, neutral text, optional tone dot. */
+export function Pill({ tone = "neutral", dot = true, children, className, title }: { tone?: Tone; dot?: boolean; children: React.ReactNode; className?: string; title?: string }) {
+  return (
+    <span title={title} className={cn("pure inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-[0.75rem] font-medium text-foreground/85", className)}>
+      {dot && <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", DOT[tone])} aria-hidden />}
+      {children}
+    </span>
+  );
+}
 
 /** Maps every status in the system to a human label + tone, so wording stays consistent. */
 const STATUS: Record<string, [string, Tone]> = {
@@ -78,5 +92,9 @@ export function statusLabel(status: string) {
 
 export function StatusBadge({ status, className }: { status: string; className?: string }) {
   const [label, tone] = STATUS[status] ?? [statusLabel(status), "neutral" as Tone];
-  return <span className={cn("inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-1 text-[0.75rem] font-medium", tones[tone], className)}>{label}</span>;
+  return (
+    <Pill tone={tone} className={className}>
+      {label}
+    </Pill>
+  );
 }

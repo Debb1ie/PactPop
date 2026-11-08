@@ -68,7 +68,7 @@ export default async function DashboardPage() {
           <div className="px-5 pb-4">
             <p className="text-[0.8125rem] text-muted">
               <span className="money font-semibold text-foreground">{formatMoney(expected, cur)}</span> expected over 6 months ·{" "}
-              <span className="money font-semibold text-success">{formatMoney(position.receivedMinor, cur)}</span> received
+              <span className="money font-semibold text-foreground">{formatMoney(position.receivedMinor, cur)}</span> received
             </p>
             <div className="mt-2">
               <CashflowChart data={cashflow} currency={cur} />

@@ -137,7 +137,7 @@ function TopBar({ user, pendingApprovals, onAccount }: { user: ShellProps["user"
     router.push(term ? `/app/clients?q=${encodeURIComponent(term)}` : "/app/clients");
   };
   return (
-    <header className="sticky top-0 z-30 bg-background/70 backdrop-blur-xl">
+    <header className="sticky top-0 z-30 backdrop-blur-xl">
       <div className="mx-auto flex h-20 max-w-[1280px] items-center gap-3 px-4 sm:px-6 lg:px-8">
         <Link href="/app/dashboard" aria-label="Dashboard" className="lg:hidden">
           <Logo size="sm" />

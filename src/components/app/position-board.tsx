@@ -20,10 +20,10 @@ export function PositionBoard({ p, currency, sandbox }: { p: Position; currency:
   const total = Math.max(1, p.contractedMinor);
   const seg = (v: number) => `${Math.max(0, Math.min(100, (v / total) * 100))}%`;
   const cols = [
-    { label: "Received", value: p.receivedMinor, note: "PayPal-confirmed", cls: "text-money-in", swatch: "bg-money-in" },
+    { label: "Received", value: p.receivedMinor, note: "PayPal-confirmed", cls: "", swatch: "bg-money-in" },
     { label: "Invoiced", value: p.invoicedMinor, note: "awaiting payment", cls: "", swatch: "bg-accent" },
     { label: "Scheduled", value: p.scheduledMinor, note: "milestones not yet invoiced", cls: "", swatch: "bg-faint" },
-    { label: "Change orders", value: p.pendingChangeOrdersMinor, note: "pending your approval", cls: p.pendingChangeOrdersMinor ? "text-warning" : "", swatch: "bg-warning" },
+    { label: "Change orders", value: p.pendingChangeOrdersMinor, note: "pending your approval", cls: "", swatch: "bg-[#f0b13f]" },
     { label: "Pipeline", value: p.pipelineMinor, note: `${p.pipelineCount} awaiting acceptance`, cls: "text-muted", swatch: "" },
   ];
 
@@ -41,7 +41,7 @@ export function PositionBoard({ p, currency, sandbox }: { p: Position; currency:
           <p className="label-mono">Contracted revenue</p>
           <p className="money mt-2 text-[2.5rem] font-medium leading-none sm:text-[3.25rem]">{formatMoney(p.contractedMinor, currency)}</p>
           <p className="mt-2 font-mono text-[0.75rem] text-muted">
-            {p.contractedCount} agreement{p.contractedCount === 1 ? "" : "s"} · <span className="text-money-in">{p.collectedPct.toFixed(1)}% collected</span>
+            {p.contractedCount} agreement{p.contractedCount === 1 ? "" : "s"} · <span className="text-foreground">{p.collectedPct.toFixed(1)}%</span> collected
           </p>
         </div>
         <div>
@@ -61,7 +61,7 @@ export function PositionBoard({ p, currency, sandbox }: { p: Position; currency:
         {cols.map((c, i) => (
           <div key={c.label} className={`min-w-0 px-4 py-3.5 ${i > 0 ? "border-l border-border" : ""} ${i >= 2 ? "max-sm:border-t" : ""} ${i === 2 ? "max-sm:border-l-0" : ""} ${i >= 3 ? "sm:max-lg:border-t" : ""} ${i === 3 ? "sm:max-lg:border-l-0" : ""}`}>
             <dt className="flex items-center gap-1.5 label-mono">
-              {c.swatch && <span className={`h-2 w-2 rounded-sm ${c.swatch}`} aria-hidden />}
+              {c.swatch && <span className={`h-1.5 w-1.5 rounded-full ${c.swatch}`} aria-hidden />}
               {c.label}
             </dt>
             <dd className={`money mt-1.5 text-[1.125rem] font-medium ${c.cls}`}>{formatMoney(c.value, currency)}</dd>

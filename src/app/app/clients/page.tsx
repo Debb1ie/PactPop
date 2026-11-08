@@ -82,7 +82,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/app/clie
               subtitle={[c.company, c.email].filter(Boolean).join(" · ") || "No contact details"}
               detail={
                 <span className="flex flex-col items-end leading-tight">
-                  <span className={`money font-semibold ${c.outstandingMinor > 0 ? "text-warning" : "text-foreground"}`}>
+                  <span className={`money font-semibold ${"text-foreground"}`}>
                     {formatMoney(c.outstandingMinor > 0 ? c.outstandingMinor : c.paidMinor, cur)}
                   </span>
                   <span className="text-xs">{c.outstandingMinor > 0 ? "outstanding" : c.activeCommitments > 0 ? `${c.activeCommitments} active` : "paid"}</span>

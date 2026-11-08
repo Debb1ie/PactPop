@@ -4,19 +4,20 @@ import { useMemo, useState } from "react";
 import { CalendarDays } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/money";
+import { Pill, type PillTone } from "@/components/ui/status-badge";
 
 export type ActivityRow = { id: string; date: string; title: string; kind: string; party: string; amountMinor: number | null };
 
 const AVATAR = ["bg-[#f6c89f] text-[#5a3a12]", "bg-[#b9a5ff] text-[#2a1a6b]", "bg-[#d7ee6e] text-[#3a4410]", "bg-[#9ee6d8] text-[#0f4a40]"];
 
 /** Status pill derived from the real event kind. */
-function statusFor(kind: string): { label: string; cls: string } {
-  if (kind.startsWith("payment.")) return { label: "Paid", cls: "bg-success-soft text-success" };
-  if (kind === "change_order.rejected") return { label: "Rejected", cls: "border border-error/60 text-error" };
-  if (kind === "change_order.drafted") return { label: "Pending", cls: "border border-warning/50 text-warning" };
-  if (kind === "change_order.approved") return { label: "Approved", cls: "bg-surface-2 text-foreground" };
-  if (kind === "proposal.accepted") return { label: "Signed", cls: "bg-surface-2 text-foreground" };
-  return { label: "Sent", cls: "bg-surface-2 text-muted" };
+function statusFor(kind: string): { label: string; tone: PillTone } {
+  if (kind.startsWith("payment.")) return { label: "Paid", tone: "success" };
+  if (kind === "change_order.rejected") return { label: "Rejected", tone: "error" };
+  if (kind === "change_order.drafted") return { label: "Pending", tone: "warning" };
+  if (kind === "change_order.approved") return { label: "Approved", tone: "violet" };
+  if (kind === "proposal.accepted") return { label: "Signed", tone: "violet" };
+  return { label: "Sent", tone: "neutral" };
 }
 
 const RANGES = [
@@ -86,7 +87,7 @@ export function MoneyActivity({ rows, currency, asOf }: { rows: ActivityRow[]; c
                     </td>
                     <td className="whitespace-nowrap py-2 text-muted">{new Date(r.date).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</td>
                     <td className="py-2">
-                      <span className={cn("inline-flex rounded-full px-3 py-1 text-[0.75rem] font-medium", st.cls)}>{st.label}</span>
+                      <Pill tone={st.tone}>{st.label}</Pill>
                     </td>
                     <td className={cn("money whitespace-nowrap py-2 text-right font-medium", inflow && "text-success")}>
                       {r.amountMinor != null ? `${inflow ? "+" : ""}${formatMoney(r.amountMinor, currency)}` : "—"}

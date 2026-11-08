@@ -3,7 +3,7 @@ import { desc, eq } from "drizzle-orm";
 import { ReceivablesTable } from "@/components/app/money-tables";
 import { PositionBoard } from "@/components/app/position-board";
 import { RevenueChart } from "@/components/app/revenue-chart";
-import { StatusBadge } from "@/components/ui/status-badge";
+import { Pill, StatusBadge } from "@/components/ui/status-badge";
 import { formatMoney } from "@/lib/money";
 import { requireAuth } from "@/server/auth/session";
 import { getDb } from "@/server/db/client";
@@ -36,9 +36,7 @@ export default async function PaymentsPage() {
           <p className="label-mono">PayPal Sandbox</p>
           <h1 className="mt-1 text-[1.75rem] font-bold leading-tight">Payments</h1>
         </div>
-        <span className={`rounded-xl border px-2.5 py-1 font-mono text-[0.7rem] uppercase tracking-[0.06em] ${connected ? "border-success/40 text-success" : "border-warning/40 text-warning"}`}>
-          {connected ? "PayPal Sandbox connected" : "PayPal Sandbox not connected"}
-        </span>
+        <Pill tone={connected ? "success" : "neutral"}>{connected ? "PayPal Sandbox connected" : "PayPal Sandbox not connected"}</Pill>
       </div>
 
       <PositionBoard p={position} currency={cur} sandbox />
@@ -90,7 +88,7 @@ export default async function PaymentsPage() {
                   <span className="font-mono text-[0.7rem] text-muted">{date(p.completedAt ?? p.createdAt)}</span>
                   <span className="min-w-0 flex-1 truncate font-mono text-[0.7rem]">{p.paypalCaptureId ?? p.paypalOrderId ?? p.paypalInvoicePaymentId}</span>
                   <StatusBadge status={p.status === "completed" ? "paid" : p.status} />
-                  <span className="money text-money-in">{formatMoney(p.amountMinor, p.currency)}</span>
+                  <span className="money font-semibold">{formatMoney(p.amountMinor, p.currency)}</span>
                 </li>
               ))}
             </ul>

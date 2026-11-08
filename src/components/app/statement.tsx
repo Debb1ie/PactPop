@@ -10,9 +10,9 @@ export type StatementLine = {
 };
 
 const FLAG = {
-  warning: "bg-warning-soft text-warning",
-  success: "bg-success-soft text-success",
-  neutral: "bg-fill text-muted",
+  warning: "bg-[#f0b13f]",
+  success: "bg-money-in",
+  neutral: "bg-faint",
 };
 
 /**
@@ -40,7 +40,7 @@ export function Statement({ title, period, badge, lines }: { title: string; peri
           >
             <dt className="flex items-center gap-2 text-[0.8125rem] text-muted">
               {l.label}
-              {l.flag && <span className={cn("rounded-md px-1.5 py-px text-[0.6875rem] font-semibold", FLAG[l.flag.tone])}>{l.flag.text}</span>}
+              {l.flag && <span className="pure inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[0.6875rem] font-medium text-foreground/85"><span className={cn("h-1.5 w-1.5 rounded-full", FLAG[l.flag.tone])} aria-hidden />{l.flag.text}</span>}
             </dt>
             <dd className="money mt-2 text-[1.625rem] font-semibold leading-none tracking-[-0.03em] sm:text-[1.875rem]">{l.value}</dd>
             <dd className="mt-2 text-[0.8125rem] text-muted">{l.note}</dd>

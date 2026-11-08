@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/money";
-import { StatusBadge } from "@/components/ui/status-badge";
+import { Pill, StatusBadge } from "@/components/ui/status-badge";
 
 const date = (d: Date | null) => (d ? d.toLocaleDateString("en-US", { month: "short", day: "2-digit" }).toUpperCase() : "—");
 
@@ -35,9 +35,13 @@ export function ReceivablesTable({ rows, compact }: { rows: Receivable[]; compac
         <tbody className="divide-y divide-border">
           {rows.map((r) => (
             <tr key={r.id} className="transition-colors hover:bg-fill">
-              <td className={cn("whitespace-nowrap px-4 py-2.5 font-mono text-[0.75rem]", r.overdue ? "text-error" : "text-muted")}>
+              <td className="whitespace-nowrap px-4 py-2.5 font-mono text-[0.75rem] text-muted">
                 {date(r.dueDate)}
-                {r.overdue && <span className="ml-1.5">LATE</span>}
+                {r.overdue && (
+                  <Pill tone="error" className="ml-2 py-0.5 font-sans text-[0.6875rem]">
+                    Late
+                  </Pill>
+                )}
               </td>
               <td className="px-2 py-2.5">
                 <Link href={`/app/clients/${r.clientId}`} className="font-medium hover:text-accent">
@@ -87,7 +91,7 @@ export function LedgerTable({ rows, currency }: { rows: LedgerRow[]; currency: s
                   {r.actor && <span className="ml-1.5 font-mono text-[0.65rem] uppercase text-faint">{r.actor}</span>}
                 </td>
                 <td className="px-2 py-2.5 text-muted">{r.client}</td>
-                <td className={cn("money whitespace-nowrap px-4 py-2.5 text-right", positive && "text-money-in")}>
+                <td className={cn("money whitespace-nowrap px-4 py-2.5 text-right", positive && "font-semibold")}>
                   {r.amountMinor != null ? `${positive ? "+" : ""}${formatMoney(r.amountMinor, currency)}` : "—"}
                 </td>
               </tr>
