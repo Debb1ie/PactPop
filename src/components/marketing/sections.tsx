@@ -207,7 +207,7 @@ export function IntelligenceSection() {
         </div>
         <div className="lg:pb-2">
           <p className="max-w-sm text-[0.9375rem] leading-relaxed text-muted">
-            Scope control, proof checks, a linked record of every promise and approvals you control, all in one free workspace.
+            Scope control, proof checks, PayPal payments and approvals you control, with every promise linked to the money. All in one free workspace.
           </p>
           <Link
             href="/login"

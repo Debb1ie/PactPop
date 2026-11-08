@@ -63,8 +63,9 @@ function TiltCard({ spec }: { spec: CardSpec }) {
         **** {spec.ref}
       </span>
       <span className="absolute left-[8%] top-[10%] text-[clamp(0.55rem,0.9vw,0.8rem)] font-semibold uppercase tracking-[0.14em] text-white/75">{spec.label}</span>
-      <span className="absolute bottom-[8%] right-[7%]">
+      <span className="absolute bottom-[8%] right-[7%] flex flex-col items-end gap-0.5">
         <PactMark />
+        <span className="font-[family-name:var(--font-brand)] text-[clamp(0.5rem,0.85vw,0.75rem)] font-semibold tracking-[0.08em] text-white/85">VowCard</span>
       </span>
     </div>
   );

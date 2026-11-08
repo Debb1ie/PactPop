@@ -52,7 +52,7 @@ function FinCard({ d }: { d: CardData }) {
     >
       <div className="flex items-center justify-between">
         <span className="flex items-center gap-1.5 text-[0.8125rem] font-semibold">
-          <Mark dark={dark} /> PactPop
+          <Mark dark={dark} /> <span className="font-[family-name:var(--font-brand)] tracking-[0.02em]">VowCard</span>
         </span>
         <span className={cn("text-[0.7rem] font-bold uppercase tracking-[0.1em]", dark ? "text-[#6c4ef5]" : "text-white/85")}>{d.version}</span>
       </div>

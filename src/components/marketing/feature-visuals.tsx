@@ -120,6 +120,38 @@ function GateVisual() {
   );
 }
 
+/** PayPal: a deposit paid through PayPal, confirmed by a verified webhook before it counts. */
+function PayPalVisual() {
+  const steps = [
+    { t: "Invoice sent through PayPal", s: "Invoicing v2 · from the milestone amount", done: true },
+    { t: "Client pays with PayPal", s: "Orders v2 · captured on the server", done: true },
+    { t: "Webhook signature verified", s: "Only then does money count", done: true },
+  ];
+  return (
+    <div className="w-full">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-[0.75rem] font-medium text-[#0d0d10]/50">Deposit · Northwind Bakery</p>
+          <p className="money text-[1.75rem] font-bold leading-tight tracking-[-0.02em]">$750.00</p>
+        </div>
+        <span className="rounded-full bg-[#e7f6ec] px-3 py-1 text-[0.75rem] font-semibold text-[#1f8a4c]">Paid</span>
+      </div>
+      <ol className="mt-4 space-y-2.5">
+        {steps.map((x, i) => (
+          <li key={x.t} className="pp-pop-in flex items-start gap-3" style={{ animationDelay: `${0.3 + i * 0.25}s` }}>
+            <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#0a62d0] text-[0.7rem] font-bold text-white">{i + 1}</span>
+            <span className="min-w-0">
+              <span className="block text-[0.875rem] font-semibold text-[#0d0d10]">{x.t}</span>
+              <span className="block text-[0.75rem] text-[#0d0d10]/50">{x.s}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+      <div className="mt-4 flex h-10 items-center justify-center rounded-full bg-[#ffc439] text-[0.875rem] font-bold italic text-[#003087]">Pay with PayPal</div>
+    </div>
+  );
+}
+
 /* ───────── expanding feature panels ───────── */
 
 type Panel = { key: string; name: string; title: string; text: string; silk: string; line: string; visual: ReactNode };
@@ -151,6 +183,15 @@ const PANELS: Panel[] = [
     silk: "bg-[radial-gradient(80%_70%_at_20%_0%,#9fc48a_0%,transparent_60%),radial-gradient(70%_70%_at_90%_100%,#2e5b26_0%,transparent_60%),linear-gradient(165deg,#6f9a5c,#3b6a32)]",
     line: "#eaf5e2",
     visual: <ProofVisual />,
+  },
+  {
+    key: "paypal",
+    name: "PayPal",
+    title: "Paid through PayPal, confirmed by PayPal.",
+    text: "The PayFlow Agent sends PayPal invoices you approve, clients pay the deposit with PayPal from one link, and money counts only after a verified PayPal webhook.",
+    silk: "bg-[radial-gradient(80%_70%_at_25%_0%,#7cc4ff_0%,transparent_60%),radial-gradient(70%_70%_at_90%_100%,#002f86_0%,transparent_60%),linear-gradient(165deg,#2a7de1,#0a3d91)]",
+    line: "#e6f1ff",
+    visual: <PayPalVisual />,
   },
   {
     key: "gate",
@@ -190,7 +231,7 @@ export function FeaturePanels() {
             key={p.key}
             onMouseEnter={() => setOpen(i)}
             className={cn(
-              "relative overflow-hidden rounded-[2rem] text-white transition-[flex-grow] duration-700 ease-[var(--ease-ios)] lg:min-w-[7.5rem]",
+              "relative overflow-hidden rounded-[2rem] text-white transition-[flex-grow] duration-700 ease-[var(--ease-ios)] lg:min-w-[6.25rem]",
               p.silk,
               on ? "lg:flex-[5_1_0%]" : "lg:flex-[1_1_0%] lg:cursor-pointer",
             )}
@@ -209,13 +250,13 @@ export function FeaturePanels() {
                 on ? "pointer-events-none opacity-0" : "opacity-100",
               )}
             >
-              <span className="rotate-180 whitespace-nowrap text-[2rem] font-semibold tracking-[-0.03em] [writing-mode:vertical-rl]">{p.name}</span>
+              <span className="rotate-180 whitespace-nowrap text-[1.75rem] font-semibold tracking-[-0.03em] [writing-mode:vertical-rl]">{p.name}</span>
             </button>
 
             {/* open panel */}
             <div
               className={cn(
-                "relative flex h-full flex-col p-6 transition-[opacity,transform] duration-700 ease-[var(--ease-ios)] sm:p-8 lg:p-9 lg:absolute lg:inset-y-0 lg:left-0 lg:w-[44rem]",
+                "relative flex h-full flex-col p-6 transition-[opacity,transform] duration-700 ease-[var(--ease-ios)] sm:p-8 lg:p-9 lg:absolute lg:inset-y-0 lg:left-0 lg:w-[40rem]",
                 on ? "opacity-100 lg:translate-x-0" : "lg:pointer-events-none lg:-translate-x-6 lg:opacity-0",
               )}
             >
