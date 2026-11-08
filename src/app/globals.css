@@ -413,3 +413,14 @@ input[type="range"] { accent-color: var(--accent); }
 .pp-range::-webkit-slider-thumb:hover { transform: scale(1.12); }
 .pp-range::-moz-range-thumb { width: 20px; height: 20px; border: 0; border-radius: 50%; background: #fff; box-shadow: 0 0 0 4px var(--c), 0 6px 14px rgb(0 0 0 / 0.45); }
 .pp-range:focus-visible { box-shadow: 0 0 0 3px rgb(255 255 255 / 0.4); }
+
+/* Touch devices: 16px form text stops iOS Safari zooming in on focus. */
+@media (pointer: coarse) {
+  input:not([type="range"]):not([type="checkbox"]):not([type="radio"]),
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+/* Respect the iPhone notch / Android cut-out in landscape. */
+.px-safe { padding-left: max(env(safe-area-inset-left), 0px); padding-right: max(env(safe-area-inset-right), 0px); }

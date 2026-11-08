@@ -14,11 +14,11 @@ export default function MarketingLayout({ children }: LayoutProps<"/">) {
     <div className="force-light relative isolate flex min-h-screen flex-col">
       <ScrollGrid forceLight />
       <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md">
-        <div className="mx-auto grid h-20 max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 sm:px-6">
+        <div className="mx-auto grid h-16 max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-2 px-3 sm:h-20 sm:gap-3 sm:px-6">
           <Link href="/" aria-label="PactPop home" className="flex items-center gap-4 justify-self-start">
             <span className="flex items-center gap-2.5">
-              <LogoMark variant="mark" className="h-8 w-8" />
-              <span className="font-[family-name:var(--font-brand)] text-[1.35rem] font-semibold uppercase tracking-[0.04em] text-[#0d0d10]">PactPop</span>
+              <LogoMark variant="mark" className="h-7 w-7 sm:h-8 sm:w-8" />
+              <span className="font-[family-name:var(--font-brand)] text-[1.1rem] font-semibold uppercase tracking-[0.04em] text-[#0d0d10] sm:text-[1.35rem]">PactPop</span>
             </span>
           </Link>
           <SectionNav />
@@ -28,7 +28,7 @@ export default function MarketingLayout({ children }: LayoutProps<"/">) {
           </Link>
           <Link
             href="/register"
-            className="whitespace-nowrap rounded-xl bg-[#0d0d10] px-4 py-2.5 text-[0.875rem] font-medium text-white transition hover:bg-[#2a2a30] sm:px-5"
+            className="whitespace-nowrap rounded-xl bg-[#0d0d10] px-3 py-2.5 text-[0.875rem] font-medium text-white transition hover:bg-[#2a2a30] sm:px-5"
           >
             <span className="sm:hidden">Sign up</span>
             <span className="hidden sm:inline">Create account</span>

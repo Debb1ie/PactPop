@@ -101,9 +101,46 @@ export default async function CommitmentsPage() {
         ))}
       </div>
 
-      <section className="panel overflow-hidden" aria-label="All commitments">
+      {/* phones: one card per agreement */}
+      <ul className="space-y-3 md:hidden" aria-label="All commitments">
+        {rows.map(({ c, company, clientName, clientId }) => {
+          const own = ms.filter((m) => m.commitmentId === c.id);
+          const paid = own.filter((m) => m.status === "paid").length;
+          return (
+            <li key={c.id} className="panel p-4">
+              <div className="flex items-center gap-3">
+                <Avatar name={company ?? clientName} tone={toneOf.get(clientId)!} />
+                <div className="min-w-0 flex-1">
+                  <Link href={`/app/clients/${clientId}`} className="block truncate font-semibold">
+                    {company ?? clientName}
+                  </Link>
+                  <p className="truncate text-[0.8125rem] text-muted">{c.title}</p>
+                </div>
+                <p className="money shrink-0 text-[1rem] font-semibold">{formatMoney(c.agreedTotalMinor, c.currency)}</p>
+              </div>
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-[0.75rem] text-muted">
+                <StatusBadge status={c.status} />
+                <span>v{c.currentVersion}</span>
+                {own.length > 0 && (
+                  <span>
+                    · {paid}/{own.length} paid
+                  </span>
+                )}
+                {c.dueDate && <span>· due {date(c.dueDate)}</span>}
+                {c.proposalId && ["awaiting_acceptance", "proposed", "accepted", "in_progress"].includes(c.status) && (
+                  <span className="ml-auto">
+                    <ClientLinkButton commitmentId={c.id} />
+                  </span>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+
+      <section className="panel hidden overflow-hidden md:block" aria-label="All commitments table">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[880px] text-[0.8125rem]">
+          <table className="w-full min-w-[720px] text-[0.8125rem]">
             <thead>
               <tr className="border-b border-border text-left">
                 <th className="label-mono px-4 py-2.5 font-normal">Client · agreement</th>

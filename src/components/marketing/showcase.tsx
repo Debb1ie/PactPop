@@ -82,7 +82,7 @@ export function AgentsShowcase() {
           <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#b18cff] to-[#6c4ef5]">
             <Sparkles className="h-5 w-5" />
           </span>
-          <p className="min-w-0 flex-1 truncate text-[0.9375rem]">
+          <p className="min-w-0 flex-1 text-[0.875rem] leading-snug sm:truncate sm:text-[0.9375rem]">
             <span className="font-semibold">Orchestrator</span>
             <span className="text-white/60"> · &ldquo;Which invoices are overdue?&rdquo; → Finance Agent</span>
           </p>

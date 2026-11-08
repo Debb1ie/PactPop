@@ -62,7 +62,7 @@ export function SectionNav() {
           onClick={() => setOpen((o) => !o)}
           aria-expanded={open}
           aria-controls="site-menu"
-          className="flex h-9 items-center gap-2 rounded-xl bg-[#0d0d10] px-3 text-[0.8125rem] font-medium text-white transition hover:bg-[#2a2a30] lg:hidden"
+          className="flex h-9 items-center gap-1.5 rounded-xl bg-[#0d0d10] px-2.5 text-[0.8125rem] font-medium text-white transition hover:bg-[#2a2a30] sm:gap-2 sm:px-3 lg:hidden"
         >
           {open ? <X className="h-4 w-4" /> : <LayoutGrid className="h-4 w-4" />} Menu
         </button>

@@ -1,4 +1,5 @@
 import { cn } from "@/lib/cn";
+import { LogoMark } from "@/components/brand/logo";
 import { formatMoney } from "@/lib/money";
 
 type Position = {
@@ -14,13 +15,7 @@ type Position = {
 };
 
 function Mark() {
-  return (
-    <svg viewBox="0 0 64 28" className="h-5 w-10" aria-hidden>
-      <path d="M6 22 C18 22 22 6 32 6 C42 6 46 22 58 22" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" />
-      <circle cx="6" cy="22" r="4.5" fill="white" />
-      <circle cx="58" cy="22" r="4.5" fill="white" />
-    </svg>
-  );
+  return <LogoMark variant="mono" className="h-6 w-6" title="" />;
 }
 
 /**

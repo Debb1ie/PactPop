@@ -5,6 +5,7 @@ import { useState } from "react";
 import { MoreHorizontal } from "lucide-react";
 import { statusLabel } from "@/components/ui/status-badge";
 import { cn } from "@/lib/cn";
+import { LogoMark } from "@/components/brand/logo";
 import { formatMoney } from "@/lib/money";
 
 export type WalletCommitment = {
@@ -95,11 +96,7 @@ export function CommitmentWallet({ items }: { items: WalletCommitment[] }) {
                   <p className="money text-[0.75rem] tracking-[0.12em] text-white/80">•••• {ref(c.id)}</p>
                   <p className="money mt-1 text-[1.6rem] font-bold leading-none">{formatMoney(c.agreedTotalMinor, c.currency)}</p>
                 </div>
-                <svg viewBox="0 0 64 28" className="h-6 w-12" aria-hidden>
-                  <path d="M6 22 C18 22 22 6 32 6 C42 6 46 22 58 22" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" />
-                  <circle cx="6" cy="22" r="4" fill="white" />
-                  <circle cx="58" cy="22" r="4" fill="white" />
-                </svg>
+                <LogoMark variant="mono" className="h-8 w-8" title="" />
               </div>
             </button>
           );
@@ -114,7 +111,7 @@ export function CommitmentWallet({ items }: { items: WalletCommitment[] }) {
               <MoreHorizontal className="h-5 w-5" />
             </Link>
           </div>
-          <dl className="m-5 mt-3 grid grid-cols-2 gap-y-3 rounded-xl bg-surface-2 px-4 py-3 sm:grid-cols-4 sm:gap-0 sm:divide-x sm:divide-border">
+          <dl className="m-5 mt-3 grid grid-cols-2 gap-y-3 rounded-xl bg-surface-2 px-4 py-3 sm:grid-cols-4 sm:gap-0 sm:divide-x sm:divide-border lg:grid-cols-2 lg:gap-y-3 lg:divide-x-0 xl:grid-cols-4 xl:gap-y-0 xl:divide-x">
             {[
               ["Number", `•••• ${ref(selected.id)}`],
               ["Due date", dueLabel(selected.dueDate)],

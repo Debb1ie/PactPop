@@ -278,7 +278,7 @@ export function AgentConsole({ mode, models, defaultModel, suggestions, greeting
   };
 
   return (
-    <section className="flex h-[calc(100dvh-12.5rem)] flex-col lg:h-[calc(100dvh-6rem)]" aria-label="Agent chat">
+    <section className="flex h-[calc(100dvh-11.5rem-env(safe-area-inset-bottom))] flex-col lg:h-[calc(100dvh-6rem)]" aria-label="Agent chat">
       <div ref={scroller} className="flex-1 overflow-y-auto" aria-live="polite">
         <div className="mx-auto w-full max-w-3xl px-1 py-6">
           {runs.length === 0 ? (
@@ -334,13 +334,13 @@ export function AgentConsole({ mode, models, defaultModel, suggestions, greeting
           />
           <div className="flex items-center gap-2 px-1.5 pb-0.5">
             {mode === "ai" && models.length > 0 ? (
-              <label className="pure relative inline-flex items-center gap-1.5 rounded-full py-1 pl-2.5 pr-7 text-[0.75rem] font-medium text-foreground/85">
+              <label className="pure relative inline-flex min-w-0 max-w-[70%] items-center gap-1.5 rounded-full py-1 pl-2.5 pr-7 text-[0.75rem] font-medium text-foreground/85">
                 <Sparkles className="h-3.5 w-3.5 text-muted" />
                 <span className="sr-only">Model</span>
-                <select value={model ?? ""} onChange={(e) => chooseModel(e.target.value)} disabled={busy} className="appearance-none bg-transparent pr-1 focus:outline-none" aria-label="Choose the AI model">
+                <select value={model ?? ""} onChange={(e) => chooseModel(e.target.value)} disabled={busy} className="min-w-0 max-w-full appearance-none truncate bg-transparent pr-1 focus:outline-none" aria-label="Choose the AI model">
                   {models.map((m) => (
                     <option key={m.id} value={m.id} className="bg-surface text-foreground">
-                      {m.label} · {m.note}
+                      {m.label}
                     </option>
                   ))}
                 </select>
