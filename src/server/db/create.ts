@@ -18,10 +18,15 @@ export async function createDatabase(url?: string): Promise<Database> {
     const { Pool } = await import("pg");
     const pool = new Pool({
       connectionString: url,
-      max: 10,
+      // Serverless functions (Vercel) each hold their own pool; keep it small for Neon's free plan.
+      max: process.env.VERCEL ? 3 : 10,
       ssl: /sslmode=require/.test(url) ? { rejectUnauthorized: false } : undefined,
     });
     return drizzlePg(pool, { schema });
+  }
+  if (process.env.VERCEL) {
+    // Embedded PGlite needs a writable disk; Vercel's is read-only.
+    throw new Error("DATABASE_URL is not set. Add a PostgreSQL connection string (for example from Neon) in the Vercel project settings.");
   }
   const { PGlite } = await import("@electric-sql/pglite");
   const dataDir = !url ? DEFAULT_PGLITE_DIR : url === "memory://" ? undefined : url.replace(/^pglite:/, "");
