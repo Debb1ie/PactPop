@@ -27,18 +27,17 @@ PactPop is under active development. This table is kept honest: anything not mar
 | Dashboard (PayPal-confirmed metrics only), clients (list, search, create, edit, balances) | ✅ Working |
 | Database schema for the whole workflow (24 tables), migrations, demo seed | ✅ Working |
 | Deterministic pricing engine, exact money handling, TrustGate policy table | ✅ Working (unit-tested) |
-| Light & dark themes, responsive layout with a mobile tab bar, scroll-reactive WebGL grid terrain | ✅ Working |
-| VowGraph 3D view (commitments as glass orbs: milestones as rings, change orders as satellites) and 3D architecture diagram | ✅ Working (live data) |
+| Light & dark themes; responsive on phones (iOS/Android) and tablets with a mobile tab bar; scroll-reactive WebGL grid terrain | ✅ Working |
+| Poppy the pup mascot across the landing page and app (moods for approvals, payments, errors) | ✅ Working |
 | One-click demo workspace with sample commitments, scope change and approval; **Reset demo data** in Settings | ✅ Working |
 | **Client request page** behind each business's request link (`/request/[slug]`) | ✅ Working |
 | **One-link client checkout** (`/agreement/[token]`): client reviews scope, accepts by name, pays the deposit with PayPal Smart Buttons (Orders v2, server-side create + capture) | ✅ Working (tested in the Sandbox) |
 | **AI Agents** chat page: live, streamed agent runs with every tool call and TrustGate decision visible | ✅ Working |
 | **Settings**: editable TrustGate permissions (locked money controls), agent history, tools, workspace | ✅ Working |
-| **Finance dashboard** (account position, cash flow, receivables, ledger), **Commitments** (table, VowGraph, activity) and **Payments** pages | ✅ Working |
-| All 8 agents (Intake, Pricing, Proposal, Scope, Operations, Finance, ProofFlow, PayFlow) acting on real records through 18 tools | ✅ Working (Groq `openai/gpt-oss-120b` or Claude, set by `AI_PROVIDER`; labelled rule-based mode without a key) |
+| **Finance dashboard** (account position, cash flow, charts, transactions), **Commitments** (cards/table, delivery proof, agreement journey, activity) and **Payments** pages | ✅ Working |
+| All 8 agents (Intake, Pricing, Proposal, Scope, Operations, Finance, ProofFlow, PayFlow) acting on real records through 20 tools | ✅ Working (Groq `openai/gpt-oss-120b` or Claude, set by `AI_PROVIDER`; labelled rule-based mode without a key) |
 | **Approval Center** + inline approvals: approving a change order creates agreement v2 and a change-order milestone | ✅ Working |
 | Agent briefing: next actions found in your records, one click to run | ✅ Working |
-| Customer request portal, proposal acceptance page, commitments pages | 🚧 Next |
 | PayPal Sandbox: server-side OAuth, **Invoicing v2** milestone invoices (create + send), payment confirmed with the PayPal API | ✅ Working |
 | PayPal **webhooks**: signature verified with PayPal, stored once per event id, invoice/capture re-read from PayPal before money is recorded | ✅ Working (live on Vercel) |
 | **PayFlow Agent**: finds payments due, prepares PayPal invoices (queued in TrustGate for your approval), checks payment status with PayPal | ✅ Working |
@@ -46,7 +45,7 @@ PactPop is under active development. This table is kept honest: anything not mar
 | **Every PayPal invoice and payment is documented**: printable invoice and receipt pages with PayPal's own record (IDs, status, fee/net, webhooks) and a paper trail; download as PDF or save as image | ✅ Working |
 | **ProofFlow Agent**: checks delivery proof against each acceptance criterion; a passing review queues "Approve delivery", which makes the payment due | ✅ Working |
 | Approved ScopeWatch change orders become invoiceable milestones | ✅ Working |
-| ScopeWatch, ProofFlow, Evidence Vault, VowGraph, reports, settings | 🚧 Planned |
+| Delivery-proof file uploads (proof is links + notes today), client-facing receipts, email reminders | 🚧 Planned |
 
 The full plan is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), the agent system is documented in [docs/AGENTS.md](docs/AGENTS.md), and progress is tracked in [docs/DEVLOG.md](docs/DEVLOG.md).
 
@@ -56,7 +55,7 @@ The full plan is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), the agent syst
 |---|---|---|
 | Meaningfully integrate a PayPal technology | Invoicing v2 for deposits, milestones and change orders; Orders v2 checkout; verified webhooks drive the commitment timeline | ✅ Invoicing v2, Orders v2 checkout and verified webhooks all working in the Sandbox |
 | Meaningfully incorporate AI | AI orchestrator (Groq or Claude) coordinating specialist agents through permission-checked tools that change real records ([docs/AGENTS.md](docs/AGENTS.md)) | ✅ All 8 agents working: Intake, Scope, Pricing, Proposal, Operations, Finance, ProofFlow and PayFlow |
-| Working prototype | One-click demo workspace; setup steps below run on any machine with Node.js | ✅ Runs locally |
+| Working prototype | Live at [pact-pop.vercel.app](https://pact-pop.vercel.app) with a one-click demo workspace; setup steps below also run locally | ✅ Live and tested end to end against the PayPal Sandbox |
 | Documentation | This README plus [docs/](docs/) | ✅ |
 | Public, open-source repo with a license | MIT, see [LICENSE](LICENSE) | ✅ |
 
@@ -73,15 +72,26 @@ The inputs are unstructured: client emails, change requests, screenshots and del
 - **The model interprets** text and proposes *units* of work (pages, features, hours).
 - **Code decides.** Prices are calculated by the deterministic pricing engine from your rates. Permissions are enforced by TrustGate on the server. Payment status comes only from PayPal.
 
-## How PayPal is integrated (design)
+## How PayPal is integrated
 
-- A typed server-side gateway calls the PayPal REST APIs: OAuth2 client credentials, **Invoicing v2** (deposits, milestones, approved change orders), **Orders v2** (checkout and capture after approval), and **webhook signature verification**.
+All PayPal calls run on the server against the **PayPal Sandbox** (`src/server/paypal/`):
+
+| PayPal tool | What PactPop does with it |
+|---|---|
+| **REST API: OAuth 2.0** (client credentials) | Server-side sign-in with token caching; credentials and tokens never reach the browser. |
+| **Invoicing API v2** | Creates and sends a PayPal invoice for each milestone (deposit, final payment, approved change orders), with the amount taken from the stored milestone. Status is re-checked with PayPal before any payment is recorded. Used from the Payments page and by the **PayFlow Agent** (after the owner approves). |
+| **Orders API v2 + JavaScript SDK (Smart Payment Buttons)** | The client's one-link checkout (`/agreement/[token]`): the client accepts the agreement and pays the deposit with PayPal. The order is created and captured on the server; amount, PayPal fee and net come from PayPal's capture response. |
+| **Webhooks + Verify Webhook Signature** | `INVOICING.INVOICE.PAID` and `PAYMENT.CAPTURE.COMPLETED` (endpoint `/api/paypal/webhook`) are signature-verified, stored once per event id, then the invoice/order is re-read from PayPal before money is counted. |
+| **Sandbox test accounts** | Business and personal buyer accounts for real end-to-end test payments. |
+
+Every PayPal invoice and payment is **documented**: `/app/payments/invoices/[id]` and `/app/payments/receipts/[id]` show the invoice or receipt with PayPal's own record (IDs, status, fee, net, webhook events) and a paper trail, downloadable as PDF or saved as an image.
+
 - Every mutating call sends a `PayPal-Request-Id` derived from an internal record ID, so retries are idempotent.
 - A payment counts as complete **only** after a verified webhook or a server-side status check. A browser redirect is never treated as proof of payment.
 - Webhook events are stored with a unique PayPal event ID, so duplicate deliveries are ignored.
 - Client secrets and access tokens never reach the browser, and the app refuses to start against non-sandbox PayPal hosts.
 
-## How the agents work (design)
+## How the agents work
 
 One capable model with eight specialised roles: **Intake, Scope, Pricing, Proposal, Operations, ProofFlow, PayFlow and Finance**. A central orchestrator routes each request. Every tool call passes through **TrustGate**, which returns one of three outcomes:
 
@@ -91,7 +101,9 @@ One capable model with eight specialised roles: **Intake, Scope, Pricing, Propos
 | `approval` | An approval request is created with the AI's reasoning summary. Nothing runs until a human approves it. |
 | `deny` | The call is blocked and logged. |
 
-Capturing payments, issuing refunds, changing agreed amounts and applying change orders have a **locked floor of "approval"** that no configuration can relax. Tool policies live in [`src/server/agents/policies.ts`](src/server/agents/policies.ts).
+The agents run on **Groq** (`openai/gpt-oss-120b` by default; `gpt-oss-20b` and Qwen 3.8 27B are selectable in the chat), or **Anthropic Claude** with `AI_PROVIDER=anthropic`. They can show charts (pie, donut, bar, line) and invoice samples in the chat, and conversations are saved in a History panel. The model chooses tools and views; every amount and chart value is computed by code from the database.
+
+Capturing payments, issuing refunds, changing agreed amounts, applying change orders and approving deliveries have a **locked floor of "approval"** that no configuration can relax. Tool policies live in [`src/server/agents/policies.ts`](src/server/agents/policies.ts).
 
 ---
 
@@ -102,6 +114,7 @@ Capturing payments, issuing refunds, changing agreed amounts and applying change
 - **Zod** validation, **bcrypt** password hashing, **Recharts** charts, **three.js** (WebGL background)
 - **Vitest** unit tests, **Playwright** browser checks
 - **Groq** (OpenAI-compatible API, `openai/gpt-oss-120b`) or **Anthropic Claude** for the agents; **PayPal REST APIs** (Sandbox)
+- **Vercel** hosting with **Neon** serverless PostgreSQL in production; **html-to-image** for saving documents as images
 
 Key decisions and their reasons are recorded in [docs/DECISIONS.md](docs/DECISIONS.md).
 
@@ -135,7 +148,7 @@ docs/                  architecture, decisions, dev log
 git clone https://github.com/Debb1ie/PactPop.git
 cd PactPop
 npm install
-cp .env.example .env        # optional for now: the defaults run locally
+cp .env.example .env        # add PayPal Sandbox + AI keys here (optional: the app runs without them)
 npm run db:seed             # creates the local database and the demo workspace
 npm run dev                 # http://localhost:3000
 ```
@@ -180,7 +193,20 @@ See [`.env.example`](.env.example) for the documented list:
 3. Under **Testing Tools → Sandbox Accounts**, use the generated *personal* account to pay invoices as a test customer.
 4. Webhooks need a public URL. Expose your local server with a tunnel (e.g. `cloudflared tunnel --url http://localhost:3000`), then register `<public-url>/api/paypal/webhook` in the app's webhook settings and copy the webhook ID into `PAYPAL_WEBHOOK_ID`.
 
-The PayPal workflow itself is still in development. See the project status above.
+Without PayPal keys the app still runs; PayPal actions are disabled and the UI says PayPal isn't connected.
+
+### AI setup
+
+Create a free key at [console.groq.com](https://console.groq.com) and set `AI_PROVIDER=groq` and `AI_API_KEY` in `.env` (default model `openai/gpt-oss-120b`). Without a key, the agents run in a clearly labelled rule-based mode with the same tools and TrustGate checks.
+
+### Deployment (as used for the live demo)
+
+1. Create a **Neon** Postgres database and copy its pooled connection string.
+2. Import the GitHub repo into **Vercel** and add the environment variables from `.env.example` (`DATABASE_URL` = Neon string, `APP_URL` = your Vercel URL).
+3. Run `npm run db:migrate` once against the Neon database.
+4. Register the PayPal webhook at `<APP_URL>/api/paypal/webhook` and set `PAYPAL_WEBHOOK_ID`.
+
+Every push to `main` redeploys automatically.
 
 ## Scripts
 
@@ -216,7 +242,9 @@ The tests check, among other things, that the demo project prices to **$1,500** 
 
 ## Known limitations
 
-- The PayPal integration (PayFlow Agent), ProofFlow and the customer portal are not implemented yet (see Project status).
+- PayPal runs in **Sandbox only** by design; the app refuses to start against live PayPal hosts.
+- Delivery proof is notes and links; file uploads are planned.
+- Groq's free tier rate-limits long multi-step agent runs; the orchestrator waits and retries automatically.
 - In rule-based mode (no `AI_API_KEY`) the planner understands a fixed set of intents. The AI provider (Groq or Claude) handles free-form requests.
 - PGlite is for local development only. Use PostgreSQL in production.
 
@@ -233,7 +261,11 @@ PayPal is a trademark of PayPal, Inc. PactPop is an independent hackathon projec
 | **Anthropic Claude** (runtime, optional, `claude-opus-5-5`) | Alternative provider (`AI_PROVIDER=anthropic`). Powers PactPop's agents: extracting requirements from client messages, comparing new requests with the accepted scope, drafting proposals and change orders, and checking deliverable evidence. Accessed through a provider interface, so the model can be swapped. Every tool call goes through TrustGate. |
 | **Claude Code** (development) | AI coding assistant used to plan the architecture, write and review code, and run tests and browser checks during the hackathon. It is not part of the running app. |
 | **Mascot artwork (Poppy the pup)** | Sticker set and hero illustration supplied by the project owner; cut into transparent stickers for the app (`public/mascot/`). |
-| **three.js** | WebGL grid-terrain background that reacts to scrolling, the VowGraph orb view on the dashboard, and the 3D architecture diagram. |
+| **Vercel** | Hosts the live app (`pact-pop.vercel.app`); every push to GitHub deploys automatically. |
+| **Neon** | Serverless PostgreSQL for production data (agreements, invoices, payments, chat history). |
+| **Recharts** | Dashboard and AI-chat charts. |
+| **html-to-image** | "Save as image" for invoices and receipts. |
+| **three.js** | WebGL grid-terrain background on the landing page that reacts to scrolling. |
 
 ## License
 
