@@ -119,7 +119,7 @@ export async function sendMilestoneInvoice(db: Database, input: { businessId: st
       action: "paypal.send_invoice",
       entityType: "invoice",
       entityId: ins[0].id,
-      after: { paypalInvoiceId: created.id, amountMinor: m.amountMinor, currency: m.currency },
+      after: { paypalInvoiceId: created.id, amountMinor: m.amountMinor, currency: m.currency, paypal: { id: sent.id, status: sent.status, invoiceNumber: sent.detail.invoice_number ?? null, recipientViewUrl: sent.detail.metadata?.recipient_view_url ?? null, recordedAt: new Date().toISOString() } },
     });
     return ins;
   });
@@ -180,7 +180,7 @@ export async function syncInvoice(db: Database, input: { businessId: string; inv
       action: "payment.confirmed",
       entityType: "invoice",
       entityId: inv.id,
-      after: { paypalStatus: remote.status, paidMinor, via: input.via },
+      after: { paypalStatus: remote.status, paidMinor, via: input.via, paypal: { id: remote.id, status: remote.status, paidAmount: remote.payments?.paid_amount ?? null, transactions: remote.payments?.transactions ?? [], recordedAt: new Date().toISOString() } },
     });
   });
   return { ok: true as const, status, paid, message: paid ? "PayPal confirms this invoice is paid" : `PayPal status: ${remote.status.toLowerCase().replace(/_/g, " ")}` };

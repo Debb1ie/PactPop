@@ -18,11 +18,14 @@ import { TOOL_BY_NAME, TOOLS, toolJsonSchema, type AgentName, type ApprovalSpec,
 import { planHeuristic } from "./planner";
 import { queueApproval } from "@/server/services/workflow";
 import { formatMoney } from "@/lib/money";
+import type { ChartSpec, InvoiceDocData } from "@/lib/docs";
 
 export type AgentEvent =
   | { type: "start"; executionId: string; mode: "ai" | "heuristic"; model: string | null }
   | { type: "thinking"; agent: AgentName; text: string }
   | { type: "status"; text: string }
+  | { type: "chart"; chart: ChartSpec }
+  | { type: "invoice"; invoice: InvoiceDocData }
   | { type: "tool_call"; id: string; tool: string; agent: AgentName; label: string; decision: "allowed" | "approval_required" | "denied" }
   | { type: "tool_result"; id: string; ok: boolean; summary: string }
   | { type: "approval"; approvalId: string; title: string; amount: string | null; reason: string }
@@ -56,7 +59,7 @@ function moneyForModel(value: unknown, currency = "USD"): unknown {
   const out: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(obj)) {
     // Approval ids are for the UI card only; the model would read them out to the user.
-    if (/^(approvalId|pendingApprovalId)$/.test(k)) continue;
+    if (/^(approvalId|pendingApprovalId)$/.test(k) || k.startsWith("__")) continue;
     if (/Minor$/.test(k) && typeof v === "number") out[k.replace(/Minor$/, "")] = formatMoney(v, cur);
     else out[k] = moneyForModel(v, cur);
   }
@@ -114,7 +117,9 @@ async function invokeTool(ctx: ToolContext, name: string, rawInput: unknown, cal
     await ctx.db.insert(agentToolCalls).values({ businessId: ctx.businessId, executionId: ctx.executionId, tool: name, args: input as object, decision: "allowed", result: result.data as object, durationMs: Date.now() - started });
     emit({ type: "tool_result", id: callId, ok: true, summary: result.summary });
     // a tool may itself queue an approval (e.g. ScopeWatch change orders)
-    const d = result.data as { approvalId?: string; approvalTitle?: string; amount?: string } | null;
+    const d = result.data as { approvalId?: string; approvalTitle?: string; amount?: string; __chart?: ChartSpec; __invoice?: InvoiceDocData } | null;
+    if (d?.__chart) emit({ type: "chart", chart: d.__chart });
+    if (d?.__invoice) emit({ type: "invoice", invoice: d.__invoice });
     if (d?.approvalId) {
       state.approvals += 1;
       emit({ type: "approval", approvalId: d.approvalId, title: d.approvalTitle ?? "Change order waiting for approval", amount: d.amount ?? null, reason: ctx.reasoning });
@@ -144,19 +149,42 @@ Rules:
 - ProofFlow: to check delivery proof, call get_delivery_proof, compare every acceptance criterion with the delivery notes and evidence, then call save_proof_review for each deliverable. Put a criterion in verified (exact text) only if the evidence clearly shows it; otherwise list it as missing. If a review passes, a delivery approval is queued for the owner; approving it makes that payment due.
 - PayFlow (PayPal): to invoice, call list_invoiceable to find the milestone, then send_invoice with its milestoneId. Sending is normally queued for the owner to approve; say so plainly. Use check_payment to ask PayPal whether an invoice is paid.
 - Only if the message is purely a greeting or thanks with no request (e.g. "hi", "good morning", "thanks"): reply in one or two friendly sentences and offer two or three concrete things you can do, without calling tools. Any message that asks for information or an action, such as a briefing, summary, status or check, is a real request: use the tools and answer with real figures.
+- Charts: when the owner asks for a chart, graph, breakdown, trend or analytics, call show_chart (pick the metric and chart type that fit). The chart appears on screen automatically; in your reply, point out one or two insights from the points it returned. Never draw charts with text.
+- Invoice samples: when the owner wants to see or preview an invoice, find the milestone with list_invoiceable, then call preview_invoice. The sample appears on screen; nothing is sent.
 - Formatting: plain sentences, short bullet lists with "- ", and **bold** only for key figures or names. No tables, no headings.
 - Finish with a short, plain-language summary for the business owner: what you did, what changed, and what needs their decision. No markdown headings; short paragraphs or simple lists are fine.`;
 
-type Run = { db: Database; businessId: string; userId: string; input: string; emit: Emit; model?: string };
+type Turn = { input: string; text: string };
+type Run = { db: Database; businessId: string; userId: string; input: string; emit: Emit; model?: string; conversationId?: string; history?: Turn[] };
 
-export async function runCommand({ db, businessId, userId, input, emit, model: requested }: Run) {
+export async function runCommand({ db, businessId, userId, input, emit: send, model: requested, conversationId }: Run) {
+  // Keep every event so the conversation can be reopened from History exactly as it looked.
+  const log: AgentEvent[] = [];
+  const emit: Emit = (e) => {
+    if (e.type !== "start") log.push(e);
+    send(e);
+  };
+  // Earlier turns of this conversation (same user + business) give the model context.
+  const history: Turn[] = conversationId
+    ? (
+        await db
+          .select({ input: agentExecutions.input, output: agentExecutions.output })
+          .from(agentExecutions)
+          .where(and(eq(agentExecutions.businessId, businessId), eq(agentExecutions.userId, userId), eq(agentExecutions.conversationId, conversationId)))
+          .orderBy(desc(agentExecutions.createdAt))
+          .limit(6)
+      )
+        .reverse()
+        .map((r) => ({ input: r.input, text: String((r.output as { text?: string } | null)?.text ?? "") }))
+        .filter((t) => t.text)
+    : [];
   const ai = aiConfigured();
   const provider = ai ? env().AI_PROVIDER : "heuristic";
   // Only models from the allowed list can be chosen; anything else falls back to the default.
   const model = ai ? (requested && aiModels().some((m) => m.id === requested) ? requested : aiModel()) : null;
   const [exec] = await db
     .insert(agentExecutions)
-    .values({ businessId, userId, role: "orchestrator", input, status: "running", provider, model })
+    .values({ businessId, userId, role: "orchestrator", input, status: "running", provider, model, conversationId: conversationId ?? null })
     .returning();
   emit({ type: "start", executionId: exec.id, mode: ai ? "ai" : "heuristic", model: model ? aiModelLabel(model) : null });
 
@@ -166,7 +194,7 @@ export async function runCommand({ db, businessId, userId, input, emit, model: r
   let tokensOut = 0;
   try {
     if (ai) {
-      const r = provider === "groq" ? await runWithGroq({ db, businessId, userId, input, emit, model: model! }, exec.id, state) : await runWithClaude({ db, businessId, userId, input, emit, model: model! }, exec.id, state);
+      const r = provider === "groq" ? await runWithGroq({ db, businessId, userId, input, emit, model: model!, history }, exec.id, state) : await runWithClaude({ db, businessId, userId, input, emit, model: model!, history }, exec.id, state);
       finalText = r.text;
       tokensIn = r.inputTokens;
       tokensOut = r.outputTokens;
@@ -176,7 +204,7 @@ export async function runCommand({ db, businessId, userId, input, emit, model: r
     const status = state.approvals > 0 ? "awaiting_approval" : "completed";
     await db
       .update(agentExecutions)
-      .set({ status, output: { text: finalText }, completedAt: new Date(), inputTokens: tokensIn || null, outputTokens: tokensOut || null })
+      .set({ status, output: { text: finalText, events: log }, completedAt: new Date(), inputTokens: tokensIn || null, outputTokens: tokensOut || null })
       .where(eq(agentExecutions.id, exec.id));
     emit({ type: "done", status });
   } catch (e) {
@@ -186,7 +214,7 @@ export async function runCommand({ db, businessId, userId, input, emit, model: r
         : e instanceof Error
           ? e.message
           : "The agent run failed";
-    await db.update(agentExecutions).set({ status: "failed", error: message, completedAt: new Date() }).where(eq(agentExecutions.id, exec.id));
+    await db.update(agentExecutions).set({ status: "failed", error: message, output: { text: "", events: [...log, { type: "error", message }] }, completedAt: new Date() }).where(eq(agentExecutions.id, exec.id));
     emit({ type: "error", message });
     emit({ type: "done", status: "failed" });
   }
@@ -201,7 +229,13 @@ async function runWithClaude(run: Run, executionId: string, state: { approvals: 
     description: `[${t.agent}] ${t.description}`,
     input_schema: toolJsonSchema(t) as Anthropic.Beta.BetaTool.InputSchema,
   }));
-  const messages: Anthropic.Beta.BetaMessageParam[] = [{ role: "user", content: run.input }];
+  const messages: Anthropic.Beta.BetaMessageParam[] = [
+    ...(run.history ?? []).flatMap((t) => [
+      { role: "user" as const, content: t.input },
+      { role: "assistant" as const, content: t.text },
+    ]),
+    { role: "user", content: run.input },
+  ];
   let inputTokens = 0;
   let outputTokens = 0;
   let lastText = "";
@@ -299,6 +333,10 @@ async function runWithGroq(run: Run, executionId: string, state: { approvals: nu
   const tools = TOOLS.map((t) => ({ type: "function" as const, function: { name: t.name, description: `[${t.agent}] ${t.description}`, parameters: toolJsonSchema(t) } }));
   const messages: ChatMessage[] = [
     { role: "system", content: SYSTEM_PROMPT },
+    ...(run.history ?? []).flatMap((t): ChatMessage[] => [
+      { role: "user", content: t.input },
+      { role: "assistant", content: t.text },
+    ]),
     { role: "user", content: run.input },
   ];
   let inputTokens = 0;

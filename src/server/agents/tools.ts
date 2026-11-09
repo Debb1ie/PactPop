@@ -14,6 +14,7 @@ import type { Database } from "@/server/db/create";
 import type { RequestExtraction } from "@/server/db/schema";
 import { formatMoney } from "@/lib/money";
 import { listClients } from "@/server/services/clients";
+import { CHART_METRICS, chartData } from "@/server/services/charts";
 import { listProof, saveProofReview } from "@/server/services/proof";
 import { financeSummary } from "@/server/services/finance";
 import {
@@ -344,6 +345,26 @@ export const TOOLS: ToolSpec[] = [
       };
     },
   }),
+  /* ───── Finance Agent: charts (numbers come from the database, the model only picks the view) ───── */
+  tool({
+    name: "show_chart",
+    agent: "Finance Agent",
+    policy: "finance.summary",
+    description:
+      "Show the owner a chart in the chat. metric: agreed_by_client (who the money comes from), money_by_stage (where agreed value sits in the journey), cash_flow (expected vs received per month), received_by_month (PayPal-confirmed income), invoice_status (PayPal invoices by status). chart: pie | donut | bar | line (pie/donut for shares of a whole, bar for comparing, line for trends over time). Use it whenever the owner asks for a chart, graph, breakdown, trend or analytics. You can call it more than once.",
+    schema: z.object({ metric: z.enum(CHART_METRICS), chart: z.enum(["pie", "donut", "bar", "line"]).optional() }),
+    label: (i) => `Build chart: ${i.metric.replace(/_/g, " ")}`,
+    run: async ({ db, businessId }, i) => {
+      const spec = await chartData(db, businessId, i.metric, i.chart);
+      const key = spec.series[0].key;
+      const points = spec.data.map((d) => `${d.label}: ${spec.series.map((s) => (spec.unit === "money" ? formatMoney(Number(d[s.key] ?? 0), spec.currency) : String(d[s.key] ?? 0))).join(" / ")}`);
+      const total = spec.data.reduce((s, d) => s + Number(d[key] ?? 0), 0);
+      return {
+        summary: `${spec.title} · ${spec.data.length} point(s)`,
+        data: { __chart: spec, chartShown: spec.title, series: spec.series.map((s) => s.label), points, empty: total === 0 },
+      };
+    },
+  }),
   /* ───── PayFlow Agent: PayPal invoicing (amounts always come from milestone rows) ───── */
   tool({
     name: "list_invoiceable",
@@ -388,6 +409,20 @@ export const TOOLS: ToolSpec[] = [
       const r = await sendMilestoneInvoice(db, { businessId, milestoneId: i.milestoneId, userId, userName: "PayFlow Agent" });
       if (!r.ok) throw new Error(r.message);
       return { summary: r.message, data: { invoiceNumber: r.invoice.invoiceNumber, status: r.invoice.status, amountMinor: r.invoice.amountMinor } };
+    },
+  }),
+  tool({
+    name: "preview_invoice",
+    agent: "PayFlow Agent",
+    policy: "invoices.list",
+    description: "Show a sample of the PayPal invoice for one milestone (find it with list_invoiceable) right in the chat. Nothing is sent. Use it when the owner asks to see, preview or draft an invoice.",
+    schema: z.object({ milestoneId: uuid }),
+    label: () => "Preview invoice",
+    run: async ({ db, businessId }, i) => {
+      const { sampleInvoice } = await import("@/server/services/invoice-docs");
+      const doc = await sampleInvoice(db, businessId, i.milestoneId);
+      if (!doc) throw new Error("Milestone not found");
+      return { summary: `Sample invoice ${doc.number} · ${formatMoney(doc.totalMinor, doc.currency)}`, data: { __invoice: doc, previewShown: doc.number, totalMinor: doc.totalMinor, client: doc.client.company ?? doc.client.name } };
     },
   }),
   tool({

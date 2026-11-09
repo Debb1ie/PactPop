@@ -5,7 +5,8 @@ import { PositionBoard } from "@/components/app/position-board";
 import { RevenueChart } from "@/components/app/revenue-chart";
 import { Pill, StatusBadge } from "@/components/ui/status-badge";
 import { formatMoney } from "@/lib/money";
-import { CircleDollarSign, ExternalLink, ReceiptText, type LucideIcon } from "lucide-react";
+import { CircleDollarSign, ExternalLink, FileText, Receipt, ReceiptText, type LucideIcon } from "lucide-react";
+import Link from "next/link";
 import { SyncInvoiceButton } from "@/components/app/paypal-buttons";
 import type { ReactNode } from "react";
 
@@ -92,6 +93,9 @@ export default async function PaymentsPage() {
                     </a>
                   )}
                   {!i.paidAt && <SyncInvoiceButton invoiceId={i.id} />}
+                  <Link href={`/app/payments/invoices/${i.id}`} className="pure inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[0.75rem] font-medium hover:opacity-80">
+                    <FileText className="h-3.5 w-3.5 text-[#6c4ef5]" /> Document
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -103,18 +107,21 @@ export default async function PaymentsPage() {
             <h2 className="panel-title">Transactions</h2>
             <span className="ml-auto font-mono text-[0.65rem] uppercase tracking-[0.06em] text-faint">verified by webhook or API</span>
           </div>
-          {pays.length === 0 ? (
+          {pays.filter((p) => p.status !== "created").length === 0 ? (
             <EmptyTile icon={CircleDollarSign} tile="from-[#d7ee6e] to-[#1f8f7a]" title="No transactions yet">
               Payments appear here only after PayPal confirms them.
             </EmptyTile>
           ) : (
             <ul className="divide-y divide-border text-[0.8125rem]">
-              {pays.map((p) => (
+              {pays.filter((p) => p.status !== "created").map((p) => (
                 <li key={p.id} className="flex items-center gap-3 px-4 py-2.5">
                   <span className="font-mono text-[0.7rem] text-muted">{date(p.completedAt ?? p.createdAt)}</span>
                   <span className="min-w-0 flex-1 truncate font-mono text-[0.7rem]">{p.paypalCaptureId ?? p.paypalOrderId ?? p.paypalInvoicePaymentId}</span>
                   <StatusBadge status={p.status === "completed" ? "paid" : p.status} />
                   <span className="money font-semibold">{formatMoney(p.amountMinor, p.currency)}</span>
+                  <Link href={`/app/payments/receipts/${p.id}`} className="pure inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[0.75rem] font-medium hover:opacity-80">
+                    <Receipt className="h-3.5 w-3.5 text-[#0f9182]" /> Receipt
+                  </Link>
                 </li>
               ))}
             </ul>

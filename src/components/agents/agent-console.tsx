@@ -2,15 +2,21 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
-import { ArrowUp, Ban, Check, ChevronDown, ChevronRight, CircleDashed, ShieldAlert, Sparkles } from "lucide-react";
+import { ArrowUp, Ban, Check, ChevronDown, ChevronRight, CircleDashed, ExternalLink, History, MessageSquarePlus, ShieldAlert, Sparkles, X } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { Mascot } from "@/components/brand/mascot";
 import { ApprovalCard } from "./approval-card";
+import { ChatChart } from "./chat-chart";
+import { InvoiceDocument } from "@/components/docs/invoice-document";
+import type { ChartSpec, InvoiceDocData } from "@/lib/docs";
+import Link from "next/link";
 
 type Ev =
   | { type: "start"; executionId: string; mode: "ai" | "heuristic"; model: string | null }
   | { type: "thinking"; agent: string; text: string }
   | { type: "status"; text: string }
+  | { type: "chart"; chart: ChartSpec }
+  | { type: "invoice"; invoice: InvoiceDocData }
   | { type: "tool_call"; id: string; tool: string; agent: string; label: string; decision: "allowed" | "approval_required" | "denied" }
   | { type: "tool_result"; id: string; ok: boolean; summary: string }
   | { type: "approval"; approvalId: string; title: string; amount: string | null; reason: string }
@@ -161,6 +167,20 @@ function RunView({ run }: { run: Run }) {
             }
             if (e.type === "approval")
               return <ApprovalCard key={i} compact approval={{ id: e.approvalId, title: e.title, amount: e.amount, reason: e.reason }} />;
+            if (e.type === "chart") return <ChatChart key={i} spec={e.chart} />;
+            if (e.type === "invoice")
+              return (
+                <div key={i} className="space-y-2">
+                  <div className="origin-top-left overflow-hidden rounded-2xl">
+                    <InvoiceDocument doc={e.invoice} />
+                  </div>
+                  {e.invoice.kind === "sample" && (
+                    <Link href={`/app/payments/invoice-sample/${milestoneFromNumber(e.invoice)}`} className="pure inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[0.75rem] font-medium hover:opacity-80">
+                      Open full page · PDF or image <ExternalLink className="h-3 w-3 text-muted" />
+                    </Link>
+                  )}
+                </div>
+              );
             if (e.type === "message")
               return (
                 <div key={i} className="rounded-2xl rounded-tl-md bg-surface px-4 py-3 text-[0.9375rem] leading-relaxed text-foreground/90 shadow-[0_10px_30px_-20px_rgb(0_0_0/0.6)] ring-1 ring-border">
@@ -187,6 +207,91 @@ function RunView({ run }: { run: Run }) {
   );
 }
 
+/** Sample invoices carry the milestone they were built from (for the full-page link). */
+function milestoneFromNumber(doc: InvoiceDocData) {
+  return doc.milestoneId ?? "";
+}
+
+type ConversationSummary = { id: string; title: string; updatedAt: string; turns: number };
+
+/** Slide-over list of past conversations. */
+function HistoryPanel({ open, onClose, onPick, current }: { open: boolean; onClose: () => void; onPick: (id: string) => void; current: string | null }) {
+  const [items, setItems] = useState<ConversationSummary[] | null>(null);
+  const [now, setNow] = useState(0);
+  useEffect(() => {
+    if (!open) return;
+    let alive = true;
+    fetch("/api/agents/conversations")
+      .then((r) => r.json())
+      .then((j: { conversations?: ConversationSummary[] }) => {
+        if (!alive) return;
+        setNow(Date.now());
+        setItems(j.conversations ?? []);
+      })
+      .catch(() => alive && setItems([]));
+    return () => {
+      alive = false;
+    };
+  }, [open]);
+  if (!open) return null;
+  const day = (iso: string) => {
+    const d = new Date(iso);
+    const diff = Math.floor((now - d.getTime()) / 86_400_000);
+    return diff === 0 ? d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }) : diff === 1 ? "Yesterday" : d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  };
+  return (
+    <div className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-[2px]" onClick={onClose}>
+      <aside
+        aria-label="Chat history"
+        onClick={(e) => e.stopPropagation()}
+        className="animate-rise flex h-full w-full max-w-sm flex-col bg-surface shadow-[0_0_60px_rgb(0_0_0/0.5)] ring-1 ring-border"
+        style={{ paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}
+      >
+        <div className="flex items-center gap-3 border-b border-border px-5 py-4">
+          <Mascot mood="thinking" width={40} decorative className="h-auto w-10" />
+          <div className="min-w-0 flex-1">
+            <p className="text-[1.0625rem] font-semibold">Chat history</p>
+            <p className="text-[0.75rem] text-muted">Your conversations with the agents</p>
+          </div>
+          <button type="button" onClick={onClose} aria-label="Close history" className="grid h-9 w-9 place-items-center rounded-full bg-fill hover:bg-fill-strong">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-3">
+          {items === null ? (
+            <p className="flex items-center gap-2 px-2 py-3 text-[0.875rem] text-muted">
+              <CircleDashed className="h-4 w-4 animate-spin" /> Loading…
+            </p>
+          ) : items.length === 0 ? (
+            <div className="flex flex-col items-center px-4 py-10 text-center">
+              <Mascot mood="sleeping" width={110} decorative />
+              <p className="mt-3 text-[0.9375rem] font-semibold">No conversations yet</p>
+              <p className="text-[0.8125rem] text-muted">Ask the agents anything and it shows up here.</p>
+            </div>
+          ) : (
+            <ul className="space-y-1">
+              {items.map((c) => (
+                <li key={c.id}>
+                  <button
+                    type="button"
+                    onClick={() => onPick(c.id)}
+                    className={cn("w-full rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-fill", c.id === current && "bg-fill-strong")}
+                  >
+                    <span className="block truncate text-[0.875rem] font-medium">{c.title}</span>
+                    <span className="mt-0.5 block text-[0.7rem] text-muted">
+                      {day(c.updatedAt)} · {c.turns} message{c.turns === 1 ? "" : "s"}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </aside>
+    </div>
+  );
+}
+
 export type Suggestion = { title: string; detail?: string; command: string };
 
 /** Full-page agent chat (ChatGPT / Claude style): greeting + suggestions, centred thread, composer at the bottom. */
@@ -194,6 +299,10 @@ export type ModelOption = { id: string; label: string; note: string };
 
 export function AgentConsole({ mode, models, defaultModel, suggestions, greeting }: { mode: "ai" | "heuristic"; models: ModelOption[]; defaultModel: string | null; suggestions: Suggestion[]; greeting: string }) {
   const [runs, setRuns] = useState<Run[]>([]);
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const convRef = useRef<string | null>(null);
+  convRef.current = conversationId;
   const [model, setModel] = useState<string | null>(defaultModel);
   useEffect(() => {
     try {
@@ -224,10 +333,16 @@ export function AgentConsole({ mode, models, defaultModel, suggestions, greeting
       setBusy(true);
       setInput("");
       const id = ++counter.current;
+      let convId = convRef.current;
+      if (!convId) {
+        convId = crypto.randomUUID();
+        convRef.current = convId;
+        setConversationId(convId);
+      }
       setRuns((r) => [...r, { id, input: command, events: [], done: false }]);
       const push = (e: Ev) => setRuns((all) => all.map((r) => (r.id === id ? { ...r, events: [...r.events, e] } : r)));
       try {
-        const res = await fetch("/api/agents/command", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ input: command, ...(model ? { model } : {}) }) });
+        const res = await fetch("/api/agents/command", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ input: command, conversationId: convId, ...(model ? { model } : {}) }) });
         if (!res.ok || !res.body) {
           const j = await res.json().catch(() => ({}));
           push({ type: "error", message: (j as { error?: string }).error ?? `Request failed (${res.status})` });
@@ -272,6 +387,21 @@ export function AgentConsole({ mode, models, defaultModel, suggestions, greeting
     if (el) el.scrollTop = el.scrollHeight;
   }, [runs]);
 
+  const openConversation = async (cid: string) => {
+    setHistoryOpen(false);
+    if (busy) return;
+    const res = await fetch(`/api/agents/conversations/${cid}`);
+    if (!res.ok) return;
+    const j = (await res.json()) as { turns: { input: string; events: Ev[] }[] };
+    setRuns(j.turns.map((t) => ({ id: ++counter.current, input: t.input, events: t.events, done: true })));
+    setConversationId(cid);
+  };
+  const newChat = () => {
+    if (busy) return;
+    setRuns([]);
+    setConversationId(null);
+  };
+
   const submit = (e: FormEvent) => {
     e.preventDefault();
     run(input);
@@ -279,6 +409,17 @@ export function AgentConsole({ mode, models, defaultModel, suggestions, greeting
 
   return (
     <section className="flex h-[calc(100dvh-11.5rem-env(safe-area-inset-bottom))] flex-col lg:h-[calc(100dvh-6rem)]" aria-label="Agent chat">
+      <div className="mx-auto flex w-full max-w-3xl items-center gap-2 px-1 pb-1">
+        <button type="button" onClick={() => setHistoryOpen(true)} className="pure inline-flex h-9 items-center gap-2 rounded-full px-3.5 text-[0.8125rem] font-medium hover:opacity-80">
+          <History className="h-4 w-4 text-muted" /> History
+        </button>
+        {runs.length > 0 && (
+          <button type="button" onClick={newChat} disabled={busy} className="pure inline-flex h-9 items-center gap-2 rounded-full px-3.5 text-[0.8125rem] font-medium hover:opacity-80 disabled:opacity-50">
+            <MessageSquarePlus className="h-4 w-4 text-muted" /> New chat
+          </button>
+        )}
+      </div>
+      <HistoryPanel open={historyOpen} onClose={() => setHistoryOpen(false)} onPick={openConversation} current={conversationId} />
       <div ref={scroller} className="flex-1 overflow-y-auto" aria-live="polite">
         <div className="mx-auto w-full max-w-3xl px-1 py-6">
           {runs.length === 0 ? (

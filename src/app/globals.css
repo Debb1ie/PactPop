@@ -424,3 +424,14 @@ input[type="range"] { accent-color: var(--accent); }
 }
 /* Respect the iPhone notch / Android cut-out in landscape. */
 .px-safe { padding-left: max(env(safe-area-inset-left), 0px); padding-right: max(env(safe-area-inset-right), 0px); }
+
+/* Documents (invoices, receipts): print only the paper, on white. */
+@media print {
+  @page { margin: 12mm; }
+  html, body { background: #fff !important; }
+  body * { visibility: hidden; }
+  #print-area, #print-area * { visibility: visible; }
+  #print-area { position: absolute; inset: 0 auto auto 0; width: 100%; }
+  #print-area article { box-shadow: none !important; }
+  .no-print { display: none !important; }
+}

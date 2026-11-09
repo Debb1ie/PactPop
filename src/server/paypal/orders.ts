@@ -102,7 +102,7 @@ async function recordCapture(db: Database, orderId: string, capture: Capture, pa
         amountMinor,
       });
     }
-    await recordAudit(tx, { businessId: p.businessId, actor: { type: "paypal", label: "PayPal Sandbox" }, action: "payment.confirmed", entityType: "payment", entityId: p.id, after: { captureId: capture.id, amountMinor, via } });
+    await recordAudit(tx, { businessId: p.businessId, actor: { type: "paypal", label: "PayPal Sandbox" }, action: "payment.confirmed", entityType: "payment", entityId: p.id, after: { captureId: capture.id, amountMinor, via, paypal: { orderId, captureId: capture.id, status: capture.status, amount: capture.amount, fee: capture.seller_receivable_breakdown?.paypal_fee ?? null, net: capture.seller_receivable_breakdown?.net_amount ?? null, payerEmail, recordedAt: new Date().toISOString() } } });
   });
   return { recorded: true, reason: "recorded" };
 }

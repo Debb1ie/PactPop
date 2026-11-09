@@ -42,6 +42,8 @@ PactPop is under active development. This table is kept honest: anything not mar
 | PayPal Sandbox: server-side OAuth, **Invoicing v2** milestone invoices (create + send), payment confirmed with the PayPal API | ✅ Working |
 | PayPal **webhooks**: signature verified with PayPal, stored once per event id, invoice/capture re-read from PayPal before money is recorded | ✅ Working (live on Vercel) |
 | **PayFlow Agent**: finds payments due, prepares PayPal invoices (queued in TrustGate for your approval), checks payment status with PayPal | ✅ Working |
+| **AI chat**: saved conversation history (reopen and continue), model picker, charts the agents can show (pie, donut, bar, line, with numbers from the database), invoice samples | ✅ Working |
+| **Every PayPal invoice and payment is documented**: printable invoice and receipt pages with PayPal's own record (IDs, status, fee/net, webhooks) and a paper trail; download as PDF or save as image | ✅ Working |
 | **ProofFlow Agent**: checks delivery proof against each acceptance criterion; a passing review queues "Approve delivery", which makes the payment due | ✅ Working |
 | Approved ScopeWatch change orders become invoiceable milestones | ✅ Working |
 | ScopeWatch, ProofFlow, Evidence Vault, VowGraph, reports, settings | 🚧 Planned |
